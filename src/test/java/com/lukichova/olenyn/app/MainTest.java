@@ -36,6 +36,15 @@ public class MainTest {
         assertFalse(sourceText.equals(cypheredText));
     }
 
+    @Test
+    public void test_endecodeMessage(){
+        Message testMessage = new Message(3, 4, "We love programming!!!");
+        Message encodedMessage = new Message(3, 4, "We love programming!!!");
+        encodedMessage.encode();
+        encodedMessage.decode();
+        assertTrue(testMessage.equals(encodedMessage));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void test_wrongMagic() throws Exception {
         Message testMessage = new Message(3, 4, "test");
