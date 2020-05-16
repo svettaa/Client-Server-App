@@ -7,6 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
+import java.security.NoSuchAlgorithmException;
 
 import static com.lukichova.olenyn.app.classes.Key.secretKey;
 import static org.junit.Assert.assertFalse;
@@ -14,9 +15,8 @@ import static org.junit.Assert.assertTrue;
 
 public class MainTest {
     @Test
-    public void testDeencode() {
-        String sourceText = "test123";
-
+    public void test_Deencode() {
+        String sourceText = "Practice_1";
         String cypheredText = AES.encrypt(sourceText, secretKey);
         String decypheredText = AES.decrypt(cypheredText, secretKey);
         assertTrue(sourceText.equals(decypheredText));
@@ -28,6 +28,7 @@ public class MainTest {
         String cypheredText = AES.encrypt(sourceText, secretKey);
         assertFalse(sourceText.equals(cypheredText));
     }
+
     @Test
     public void testDecode_different() {
         String sourceText = "test123";
@@ -44,6 +45,7 @@ public class MainTest {
         new Packet(encodedPacket);
     }
 
+
     @Test(expected = IllegalArgumentException.class)
     public void test_wrongCrc16_1() throws Exception {
         Message testMessage = new Message(3, 4, "test");
@@ -51,6 +53,7 @@ public class MainTest {
         byte[] encodedPacket = packet.toPacket();
         encodedPacket[1] = 6;
         new Packet(encodedPacket);
+
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -60,8 +63,8 @@ public class MainTest {
         byte[] encodedPacket = packet.toPacket();
         encodedPacket[18] = 6;
         new Packet(encodedPacket);
-
     }
+
     @Test
     public void test_getter_bSrc() {
         Message testMessage = new Message(3, 4, "test");

@@ -8,7 +8,9 @@ import java.nio.ByteBuffer;
 @ToString
 public class Packet {
     final static Byte bMagic = 0x13;
-    public Packet(){};
+
+    public Packet() { }
+
     public Packet(Byte bSrc, Long bPktId, Message bMsq) {
         this.bSrc = bSrc;
         this.bPktId = bPktId;
@@ -27,9 +29,6 @@ public class Packet {
 
     @Getter
     Integer wLen;
-
-    @Getter
-    Short wCrc16_1;
 
     @Getter
     Message bMsq;
@@ -73,14 +72,14 @@ public class Packet {
         wCrc16_2 = (short) CRC.calculateCRC(CRC.Parameters.CRC16, packet.getBytes());
     }
 
-
+    @Getter
+    Short wCrc16_1;
 
     @Getter
     Short wCrc16_2;
 
     public Short calculateCrc16(Byte bSrc, Long bPktId) {
-
-        String packet = bMagic.toString()  + bSrc.toString()  + bPktId.toString();
+        String packet = bMagic.toString() + bSrc.toString() + bPktId.toString();
         return (short) CRC.calculateCRC(CRC.Parameters.CRC16, packet.getBytes());
     }
 
