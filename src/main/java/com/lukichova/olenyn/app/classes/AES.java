@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Base64;
 
 public class AES {
-
+    public static final String algorithm = "AES";
     private static SecretKeySpec secretKey;
     private static byte[] key;
 
@@ -21,7 +21,7 @@ public class AES {
             sha = MessageDigest.getInstance("SHA-1");
             key = sha.digest(key);
             key = Arrays.copyOf(key, 16);
-            secretKey = new SecretKeySpec(key, "AES");
+            secretKey = new SecretKeySpec(key, algorithm);
         }
         catch (NoSuchAlgorithmException e) {
             e.printStackTrace();

@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 @ToString
 public class Packet {
     final static Byte bMagic = 0x13;
-
+    public Packet(){};
     public Packet(Byte bSrc, Long bPktId, Message bMsq) {
         this.bSrc = bSrc;
         this.bPktId = bPktId;
@@ -29,6 +29,9 @@ public class Packet {
     Integer wLen;
 
     @Getter
+    Short wCrc16_1;
+
+    @Getter
     Message bMsq;
 
     public Packet(byte[] encodedPacket) throws Exception {
@@ -36,32 +39,28 @@ public class Packet {
 
         Byte expectedBMagic = buffer.get();
         if (!expectedBMagic.equals(bMagic))
-            throw new Exception("Unexpected bMagic");
+            throw new IllegalArgumentException("Unexpected bMagic");
 
         bSrc = buffer.get();
         bPktId = buffer.getLong();
         wLen = buffer.getInt();
 
         wCrc16_1 = buffer.getShort();
-
+        short checkCrc1= calculateCrc16(bSrc,bPktId);
+        if(wCrc16_1 != checkCrc1)
+            throw new IllegalArgumentException("Different Crc1");
         bMsq = new Message();
         bMsq.setCType(buffer.getInt());
         bMsq.setBUserId(buffer.getInt());
-
-        /*byte[] messageBody = new byte[wLen];
-        buffer.get(messageBody);
-        bMsq.setMessage(new String(messageBody));
-        bMsq.decode();
-        setbMsq(bMsq);*/
 
         byte[] messageBody = new byte[wLen];
         buffer.get(messageBody);
         bMsq.setMessage(new String(messageBody));
 
         wCrc16_2 = buffer.getShort();
-        int checkCrc2 = calculateCrc16(bMsq);
+        short checkCrc2 = calculateCrc16(bMsq);
         if(wCrc16_2 != checkCrc2)
-            throw new Exception("Different Crc2");
+            throw new IllegalArgumentException("Different Crc2");
 
         bMsq.decode();
         setbMsq(bMsq);
@@ -74,18 +73,18 @@ public class Packet {
         wCrc16_2 = (short) CRC.calculateCRC(CRC.Parameters.CRC16, packet.getBytes());
     }
 
-    @Getter
-    Short wCrc16_1;
+
 
     @Getter
     Short wCrc16_2;
 
-    private Short calculateCrc16(Byte bSrc, Long bPktId) {
-        String packet = bMagic.toString() + '|' + bSrc.toString() + '|' + bPktId.toString();
+    public Short calculateCrc16(Byte bSrc, Long bPktId) {
+
+        String packet = bMagic.toString()  + bSrc.toString()  + bPktId.toString();
         return (short) CRC.calculateCRC(CRC.Parameters.CRC16, packet.getBytes());
     }
 
-    private Short calculateCrc16(Message bMsq) {
+    public Short calculateCrc16(Message bMsq) {
         String packet = bMsq.toString();
         return (short) CRC.calculateCRC(CRC.Parameters.CRC16, packet.getBytes());
     }
