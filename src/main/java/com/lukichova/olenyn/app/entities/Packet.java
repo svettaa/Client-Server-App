@@ -48,10 +48,21 @@ public class Packet {
         bMsq.setCType(buffer.getInt());
         bMsq.setBUserId(buffer.getInt());
 
+        /*byte[] messageBody = new byte[wLen];
+        buffer.get(messageBody);
+        bMsq.setMessage(new String(messageBody));
+        bMsq.decode();
+        setbMsq(bMsq);*/
 
         byte[] messageBody = new byte[wLen];
         buffer.get(messageBody);
         bMsq.setMessage(new String(messageBody));
+
+        wCrc16_2 = buffer.getShort();
+        int checkCrc2 = calculateCrc16(bMsq);
+        if(wCrc16_2 != checkCrc2)
+            throw new Exception("Different Crc2");
+
         bMsq.decode();
         setbMsq(bMsq);
     }
