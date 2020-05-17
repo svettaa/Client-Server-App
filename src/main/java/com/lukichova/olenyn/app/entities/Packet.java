@@ -88,7 +88,7 @@ public class Packet {
         return (short) CRC.calculateCRC(CRC.Parameters.CRC16, packet.getBytes());
     }
 
-    public byte[] toPacket() {
+    public byte[] toPacket() throws Exception {
         Message message = getBMsq();
         message.encode();
 

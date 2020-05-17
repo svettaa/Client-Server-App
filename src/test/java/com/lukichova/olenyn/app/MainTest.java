@@ -4,6 +4,7 @@ import com.lukichova.olenyn.app.classes.AES;
 import com.lukichova.olenyn.app.entities.Message;
 import com.lukichova.olenyn.app.entities.Packet;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -14,30 +15,32 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class MainTest {
+    private Message testMessage;
+    private Packet packet;
+
+    @Before
+    public void before_tests() throws Exception{
+        testMessage = new Message(3, 4, "test");
+        packet = new Packet((byte) 1, 2L, testMessage);
+    }
+
     @Test
-    public void test_Deencode() {
-        String sourceText = "Practice_1";
+    public void test_Deencode() throws Exception{
+        String sourceText = "test123";
         String cypheredText = AES.encrypt(sourceText, secretKey);
         String decypheredText = AES.decrypt(cypheredText, secretKey);
         assertTrue(sourceText.equals(decypheredText));
     }
 
     @Test
-    public void testEncode_different() {
+    public void testEncode_different() throws Exception{
         String sourceText = "test123";
         String cypheredText = AES.encrypt(sourceText, secretKey);
         assertFalse(sourceText.equals(cypheredText));
     }
 
     @Test
-    public void testDecode_different() {
-        String sourceText = "test123";
-        String cypheredText = AES.decrypt(sourceText, secretKey);
-        assertFalse(sourceText.equals(cypheredText));
-    }
-
-    @Test
-    public void test_endecodeMessage(){
+    public void test_endecodeMessage() throws Exception{
         Message testMessage = new Message(3, 4, "We love programming!!!");
         Message encodedMessage = new Message(3, 4, "We love programming!!!");
         encodedMessage.encode();
@@ -47,8 +50,6 @@ public class MainTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void test_wrongMagic() throws Exception {
-        Message testMessage = new Message(3, 4, "test");
-        Packet packet = new Packet((byte) 1, 2L, testMessage);
         byte[] encodedPacket = packet.toPacket();
         encodedPacket[0] = 0x14;
         new Packet(encodedPacket);
@@ -57,8 +58,6 @@ public class MainTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void test_wrongCrc16_1() throws Exception {
-        Message testMessage = new Message(3, 4, "test");
-        Packet packet = new Packet((byte) 1, 2L, testMessage);
         byte[] encodedPacket = packet.toPacket();
         encodedPacket[1] = 6;
         new Packet(encodedPacket);
@@ -67,8 +66,6 @@ public class MainTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void test_wrongCrc16_2() throws Exception {
-        Message testMessage = new Message(3, 4, "test");
-        Packet packet = new Packet((byte) 1, 2L, testMessage);
         byte[] encodedPacket = packet.toPacket();
         encodedPacket[18] = 6;
         new Packet(encodedPacket);
@@ -76,22 +73,16 @@ public class MainTest {
 
     @Test
     public void test_getter_bSrc() {
-        Message testMessage = new Message(3, 4, "test");
-        Packet packet = new Packet((byte) 1, 2L, testMessage);
         Assert.assertEquals(Byte.valueOf((byte) 1), packet.getBSrc());
     }
 
     @Test
     public void test_getter_bPktId() {
-        Message testMessage = new Message(3, 4, "test");
-        Packet packet = new Packet((byte) 1, 2L, testMessage);
         Assert.assertEquals(Long.valueOf(2L), packet.getBPktId());
     }
 
     @Test
     public void test_getter_wLen() {
-        Message testMessage = new Message(3, 4, "test");
-        Packet packet = new Packet((byte) 1, 2L, testMessage);
         Assert.assertEquals(Integer.valueOf(testMessage.getMessageBytes()), packet.getWLen());
     }
 

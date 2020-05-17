@@ -38,11 +38,12 @@ public class Message {
         return message.length();
     }
 
-    public void encode() {
+    public void encode() throws Exception {
         message = AES.encrypt(message, secretKey);
     }
 
-    public void decode() {
+    public void decode() throws Exception{
+
         message = AES.decrypt(message, secretKey);
     }
 }
