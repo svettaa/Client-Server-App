@@ -8,9 +8,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.nio.ByteBuffer;
-import java.security.NoSuchAlgorithmException;
-
 import static com.lukichova.olenyn.app.classes.Key.secretKey;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -21,10 +18,10 @@ public class MainTest {
 
     @Before
     public void before_tests() throws Exception{
-        UnsignedLong moreThanLongbPktId = UnsignedLong.valueOf(Long.MAX_VALUE);
-        moreThanLongbPktId = moreThanLongbPktId.plus(UnsignedLong.valueOf("2305"));
+        UnsignedLong unsignedLongbPktId = UnsignedLong.valueOf(Long.MAX_VALUE);
+        unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("17"));
         testMessage = new Message(3, 4, "test");
-        packet = new Packet((byte) 1, moreThanLongbPktId, testMessage);
+        packet = new Packet((byte) 1, unsignedLongbPktId, testMessage);
     }
 
     @Test
@@ -74,40 +71,7 @@ public class MainTest {
         new Packet(encodedPacket);
     }
 
-    @Test
-    public void test_getter_bSrc() {
-        Assert.assertEquals(Byte.valueOf((byte) 1), packet.getBSrc());
-    }
 
-    @Test
-    public void test_getter_bPktId() {
-        Assert.assertEquals(Long.valueOf(2L), packet.getBPktId());
-    }
-
-    @Test
-    public void test_getter_wLen() {
-        Assert.assertEquals(Integer.valueOf(testMessage.getMessageBytes()), packet.getWLen());
-    }
-
-    @Test
-    public void test_getter_wCrc16_1() {
-        UnsignedLong moreThanLongbPktId = UnsignedLong.valueOf(Long.MAX_VALUE);
-        moreThanLongbPktId = moreThanLongbPktId.plus(UnsignedLong.valueOf("2305"));
-        Message testMessage = new Message(3, 4, "test");
-        Packet packet = new Packet((byte) 1, moreThanLongbPktId, testMessage);
-        short checkCrc1 = packet.calculateCrc16(packet.getBSrc(), packet.getBPktId());
-        Assert.assertEquals(Short.valueOf(checkCrc1), packet.getWCrc16_1());
-    }
-
-    @Test
-    public void test_getter_wCrc16_2() {
-        UnsignedLong moreThanLongbPktId = UnsignedLong.valueOf(Long.MAX_VALUE);
-        moreThanLongbPktId = moreThanLongbPktId.plus(UnsignedLong.valueOf("2305"));
-        Message testMessage = new Message(3, 4, "test");
-        Packet packet = new Packet((byte) 1, moreThanLongbPktId, testMessage);
-        short checkCrc2 = packet.calculateCrc16(packet.getBMsq());
-        Assert.assertEquals(Short.valueOf(checkCrc2), packet.getWCrc16_2());
-    }
 
     @Test
     public void testToString() {
