@@ -3,9 +3,7 @@ package com.lukichova.olenyn.app;
 import com.lukichova.olenyn.app.entities.Message;
 import com.lukichova.olenyn.app.entities.Packet;
 import com.google.common.primitives.UnsignedLong;
-//import org.graalvm.compiler.core.common.util.UnsignedLong;
 
-//import static org.graalvm.compiler.core.common.util.UnsignedLong.*;
 
 public class Main {
 
