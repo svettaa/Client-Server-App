@@ -3,6 +3,8 @@ package com.lukichova.olenyn.app.entities;
 import com.github.snksoft.crc.CRC;
 import lombok.Getter;
 import lombok.ToString;
+import com.google.common.primitives.UnsignedLong;
+
 import java.nio.ByteBuffer;
 
 @ToString
@@ -11,7 +13,9 @@ public class Packet {
 
     public Packet() { }
 
-    public Packet(Byte bSrc, Long bPktId, Message bMsq) {
+
+
+    public Packet(Byte bSrc, UnsignedLong bPktId, Message bMsq) {
         this.bSrc = bSrc;
         this.bPktId = bPktId;
         wCrc16_1 = calculateCrc16(bSrc, bPktId);
@@ -25,7 +29,7 @@ public class Packet {
     Byte bSrc;
 
     @Getter
-    Long bPktId;
+    UnsignedLong bPktId;
 
     @Getter
     Integer wLen;
@@ -41,7 +45,7 @@ public class Packet {
             throw new IllegalArgumentException("Unexpected bMagic");
 
         bSrc = buffer.get();
-        bPktId = buffer.getLong();
+        bPktId = UnsignedLong.fromLongBits(buffer.getLong());
         wLen = buffer.getInt();
 
         wCrc16_1 = buffer.getShort();
@@ -78,7 +82,7 @@ public class Packet {
     @Getter
     Short wCrc16_2;
 
-    public Short calculateCrc16(Byte bSrc, Long bPktId) {
+    public Short calculateCrc16(Byte bSrc, UnsignedLong bPktId) {
         String packet = bMagic.toString() + bSrc.toString() + bPktId.toString();
         return (short) CRC.calculateCRC(CRC.Parameters.CRC16, packet.getBytes());
     }
@@ -94,11 +98,11 @@ public class Packet {
 
         setbMsq(message);
 
-        Integer packetLength = bMagic.BYTES + bSrc.BYTES + bPktId.BYTES + wLen.BYTES + wCrc16_1.BYTES + message.getMessageBytesLength() + wCrc16_2.BYTES;
+        Integer packetLength = bMagic.BYTES + bSrc.BYTES + Long.BYTES + wLen.BYTES + wCrc16_1.BYTES + message.getMessageBytesLength() + wCrc16_2.BYTES;
         return ByteBuffer.allocate(packetLength)
                 .put(bMagic)
                 .put(bSrc)
-                .putLong(bPktId)
+                .putLong(bPktId.longValue())
                 .putInt(wLen)
                 .putShort(wCrc16_1)
                 .put(message.toPacketPart())
