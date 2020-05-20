@@ -5,7 +5,6 @@ import lombok.Data;
 
 import java.nio.ByteBuffer;
 
-import static com.lukichova.olenyn.app.classes.Key.secretKey;
 
 @Data
 public class Message {
@@ -15,7 +14,7 @@ public class Message {
 
     public static final int BYTES_WITHOUT_MESSAGE = Integer.BYTES + Integer.BYTES;
 
-    public Message() { }
+    public Message() {  }
 
     public Message(Integer cType, Integer bUserId, String message) {
         this.cType = cType;
@@ -39,11 +38,11 @@ public class Message {
     }
 
     public void encode() throws Exception {
-        message = AES.encrypt(message, secretKey);
+        message = AES.encrypt(message);
     }
 
     public void decode() throws Exception{
 
-        message = AES.decrypt(message, secretKey);
+        message = AES.decrypt(message);
     }
 }

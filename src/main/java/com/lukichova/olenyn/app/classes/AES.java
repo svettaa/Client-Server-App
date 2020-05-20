@@ -11,22 +11,18 @@ import java.util.Base64;
 public class AES {
     public static final String algorithm = "AES";
     private static SecretKeySpec secretKey;
+    static String secret = "sonyaandsvetathebestprogrammers";
     private static byte[] key;
-
-    public static void setKey(String myKey) throws Exception
-    {
+  /* AES() throws UnsupportedEncodingException, NoSuchAlgorithmException {
         MessageDigest sha = null;
-        key = myKey.getBytes("UTF-8");
+        key = secret.getBytes("UTF-8");
         sha = MessageDigest.getInstance("SHA-1");
         key = sha.digest(key);
         key = Arrays.copyOf(key, 16);
         secretKey = new SecretKeySpec(key, algorithm);
-
-    }
-
-    public static String encrypt(String strToEncrypt, String secret) throws Exception
+    }*/
+    public static String encrypt(String strToEncrypt) throws Exception
     {
-
             setKey(secret);
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
@@ -35,13 +31,23 @@ public class AES {
 
     }
 
-    public static String decrypt(String strToDecrypt, String secret) throws Exception
+    public static String decrypt(String strToDecrypt) throws Exception
     {
-
             setKey(secret);
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
             return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
+
+    }
+
+    public static void setKey(String myKey) throws Exception
+    {
+        MessageDigest sha = null;
+        key = secret.getBytes("UTF-8");
+        sha = MessageDigest.getInstance("SHA-1");
+        key = sha.digest(key);
+        key = Arrays.copyOf(key, 16);
+        secretKey = new SecretKeySpec(key, algorithm);
 
     }
 }
