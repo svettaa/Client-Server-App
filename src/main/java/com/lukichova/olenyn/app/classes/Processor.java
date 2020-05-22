@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class Processor {
 
-    public static void process(Network network, Packet packet) {
+    public static Packet process(Packet packet) {
         String message = packet.getBMsq().getMessage();
 
         Message answerMessage;
@@ -19,10 +19,6 @@ public class Processor {
         }
         Packet answerPacket = new Packet((byte) 1, UnsignedLong.ONE, answerMessage);
 
-        try {
-            network.send(answerPacket);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        return answerPacket;
     }
 }

@@ -17,15 +17,13 @@ import java.util.Arrays;
 public class TCPNetwork implements Network {
 
     Socket socket;
-    ServerSocket serverSocket;
 
     OutputStream socketOutputStream;
     InputStream serverInputStream;
 
-    @Override
-    public void listen() throws IOException {
-        serverSocket = new ServerSocket(2305);
-        socket = serverSocket.accept();
+
+    public TCPNetwork(Socket socket) throws Exception{
+        this.socket = socket;
         socketOutputStream = socket.getOutputStream();
         serverInputStream = socket.getInputStream();
     }
@@ -78,24 +76,17 @@ public class TCPNetwork implements Network {
             byte fullPacket[] = packetBytes.toByteArray();
 
             System.out.println("Received");
-            System.out.println(Arrays.toString(fullPacket) + "\n");
-
             Packet packet = new Packet(fullPacket);
-            System.err.println(packet.getBMsq().getMessage());
+            System.out.println(packet.getBMsq().getMessage());
 
-            Processor.process(this, packet);
+            return packet;
+            /*Processor.process(this, packet);*/
         } catch (Exception e) {
             System.err.println("Error:" + socket);
             e.printStackTrace();
+            return null;
         }
-        return null;
-    }
 
-    @Override
-    public void connect() throws IOException {
-        socket = new Socket("localhost",2305);
-        socketOutputStream = socket.getOutputStream();
-        serverInputStream = socket.getInputStream();
     }
 
     @Override
@@ -106,7 +97,6 @@ public class TCPNetwork implements Network {
         socketOutputStream.flush();
 
         System.out.println("Send");
-        System.out.println(Arrays.toString(packetBytes) + "\n");
     }
 
     @Override

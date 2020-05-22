@@ -7,6 +7,7 @@ import com.lukichova.olenyn.app.network.Network;
 import com.lukichova.olenyn.app.network.TCPNetwork;
 
 import java.io.IOException;
+import java.net.Socket;
 
 public class Client {
 
@@ -18,17 +19,14 @@ public class Client {
         Packet secondPacket = new Packet((byte) 1, UnsignedLong.ONE, secondTestMessage);
 
         try {
-            Network network = new TCPNetwork();
-            network.connect();
+            Socket socket = new Socket("localhost",2305);
+            Network network = new TCPNetwork(socket);
 
             network.send(packet);
             network.receive();
 
-            network.send(secondPacket);
-            network.receive();
-
             network.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

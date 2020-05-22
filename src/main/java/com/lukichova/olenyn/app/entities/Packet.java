@@ -111,7 +111,11 @@ public class Packet {
 
         Integer packetLength = packetPartFirstLength + wCrc16_1.BYTES + packetPartSecondLength + wCrc16_2.BYTES;
 
-        return ByteBuffer.allocate(packetLength).put(packetPartFirst).putShort(wCrc16_1).put(packetPartSecond).putShort(wCrc16_2).array();
+        return ByteBuffer.allocate(packetLength)
+                .put(packetPartFirst)
+                .putShort(wCrc16_1)
+                .put(packetPartSecond)
+                .putShort(wCrc16_2).array();
     }
 
     public static Short calculateCrc16(byte[] packetPart) {
