@@ -2,20 +2,19 @@ package com.lukichova.olenyn.app.entities;
 
 import com.github.snksoft.crc.CRC;
 import lombok.Getter;
-import lombok.ToString;
 import com.google.common.primitives.UnsignedLong;
 
 import java.nio.ByteBuffer;
 
-@ToString
+//@ToString
 public class Packet {
     final static Byte bMagic = 0x13;
+
     public final static Integer packetPartFirstLengthWithoutwLen = bMagic.BYTES + Byte.BYTES + Long.BYTES;
     public final static Integer packetPartFirstLength = packetPartFirstLengthWithoutwLen + Integer.BYTES;
     public final static Integer packetPartFirstLengthWithCRC16 = packetPartFirstLength + Short.BYTES;
     public byte[] packetPartFirst;
     public byte[] packetPartSecond;
-
 
     public Packet() { }
 
@@ -29,11 +28,14 @@ public class Packet {
         wLen = bMsq.getMessage().length();
     }
 
-    @Getter
-    Byte bSrc;
 
     @Getter
     UnsignedLong bPktId;
+
+    @Getter
+    Byte bSrc;
+
+
 
     @Getter
     Integer wLen;
@@ -111,4 +113,11 @@ public class Packet {
     public static Short calculateCrc16(byte[] packetPart) {
         return (short) CRC.calculateCRC(CRC.Parameters.CRC16, packetPart);
     }
+    @Override
+    public String toString() {
+        System.out.println("Packet( bPktId: " + bPktId +", bSrc: "+ bSrc+",wLen: " + wLen+", "+ "Message( CType:"+ bMsq.getCType()+", BUserId: "+
+                bMsq.getBUserId()+", message: " +bMsq.getMessage() + ")"+ "wCrc16_1:" + wCrc16_1+", wCrc16_2: " +wCrc16_2 + ") ");
+        return null;
+    }
+
 }
