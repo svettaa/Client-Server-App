@@ -15,7 +15,7 @@ public class TestPacket {
 
     @Before
     public void before_tests() throws Exception{
-        unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("17"));
+        unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("2305"));
         testMessage = new Message(3, 4, "test");
         packet = new Packet((byte) 1, unsignedLongbPktId, testMessage);
     }
@@ -59,22 +59,22 @@ public class TestPacket {
     }
 
     @Test
-    public void test_getter_wCrc16_1() {
+    public void test_getter_wCrc16_1() throws Exception{
         UnsignedLong moreThanLongbPktId = UnsignedLong.valueOf(Long.MAX_VALUE);
-        moreThanLongbPktId = moreThanLongbPktId.plus(UnsignedLong.valueOf("17"));
+        moreThanLongbPktId = moreThanLongbPktId.plus(UnsignedLong.valueOf("2305"));
         Message testMessage = new Message(3, 4, "test");
         Packet packet = new Packet((byte) 1, moreThanLongbPktId, testMessage);
-        short checkCrc1 = packet.calculateCrc16(packet.getBSrc(), packet.getBPktId());
+        short checkCrc1 = packet.calculateCrc16(packet.packetPartFirst);
         Assert.assertEquals(Short.valueOf(checkCrc1), packet.getWCrc16_1());
     }
 
     @Test
-    public void test_getter_wCrc16_2() {
+    public void test_getter_wCrc16_2() throws Exception{
         UnsignedLong moreThanLongbPktId = UnsignedLong.valueOf(Long.MAX_VALUE);
-        moreThanLongbPktId = moreThanLongbPktId.plus(UnsignedLong.valueOf("17"));
+        moreThanLongbPktId = moreThanLongbPktId.plus(UnsignedLong.valueOf("2305"));
         Message testMessage = new Message(3, 4, "test");
         Packet packet = new Packet((byte) 1, moreThanLongbPktId, testMessage);
-        short checkCrc2 = packet.calculateCrc16(packet.getBMsq());
+        short checkCrc2 = packet.calculateCrc16(packet.packetPartSecond);
         Assert.assertEquals(Short.valueOf(checkCrc2), packet.getWCrc16_2());
     }
 

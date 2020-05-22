@@ -10,6 +10,12 @@ import java.nio.ByteBuffer;
 @ToString
 public class Packet {
     final static Byte bMagic = 0x13;
+    public final static Integer packetPartFirstLengthWithoutwLen = bMagic.BYTES + Byte.BYTES + Long.BYTES;
+    public final static Integer packetPartFirstLength = packetPartFirstLengthWithoutwLen + Integer.BYTES;
+    public final static Integer packetPartFirstLengthWithCRC16 = packetPartFirstLength + Short.BYTES;
+    public byte[] packetPartFirst;
+    public byte[] packetPartSecond;
+
 
     public Packet() { }
 
@@ -18,11 +24,9 @@ public class Packet {
     public Packet(Byte bSrc, UnsignedLong bPktId, Message bMsq) {
         this.bSrc = bSrc;
         this.bPktId = bPktId;
-        wCrc16_1 = calculateCrc16(bSrc, bPktId);
 
         this.bMsq = bMsq;
         wLen = bMsq.getMessage().length();
-        wCrc16_2 = calculateCrc16(bMsq);
     }
 
     @Getter
@@ -49,9 +53,6 @@ public class Packet {
         wLen = buffer.getInt();
 
         wCrc16_1 = buffer.getShort();
-        short checkCrc1= calculateCrc16(bSrc,bPktId);
-        if(wCrc16_1 != checkCrc1)
-            throw new IllegalArgumentException("Different Crc1");
         bMsq = new Message();
         bMsq.setCType(buffer.getInt());
         bMsq.setBUserId(buffer.getInt());
@@ -61,9 +62,6 @@ public class Packet {
         bMsq.setMessage(new String(messageBody));
 
         wCrc16_2 = buffer.getShort();
-        short checkCrc2 = calculateCrc16(bMsq);
-        if(wCrc16_2 != checkCrc2)
-            throw new IllegalArgumentException("Different Crc2");
 
         bMsq.decode();
         setbMsq(bMsq);
@@ -82,15 +80,7 @@ public class Packet {
     @Getter
     Short wCrc16_2;
 
-    public Short calculateCrc16(Byte bSrc, UnsignedLong bPktId) {
-        String packet = bMagic.toString() + bSrc.toString() + bPktId.toString();
-        return (short) CRC.calculateCRC(CRC.Parameters.CRC16, packet.getBytes());
-    }
 
-    public Short calculateCrc16(Message bMsq) {
-        String packet = bMsq.toString();
-        return (short) CRC.calculateCRC(CRC.Parameters.CRC16, packet.getBytes());
-    }
 
     public byte[] toPacket() throws Exception {
         Message message = getBMsq();
@@ -98,15 +88,27 @@ public class Packet {
 
         setbMsq(message);
 
-        Integer packetLength = bMagic.BYTES + bSrc.BYTES + Long.BYTES + wLen.BYTES + wCrc16_1.BYTES + message.getMessageBytesLength() + wCrc16_2.BYTES;
-        return ByteBuffer.allocate(packetLength)
+        packetPartFirst = ByteBuffer.allocate(packetPartFirstLength)
                 .put(bMagic)
                 .put(bSrc)
                 .putLong(bPktId.longValue())
                 .putInt(wLen)
-                .putShort(wCrc16_1)
-                .put(message.toPacketPart())
-                .putShort(wCrc16_2)
                 .array();
+        wCrc16_1 = calculateCrc16(packetPartFirst);
+
+        Integer packetPartSecondLength = message.getMessageBytesLength();
+        packetPartSecond = ByteBuffer.allocate(packetPartSecondLength)
+                .put(message.toPacketPart())
+                .array();
+
+        wCrc16_2 = calculateCrc16(packetPartSecond);
+
+        Integer packetLength = packetPartFirstLength + wCrc16_1.BYTES + packetPartSecondLength + wCrc16_2.BYTES;
+
+        return ByteBuffer.allocate(packetLength).put(packetPartFirst).putShort(wCrc16_1).put(packetPartSecond).putShort(wCrc16_2).array();
+    }
+
+    public static Short calculateCrc16(byte[] packetPart) {
+        return (short) CRC.calculateCRC(CRC.Parameters.CRC16, packetPart);
     }
 }

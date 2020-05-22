@@ -9,7 +9,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception{
         UnsignedLong unsignedLongbPktId = UnsignedLong.valueOf(Long.MAX_VALUE);
-        unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("17"));
+        unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("2305"));
 
         Message testMessage = new Message(3, 4, "We love programming!!!");
         Packet packet = new Packet((byte) 1,unsignedLongbPktId, testMessage);
