@@ -119,9 +119,9 @@ public class Packet {
     }
     @Override
     public String toString() {
-        System.out.println("Packet( bPktId: " + bPktId +", bSrc: "+ bSrc+",wLen: " + wLen+", "+ "Message( CType:"+ bMsq.getCType()+", BUserId: "+
-                bMsq.getBUserId()+", message: " +bMsq.getMessage() + ")"+ "wCrc16_1:" + wCrc16_1+", wCrc16_2: " +wCrc16_2 + ") ");
-        return null;
+       return "Packet( bPktId: " + bPktId +", bSrc: "+ bSrc+",wLen: " + wLen+", "+ "Message( CType:"+ bMsq.getCType()+", BUserId: "+
+                bMsq.getBUserId()+", message: " +bMsq.getMessage() + ")"+ "wCrc16_1:" + wCrc16_1+", wCrc16_2: " +wCrc16_2 + ") ";
+
     }
 
 }
