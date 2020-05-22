@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 
 @ToString
 public class Packet {
-    final static Byte bMagic = 0x13;
+    public final static Byte bMagic = 0x13;
     public final static Integer packetPartFirstLengthWithoutwLen = bMagic.BYTES + Byte.BYTES + Long.BYTES;
     public final static Integer packetPartFirstLength = packetPartFirstLengthWithoutwLen + Integer.BYTES;
     public final static Integer packetPartFirstLengthWithCRC16 = packetPartFirstLength + Short.BYTES;
@@ -82,9 +82,13 @@ public class Packet {
 
 
 
-    public byte[] toPacket() throws Exception {
+    public byte[] toPacket() {
         Message message = getBMsq();
-        message.encode();
+        try {
+            message.encode();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         setbMsq(message);
 

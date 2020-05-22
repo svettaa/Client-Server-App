@@ -8,6 +8,17 @@ import java.nio.ByteBuffer;
 
 @Data
 public class Message {
+
+    enum cTypes {
+        GET_PRODUCT_COUNT,
+        GET_PRODUCT,
+        ADD_PRODUCT,
+        ADD_PRODUCT_TITLE,
+        SET_PRODUCT_PRICE,
+        ADD_PRODUCT_TO_GROUP
+    }
+
+
     Integer cType;
     Integer bUserId;
     String message;
