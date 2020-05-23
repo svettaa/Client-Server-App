@@ -18,7 +18,7 @@ public class Server {
     public static void main(String[] args) throws Exception {
 
         try (var listener = new ServerSocket(2305)) {
-            System.out.println("The capitalization server is running...");
+            System.out.println("The server is running...");
             var pool = Executors.newFixedThreadPool(20);
             while (true) {
                 pool.execute(new Server.Listener(listener.accept()));

@@ -75,7 +75,7 @@ public class TCPNetwork implements Network {
 
             byte fullPacket[] = packetBytes.toByteArray();
 
-            System.out.println("Received");
+            System.out.println("Received:");
             Packet packet = new Packet(fullPacket);
             System.out.println(packet.getBMsq().getMessage());
 
