@@ -12,12 +12,18 @@ public class TestPacket {
     private Packet packet;
     UnsignedLong unsignedLongbPktId = UnsignedLong.valueOf(Long.MAX_VALUE);
 
-
     @Before
     public void before_tests() throws Exception{
         unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("2305"));
         testMessage = new Message(3, 4, "test");
         packet = new Packet((byte) 1, unsignedLongbPktId, testMessage);
+    }
+
+    @Test
+    public void test_coder() throws Exception {
+        byte[] encodedPacket = packet.toPacket();
+        Packet decodedPacket = new Packet(encodedPacket);
+        Assert.assertEquals(packet, decodedPacket);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -39,7 +45,7 @@ public class TestPacket {
     @Test(expected = IllegalArgumentException.class)
     public void test_wrongCrc16_2() throws Exception {
         byte[] encodedPacket = packet.toPacket();
-        encodedPacket[18] = 6;
+        encodedPacket[21] = 6;
         new Packet(encodedPacket);
     }
 
@@ -57,30 +63,10 @@ public class TestPacket {
     public void test_getter_wLen() {
         Assert.assertEquals(Integer.valueOf(testMessage.getMessageBytes()), packet.getWLen());
     }
-
-    @Test
-    public void test_getter_wCrc16_1() throws Exception{
-        UnsignedLong moreThanLongbPktId = UnsignedLong.valueOf(Long.MAX_VALUE);
-        moreThanLongbPktId = moreThanLongbPktId.plus(UnsignedLong.valueOf("2305"));
-        Message testMessage = new Message(3, 4, "test");
-        Packet packet = new Packet((byte) 1, moreThanLongbPktId, testMessage);
-        short checkCrc1 = packet.calculateCrc16(packet.packetPartFirst);
-        Assert.assertEquals(Short.valueOf(checkCrc1), packet.getWCrc16_1());
-    }
-
-    @Test
-    public void test_getter_wCrc16_2() throws Exception{
-        UnsignedLong moreThanLongbPktId = UnsignedLong.valueOf(Long.MAX_VALUE);
-        moreThanLongbPktId = moreThanLongbPktId.plus(UnsignedLong.valueOf("2305"));
-        Message testMessage = new Message(3, 4, "test");
-        Packet packet = new Packet((byte) 1, moreThanLongbPktId, testMessage);
-        short checkCrc2 = packet.calculateCrc16(packet.packetPartSecond);
-        Assert.assertEquals(Short.valueOf(checkCrc2), packet.getWCrc16_2());
-    }
-
+/*
     @Test
     public void testToString() {
         String expected = "Packet( bPktId: 9223372036854778112, bSrc: 1,wLen: 4, Message( CType:3, BUserId: 4, message: test)wCrc16_1:null, wCrc16_2: null)";
         Assert.assertEquals(expected, packet.toString());
-    }
+    }*/
 }

@@ -1,20 +1,20 @@
 package com.lukichova.olenyn.app.entities;
 
 import com.github.snksoft.crc.CRC;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import com.google.common.primitives.UnsignedLong;
 
 import java.nio.ByteBuffer;
 
-//@ToString
+@EqualsAndHashCode
 public class Packet {
     public final static Byte bMagic = 0x13;
 
     public final static Integer packetPartFirstLengthWithoutwLen = bMagic.BYTES + Byte.BYTES + Long.BYTES;
     public final static Integer packetPartFirstLength = packetPartFirstLengthWithoutwLen + Integer.BYTES;
     public final static Integer packetPartFirstLengthWithCRC16 = packetPartFirstLength + Short.BYTES;
-    public byte[] packetPartFirst;
-    public byte[] packetPartSecond;
+
 
     public Packet() { }
 
@@ -35,8 +35,6 @@ public class Packet {
     @Getter
     Byte bSrc;
 
-
-
     @Getter
     Integer wLen;
 
@@ -54,7 +52,16 @@ public class Packet {
         bPktId = UnsignedLong.fromLongBits(buffer.getLong());
         wLen = buffer.getInt();
 
-        wCrc16_1 = buffer.getShort();
+        Short wCrc16_1 = buffer.getShort();
+        byte[] checkCRC16_1 = ByteBuffer.allocate(packetPartFirstLength)
+                .put(bMagic)
+                .put(bSrc)
+                .putLong(bPktId.longValue())
+                .putInt(wLen).array();
+        if(!wCrc16_1.equals(calculateCrc16(checkCRC16_1))){
+            throw new IllegalArgumentException("Wrong CRC16_1");
+        }
+
         bMsq = new Message();
         bMsq.setCType(buffer.getInt());
         bMsq.setBUserId(buffer.getInt());
@@ -63,7 +70,14 @@ public class Packet {
         buffer.get(messageBody);
         bMsq.setMessage(new String(messageBody));
 
-        wCrc16_2 = buffer.getShort();
+        Short wCrc16_2 = buffer.getShort();
+        byte[] checkCRC16_2 = ByteBuffer.allocate(Integer.BYTES + Integer.BYTES + wLen)
+                .putInt(bMsq.getCType())
+                .putInt(bMsq.getBUserId())
+                .put(messageBody).array();
+        if(!wCrc16_2.equals(calculateCrc16(checkCRC16_2))){
+            throw new IllegalArgumentException("Wrong CRC16_2");
+        }
 
         bMsq.decode();
         setbMsq(bMsq);
@@ -72,42 +86,35 @@ public class Packet {
     public void setbMsq(Message bMsq) {
         this.bMsq = bMsq;
         wLen = bMsq.getMessage().length();
-        String packet = bMsq.toString();
-        wCrc16_2 = (short) CRC.calculateCRC(CRC.Parameters.CRC16, packet.getBytes());
     }
 
-    @Getter
-    Short wCrc16_1;
-
-    @Getter
-    Short wCrc16_2;
-
-
-
     public byte[] toPacket() {
-        Message message = getBMsq();
+        Message message = new Message();
+        message.setCType(getBMsq().getCType());
+        message.setBUserId(getBMsq().getBUserId());
+        message.setMessage(getBMsq().getMessage());
+
         try {
             message.encode();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        setbMsq(message);
 
-        packetPartFirst = ByteBuffer.allocate(packetPartFirstLength)
+        byte[] packetPartFirst = ByteBuffer.allocate(packetPartFirstLength)
                 .put(bMagic)
                 .put(bSrc)
                 .putLong(bPktId.longValue())
-                .putInt(wLen)
+                .putInt(message.getMessage().length())
                 .array();
-        wCrc16_1 = calculateCrc16(packetPartFirst);
+        Short wCrc16_1 = calculateCrc16(packetPartFirst);
 
         Integer packetPartSecondLength = message.getMessageBytesLength();
-        packetPartSecond = ByteBuffer.allocate(packetPartSecondLength)
+        byte[] packetPartSecond = ByteBuffer.allocate(packetPartSecondLength)
                 .put(message.toPacketPart())
                 .array();
 
-        wCrc16_2 = calculateCrc16(packetPartSecond);
+        Short wCrc16_2 = calculateCrc16(packetPartSecond);
 
         Integer packetLength = packetPartFirstLength + wCrc16_1.BYTES + packetPartSecondLength + wCrc16_2.BYTES;
 
@@ -123,8 +130,12 @@ public class Packet {
     }
     @Override
     public String toString() {
-       return "Packet( bPktId: " + bPktId +", bSrc: "+ bSrc+",wLen: " + wLen+", "+ "Message( CType:"+ bMsq.getCType()+", BUserId: "+
-                bMsq.getBUserId()+", message: " +bMsq.getMessage() + ")"+ "wCrc16_1:" + wCrc16_1+", wCrc16_2: " +wCrc16_2 + ")";
+
+       return "Packet( bPktId: " + bPktId +", " +
+               "bSrc: "+ bSrc+"," +
+               "wLen: " + wLen+", "+
+               "Message( CType:"+ bMsq.getCType()+", BUserId: "+
+                bMsq.getBUserId()+", message: " +bMsq.getMessage() + ")";
 
     }
 

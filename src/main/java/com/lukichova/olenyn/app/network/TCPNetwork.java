@@ -2,17 +2,14 @@ package com.lukichova.olenyn.app.network;
 
 import com.lukichova.olenyn.app.entities.Packet;
 import com.lukichova.olenyn.app.entities.Message;
-import com.lukichova.olenyn.app.classes.Processor;
 
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 public class TCPNetwork implements Network {
 
@@ -80,7 +77,6 @@ public class TCPNetwork implements Network {
             System.out.println(packet.getBMsq().getMessage());
 
             return packet;
-            /*Processor.process(this, packet);*/
         } catch (Exception e) {
             System.err.println("Error:" + socket);
             e.printStackTrace();
