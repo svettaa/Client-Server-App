@@ -80,7 +80,6 @@ public class TCPNetwork implements Network {
             System.out.println(packet.getBMsq().getMessage());
 
             return packet;
-            /*Processor.process(this, packet);*/
         } catch (Exception e) {
             System.err.println("Error:" + socket);
             e.printStackTrace();
