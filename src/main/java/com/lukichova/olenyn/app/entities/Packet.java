@@ -124,7 +124,7 @@ public class Packet {
     @Override
     public String toString() {
        return "Packet( bPktId: " + bPktId +", bSrc: "+ bSrc+",wLen: " + wLen+", "+ "Message( CType:"+ bMsq.getCType()+", BUserId: "+
-                bMsq.getBUserId()+", message: " +bMsq.getMessage() + ")"+ "wCrc16_1:" + wCrc16_1+", wCrc16_2: " +wCrc16_2 + ") ";
+                bMsq.getBUserId()+", message: " +bMsq.getMessage() + ")"+ "wCrc16_1:" + wCrc16_1+", wCrc16_2: " +wCrc16_2 + ")";
 
     }
 

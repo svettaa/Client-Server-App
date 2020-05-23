@@ -80,8 +80,7 @@ public class TestPacket {
 
     @Test
     public void testToString() {
-        Packet packet = new Packet();
-        String expected = "Packet(bSrc=null, bPktId=null, wLen=null, bMsq=null, wCrc16_1=null, wCrc16_2=null)";
+        String expected = "Packet( bPktId: 9223372036854778112, bSrc: 1,wLen: 4, Message( CType:3, BUserId: 4, message: test)wCrc16_1:null, wCrc16_2: null)";
         Assert.assertEquals(expected, packet.toString());
     }
 }

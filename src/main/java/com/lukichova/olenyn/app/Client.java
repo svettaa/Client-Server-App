@@ -25,6 +25,7 @@ public class Client {
             network.send(packet);
             network.receive();
 
+
             network.close();
         } catch (Exception e) {
             e.printStackTrace();
