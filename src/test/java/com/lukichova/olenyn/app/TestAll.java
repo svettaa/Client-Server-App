@@ -8,7 +8,10 @@ import org.junit.runners.Suite;
         {
                 TestAES.class,
                 TestPacket.class,
-                TestMessage.class
+                TestMessage.class,
+                TCPNetworkTest.class,
+                ProcessorTest.class,
+                ClientTest.class
         }
 )
 public class TestAll {
