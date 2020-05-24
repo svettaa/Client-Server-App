@@ -18,10 +18,12 @@ public class ClientTest {
         unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("2305"));
         testMessage = new Message(3, 4, "time");
         packet = new Packet((byte) 1, unsignedLongbPktId, testMessage);
+
         Packet response = client.request(packet);
         String message = response.getBMsq().getMessage();
-        Assert.assertEquals(message, "ok");
+        Assert.assertEquals(message, "OK");
 
-        client.disconnect();
+
+       client.disconnect();
     }
 }

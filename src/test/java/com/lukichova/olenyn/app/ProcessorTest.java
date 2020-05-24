@@ -21,7 +21,7 @@ public class ProcessorTest {
         testMessage = new Message(3, 4, "time");
         packet = new Packet((byte) 1, unsignedLongbPktId, testMessage);
         Packet answer = Processor.process(packet);
-        Assert.assertEquals("now()",answer.getBMsq().getMessage());
+        Assert.assertEquals("OK",answer.getBMsq().getMessage());
     }
     @Test
     public void process2() {
