@@ -1,6 +1,9 @@
 package com.lukichova.olenyn.app;
 
 import com.google.common.primitives.UnsignedLong;
+import com.lukichova.olenyn.app.Exceptions.wrongBMagicException;
+import com.lukichova.olenyn.app.Exceptions.wrongCrc1Exception;
+import com.lukichova.olenyn.app.Exceptions.wrongCrc2Exception;
 import com.lukichova.olenyn.app.entities.Message;
 import com.lukichova.olenyn.app.entities.Packet;
 import org.junit.Assert;
@@ -26,7 +29,7 @@ public class TestPacket {
         Assert.assertEquals(packet, decodedPacket);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = wrongBMagicException.class)
     public void test_wrongMagic() throws Exception {
         byte[] encodedPacket = packet.toPacket();
         encodedPacket[0] = 0x14;
@@ -34,15 +37,15 @@ public class TestPacket {
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
-    public void test_wrongCrc16_1() throws Exception {
+    @Test(expected = wrongCrc1Exception.class)
+    public void test_wrongCrc16() throws Exception {
         byte[] encodedPacket = packet.toPacket();
         encodedPacket[1] = 6;
         new Packet(encodedPacket);
 
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = wrongCrc2Exception.class)
     public void test_wrongCrc16_2() throws Exception {
         byte[] encodedPacket = packet.toPacket();
         encodedPacket[21] = 6;
@@ -63,10 +66,10 @@ public class TestPacket {
     public void test_getter_wLen() {
         Assert.assertEquals(Integer.valueOf(testMessage.getMessageBytes()), packet.getWLen());
     }
-/*
+
     @Test
     public void testToString() {
-        String expected = "Packet( bPktId: 9223372036854778112, bSrc: 1,wLen: 4, Message( CType:3, BUserId: 4, message: test)wCrc16_1:null, wCrc16_2: null)";
+        String expected = "Packet( bPktId: 9223372036854778112, bSrc: 1,wLen: 4, Message( CType:3, BUserId: 4, message: test)";
         Assert.assertEquals(expected, packet.toString());
-    }*/
+    }
 }

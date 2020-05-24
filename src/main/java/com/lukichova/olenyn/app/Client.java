@@ -22,8 +22,11 @@ public class Client {
             Socket socket = new Socket("localhost",2305);
             Network network = new TCPNetwork(socket);
 
-            network.send(packet);
+           // network.send(packet);
+
+            network.send(secondPacket);
             network.receive();
+
 
 
             network.close();

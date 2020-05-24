@@ -1,6 +1,9 @@
 package com.lukichova.olenyn.app.entities;
 
 import com.github.snksoft.crc.CRC;
+import com.lukichova.olenyn.app.Exceptions.wrongBMagicException;
+import com.lukichova.olenyn.app.Exceptions.wrongCrc1Exception;
+import com.lukichova.olenyn.app.Exceptions.wrongCrc2Exception;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import com.google.common.primitives.UnsignedLong;
@@ -45,8 +48,9 @@ public class Packet {
         ByteBuffer buffer = ByteBuffer.wrap(encodedPacket);
 
         Byte expectedBMagic = buffer.get();
+
         if (!expectedBMagic.equals(bMagic))
-            throw new IllegalArgumentException("Unexpected bMagic");
+            throw new wrongBMagicException("Unexpected bMagic");
 
         bSrc = buffer.get();
         bPktId = UnsignedLong.fromLongBits(buffer.getLong());
@@ -59,7 +63,7 @@ public class Packet {
                 .putLong(bPktId.longValue())
                 .putInt(wLen).array();
         if(!wCrc16_1.equals(calculateCrc16(checkCRC16_1))){
-            throw new IllegalArgumentException("Wrong CRC16_1");
+            throw new wrongCrc1Exception("Wrong CRC16_1");
         }
 
         bMsq = new Message();
@@ -71,12 +75,13 @@ public class Packet {
         bMsq.setMessage(new String(messageBody));
 
         Short wCrc16_2 = buffer.getShort();
+
         byte[] checkCRC16_2 = ByteBuffer.allocate(Integer.BYTES + Integer.BYTES + wLen)
                 .putInt(bMsq.getCType())
                 .putInt(bMsq.getBUserId())
                 .put(messageBody).array();
         if(!wCrc16_2.equals(calculateCrc16(checkCRC16_2))){
-            throw new IllegalArgumentException("Wrong CRC16_2");
+            throw new wrongCrc2Exception("Wrong CRC16_2");
         }
 
         bMsq.decode();

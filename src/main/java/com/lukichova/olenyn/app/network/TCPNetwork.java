@@ -87,6 +87,7 @@ public class TCPNetwork implements Network {
 
     @Override
     public void send(Packet packet) throws IOException{
+
         byte[] packetBytes = packet.toPacket();
 
         socketOutputStream.write(packetBytes);
