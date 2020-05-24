@@ -13,7 +13,7 @@ public class Processor {
 
         Message answerMessage;
         if (message.equals("time")) {
-            answerMessage = new Message(1, 1, "now()");
+            answerMessage = new Message(1, 1, "OK");
         } else {
             answerMessage = new Message(1, 1, "other");
         }
