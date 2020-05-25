@@ -1,0 +1,16 @@
+package com.lukichova.olenyn.app.practice_2;
+
+public class TickTakMain {
+    public static void main(String[] args) throws InterruptedException {
+
+        Data d = new Data();
+
+        Worker w1=new Worker(1, d);
+        Worker w2=new Worker(2, d);
+        Worker w3=new Worker(3, d);
+
+        w2.join();
+        w1.join();
+        System.out.println("end of main...");
+    }
+}
