@@ -1,6 +1,7 @@
 package com.lukichova.olenyn.app;
 
 import com.google.common.primitives.UnsignedLong;
+import com.lukichova.olenyn.app.Exceptions.wrongConnectionException;
 import com.lukichova.olenyn.app.entities.Message;
 import com.lukichova.olenyn.app.entities.Packet;
 import com.lukichova.olenyn.app.network.Network;
@@ -15,7 +16,7 @@ public class Client {
 
     Client(){}
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Message testMessage = new Message(1, 1, "time");
         Packet packet = new Packet((byte) 1, UnsignedLong.ONE, testMessage);
 
@@ -24,15 +25,11 @@ public class Client {
         Packet secondPacket = new Packet((byte) 1, UnsignedLong.ONE, secondTestMessage);
 */
 
-        try {
             Client client = new Client();
             client.connect(2305);
             client.request(packet);
-
             client.disconnect();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
     }
 
     public void connect(int serverPort) throws Exception {
@@ -41,7 +38,7 @@ public class Client {
 
     public Packet request(Packet packet) throws Exception {
         if (network == null) {
-            throw new IllegalStateException("Not connected yet");
+            throw new wrongConnectionException("Not connected yet");
         }
         network.send(packet);
         return network.receive();
