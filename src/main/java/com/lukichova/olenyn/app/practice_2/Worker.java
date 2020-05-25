@@ -7,10 +7,8 @@ public class Worker extends Thread{
     private Data data;
 
     public Worker(int id, Data data){
-        super("Worker"+id);
         this.id = id;
         this.data = data;
-
         this.start();
     }
 
@@ -18,16 +16,16 @@ public class Worker extends Thread{
     public void run() {
         synchronized (data) {
             try {
-                for (int i = 0; i < 5; i++) {
-                    while (data.getState() != id)
-                        data.wait();
+                for (int i = 1; i <= 5; i++) {
+                    while ( id!= data.getState())
+                    data.wait();
 
                     if (id == 1){
                         data.Tic();
                     } else if(id ==2){
-                        data.Tak();
-                    } else {
-                        data.Toy();
+                                       data.Tak();
+                            } else {
+                                        data.Toy();
                     }
 
                     data.notifyAll();
