@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 @Data
 public class Message {
 
-    enum cTypes {
+    public enum cTypes {
         GET_PRODUCT_COUNT,
         GET_PRODUCT,
         ADD_PRODUCT,

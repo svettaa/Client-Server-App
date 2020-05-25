@@ -11,7 +11,7 @@ public class Main {
         UnsignedLong unsignedLongbPktId = UnsignedLong.valueOf(Long.MAX_VALUE);
         unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("2305"));
 
-        Message testMessage = new Message(3, 4, "We love programming!!!");
+        Message testMessage = new Message(Message.cTypes.GET_PRODUCT.ordinal(), 4, "We love programming!!!");
         Packet packet = new Packet((byte) 1,unsignedLongbPktId, testMessage);
         System.out.println("-----------------------------Out packet------------------------------");
         System.out.println(packet);

@@ -14,10 +14,11 @@ import java.net.Socket;
 public class Client {
     private TCPNetwork network;
 
-    Client(){}
+    Client() {
+    }
 
     public static void main(String[] args) throws Exception {
-        Message testMessage = new Message(1, 1, "time");
+        Message testMessage = new Message(Message.cTypes.ADD_PRODUCT.ordinal(), 1, "time");
         Packet packet = new Packet((byte) 1, UnsignedLong.ONE, testMessage);
 
 /*
@@ -25,20 +26,21 @@ public class Client {
         Packet secondPacket = new Packet((byte) 1, UnsignedLong.ONE, secondTestMessage);
 */
 
-            Client client = new Client();
-            client.connect(2305);
-            client.request(packet);
-            client.disconnect();
+        Client client = new Client();
+        client.connect(2305);
+        client.request(packet);
+        client.disconnect();
 
     }
 
     public void connect(int serverPort) throws Exception {
         network = new TCPNetwork(new Socket("localhost", serverPort));
+        System.out.println("Client is connected");
     }
 
     public Packet request(Packet packet) throws Exception {
         if (network == null) {
-            throw new wrongConnectionException("Not connected yet");
+            throw new wrongConnectionException("Not connected");
         }
         network.send(packet);
         return network.receive();
@@ -46,5 +48,6 @@ public class Client {
 
     public void disconnect() throws Exception {
         network.close();
+        System.out.println("Client is disconnected");
     }
 }

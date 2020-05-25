@@ -18,7 +18,7 @@ public class TCPNetwork implements Network {
     InputStream serverInputStream;
 
 
-    public TCPNetwork(Socket socket) throws Exception{
+    public TCPNetwork(Socket socket) throws Exception {
         this.socket = socket;
         socketOutputStream = socket.getOutputStream();
         serverInputStream = socket.getInputStream();
@@ -26,15 +26,15 @@ public class TCPNetwork implements Network {
 
     @Override
     public Packet receive() throws Exception {
-
-        PacketProcessing pr =new PacketProcessing();
-        ByteArrayOutputStream  packetBytes= pr.processing(serverInputStream);
+        PacketProcessing pr = new PacketProcessing();
+        ByteArrayOutputStream packetBytes = pr.processing(serverInputStream);
+        if(packetBytes == null)
+            return null;
         byte fullPacket[] = packetBytes.toByteArray();
         System.out.println("Received:");
         Packet packet = new Packet(fullPacket);
         System.out.println(packet.getBMsq().getMessage());
         return packet;
-
     }
 
     @Override

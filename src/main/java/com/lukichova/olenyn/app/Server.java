@@ -17,7 +17,7 @@ public class Server {
 
         try (ServerSocket listener = new ServerSocket(2305)) {
             System.out.println("The server is running...");
-            ExecutorService pool = Executors.newFixedThreadPool(20);
+            ExecutorService pool = Executors.newFixedThreadPool(10);
             while (true) {
                 pool.execute(new Server.Listener(listener.accept()));
             }
@@ -35,11 +35,19 @@ public class Server {
         @Override
         public void run() {
             try {
+                System.out.println("Connection opened");
                 Network network = new TCPNetwork(socket);
-                Packet packet = network.receive();
-                Packet answer = Processor.process(packet);
-                network.send(answer);
+
+                while(true) {
+                    Packet packet = network.receive();
+                    if(packet == null)
+                        break;
+                    Packet answer = Processor.process(packet);
+                    network.send(answer);
+                }
+
                 network.close();
+                System.out.println("Connection closed");
             } catch (Exception e) {
                 e.printStackTrace();
             }

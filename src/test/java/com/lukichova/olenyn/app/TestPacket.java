@@ -18,7 +18,7 @@ public class TestPacket {
     @Before
     public void before_tests() throws Exception{
         unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("2305"));
-        testMessage = new Message(3, 4, "test");
+        testMessage = new Message(Message.cTypes.ADD_PRODUCT_TO_GROUP.ordinal(), 4, "test");
         packet = new Packet((byte) 1, unsignedLongbPktId, testMessage);
     }
 
@@ -69,7 +69,14 @@ public class TestPacket {
 
     @Test
     public void testToString() {
-        String expected = "Packet( bPktId: 9223372036854778112, bSrc: 1,wLen: 4, Message( CType:3, BUserId: 4, message: test)";
+        String expected = "Packet( bPktId: 9223372036854778112, bSrc: 1,wLen: 4, Message( CType:5, BUserId: 4, message: test)";
         Assert.assertEquals(expected, packet.toString());
     }
+
+    /*@Test
+    public void test(){
+        unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("2305"));
+        testMessage = new Message(Message.cTypes.ADD_PRODUCT_TO_GROUP.ordinal(), 4, "test");
+        packet = new Packet((byte) 1, unsignedLongbPktId, testMessage);
+    }*/
 }

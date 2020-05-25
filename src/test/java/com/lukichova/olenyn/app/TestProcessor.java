@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class ProcessorTest {
+public class TestProcessor {
     private Message testMessage;
     private Packet packet;
     UnsignedLong unsignedLongbPktId = UnsignedLong.valueOf(Long.MAX_VALUE);
