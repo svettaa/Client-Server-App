@@ -19,9 +19,6 @@ public class Packet {
     public final static Integer packetPartFirstLengthWithCRC16 = packetPartFirstLength + Short.BYTES;
 
 
-    public Packet() { }
-
-
 
     public Packet(Byte bSrc, UnsignedLong bPktId, Message bMsq) {
         this.bSrc = bSrc;
@@ -93,17 +90,13 @@ public class Packet {
         wLen = bMsq.getMessage().length();
     }
 
-    public byte[] toPacket() {
+    public byte[] toPacket() throws Exception{
         Message message = new Message();
         message.setCType(getBMsq().getCType());
         message.setBUserId(getBMsq().getBUserId());
         message.setMessage(getBMsq().getMessage());
+        message.encode();
 
-        try {
-            message.encode();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
 
         byte[] packetPartFirst = ByteBuffer.allocate(packetPartFirstLength)

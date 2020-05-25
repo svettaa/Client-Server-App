@@ -12,6 +12,7 @@ import org.junit.runners.Suite;
                 TCPNetworkTest.class,
                 ProcessorTest.class,
                 ClientTest.class
+
         }
 )
 public class TestAll {

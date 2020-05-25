@@ -12,7 +12,7 @@ public class ClientTest {
     UnsignedLong unsignedLongbPktId = UnsignedLong.valueOf(Long.MAX_VALUE);
 
     @Test
-    public void test() throws Exception {
+    public void testClient() throws Exception {
         Client client = new Client();
         client.connect(2305);
         unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("2305"));

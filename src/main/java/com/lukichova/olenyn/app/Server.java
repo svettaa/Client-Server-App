@@ -8,15 +8,16 @@ import lombok.var;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server {
 
     public static void main(String[] args) throws Exception {
 
-        try (var listener = new ServerSocket(2305)) {
+        try (ServerSocket listener = new ServerSocket(2305)) {
             System.out.println("The server is running...");
-            var pool = Executors.newFixedThreadPool(20);
+            ExecutorService pool = Executors.newFixedThreadPool(20);
             while (true) {
                 pool.execute(new Server.Listener(listener.accept()));
             }
