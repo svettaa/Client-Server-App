@@ -7,11 +7,11 @@ import com.lukichova.olenyn.app.entities.Packet;
 import com.lukichova.olenyn.app.network.Network;
 import com.lukichova.olenyn.app.network.TCPNetwork;
 import com.lukichova.olenyn.app.network.UDPNetwork;
-import com.lukichova.olenyn.app.utils.NetworkProperties;
 
 
-import java.io.IOException;
 import java.net.Socket;
+
+import static com.lukichova.olenyn.app.resoures.Resoures.*;
 
 
 public class Client {
@@ -26,19 +26,16 @@ public class Client {
 
 
         Client client = new Client();
-        client.connect(2305);
+        client.connect(NETWORK_PORT);
         client.request(packet);
         client.disconnect();
 
     }
 
     public void connect(int serverPort) throws Exception {
-        String portProperty = NetworkProperties.getProperty("port");
-        String hostProperty = NetworkProperties.getProperty("host");
-        String networkType = NetworkProperties.getProperty("type");
 
-        if (networkType.toLowerCase().equals("tcp"))
-            network = new TCPNetwork(new Socket(hostProperty, Integer.parseInt(portProperty)));
+        if (NETWORK_TYPE.toLowerCase().equals("tcp"))
+            network = new TCPNetwork(new Socket(NETWORK_HOST,NETWORK_PORT));
         else
             network = new UDPNetwork();
 

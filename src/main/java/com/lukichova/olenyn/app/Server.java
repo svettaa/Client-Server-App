@@ -5,7 +5,6 @@ import com.lukichova.olenyn.app.entities.Packet;
 import com.lukichova.olenyn.app.network.Network;
 import com.lukichova.olenyn.app.network.TCPNetwork;
 import com.lukichova.olenyn.app.network.UDPNetwork;
-import com.lukichova.olenyn.app.utils.NetworkProperties;
 
 
 import java.net.ServerSocket;
@@ -13,12 +12,15 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.lukichova.olenyn.app.resoures.Resoures.NETWORK_PORT;
+import static com.lukichova.olenyn.app.resoures.Resoures.NETWORK_TYPE;
+
 public class Server {
 
     public static void main(String[] args) throws Exception {
-        String portProperty = "2305";
+       // String portProperty = "2305";
 
-            try (ServerSocket listener = new ServerSocket(Integer.parseInt(portProperty)))  {
+            try (ServerSocket listener = new ServerSocket(NETWORK_PORT))  {
                 System.out.println("Server is running...");
             ExecutorService pool = Executors.newFixedThreadPool(10);
             while (true) {
@@ -39,10 +41,10 @@ public class Server {
         public void run() {
             try {
                 System.out.println("Connection opened");
-                String networkType = NetworkProperties.getProperty("type");
+
                 Network network;
 
-                if (networkType.toLowerCase().equals("tcp"))
+                if (NETWORK_TYPE.toLowerCase().equals("tcp"))
                     network = new TCPNetwork(socket);
                 else
                     network = new UDPNetwork();
