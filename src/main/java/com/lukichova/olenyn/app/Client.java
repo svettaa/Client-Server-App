@@ -29,6 +29,7 @@ public class Client {
         Client client = new Client();
         client.connect(NETWORK_PORT);
         client.request(packet);
+
         client.disconnect();
 
     }
