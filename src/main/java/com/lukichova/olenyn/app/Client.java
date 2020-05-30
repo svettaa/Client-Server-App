@@ -6,6 +6,8 @@ import com.lukichova.olenyn.app.entities.Message;
 import com.lukichova.olenyn.app.entities.Packet;
 import com.lukichova.olenyn.app.network.Network;
 import com.lukichova.olenyn.app.network.TCPNetwork;
+import com.lukichova.olenyn.app.utils.NetworkProperties;
+
 
 import java.io.IOException;
 import java.net.Socket;
@@ -34,7 +36,9 @@ public class Client {
     }
 
     public void connect(int serverPort) throws Exception {
-        network = new TCPNetwork(new Socket("localhost", serverPort));
+        String portProperty = NetworkProperties.getProperty("port");
+        String hostProperty = NetworkProperties.getProperty("host");
+        network = new TCPNetwork(new Socket(hostProperty, Integer.parseInt(portProperty)));
         System.out.println("Client is connected");
     }
 
