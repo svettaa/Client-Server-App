@@ -1,4 +1,3 @@
-/*
 package com.lukichova.olenyn.app.network;
 
 import com.lukichova.olenyn.app.classes.Processor;
@@ -49,10 +48,11 @@ public class UDPNetwork implements Network {
             packet.setClientInetAddress(datagramPacket.getAddress());
             packet.setClientPort(datagramPacket.getPort());
 
-            if (isServer)
-                Processor.process(this, packet);
-            else
+            if (isServer) {
+                Processor.process(packet);
+            }else {
                 return packet;
+            }
         } catch (Exception e) {
             System.err.println("Error:" + socket);
             e.printStackTrace();
@@ -66,7 +66,7 @@ public class UDPNetwork implements Network {
     }
 
     @Override
-    public void send(Packet packet) throws IOException {
+    public void send(Packet packet) throws Exception {
         String hostProperty = NetworkProperties.getProperty("host");
         if (hostProperty == null)
             hostProperty = "localhost";
@@ -91,4 +91,4 @@ public class UDPNetwork implements Network {
     public void close() {
         socket.close();
     }
-}*/
+}

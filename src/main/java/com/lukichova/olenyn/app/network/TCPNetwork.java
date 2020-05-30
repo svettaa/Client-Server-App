@@ -25,6 +25,11 @@ public class TCPNetwork implements Network {
     }
 
     @Override
+    public void listen() throws IOException {
+
+    }
+
+    @Override
     public Packet receive() throws Exception {
         PacketProcessing pr = new PacketProcessing();
         ByteArrayOutputStream packetBytes = pr.processing(serverInputStream);
@@ -35,6 +40,11 @@ public class TCPNetwork implements Network {
         Packet packet = new Packet(fullPacket);
         System.out.println(packet.getBMsq().getMessage());
         return packet;
+    }
+
+    @Override
+    public void connect() throws IOException {
+
     }
 
     @Override

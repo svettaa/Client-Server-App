@@ -9,6 +9,8 @@ public interface Network {
 
     Packet receive() throws Exception;
 
+    void connect() throws IOException;
+
     void send(Packet packet) throws Exception;
 
     void close() throws IOException;

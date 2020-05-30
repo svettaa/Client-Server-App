@@ -12,8 +12,6 @@ public class PacketProcessing {
     public PacketProcessing() {
     }
 
-    ;
-
     public ByteArrayOutputStream processing(InputStream serverInputStream) throws IOException {
         Integer state = 0;
         Integer wLen = 0;

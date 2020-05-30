@@ -4,15 +4,20 @@ import com.github.snksoft.crc.CRC;
 import com.lukichova.olenyn.app.Exceptions.wrongBMagicException;
 import com.lukichova.olenyn.app.Exceptions.wrongCrc1Exception;
 import com.lukichova.olenyn.app.Exceptions.wrongCrc2Exception;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import com.google.common.primitives.UnsignedLong;
 
+import java.net.InetAddress;
 import java.nio.ByteBuffer;
 
-@EqualsAndHashCode
+@Data
 public class Packet {
     public final static Byte bMagic = 0x13;
+
+    InetAddress clientInetAddress;
+    Integer clientPort;
 
     public final static Integer packetPartFirstLengthWithoutwLen = bMagic.BYTES + Byte.BYTES + Long.BYTES;
     public final static Integer packetPartFirstLength = packetPartFirstLengthWithoutwLen + Integer.BYTES;
