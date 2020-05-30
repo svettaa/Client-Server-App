@@ -4,7 +4,7 @@ import com.lukichova.olenyn.app.classes.Processor;
 import com.lukichova.olenyn.app.entities.Packet;
 import com.lukichova.olenyn.app.network.Network;
 import com.lukichova.olenyn.app.network.TCPNetwork;
-import lombok.var;
+import com.lukichova.olenyn.app.utils.NetworkProperties;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -14,8 +14,9 @@ import java.util.concurrent.Executors;
 public class Server {
 
     public static void main(String[] args) throws Exception {
+        String portProperty = NetworkProperties.getProperty("port");
 
-        try (ServerSocket listener = new ServerSocket(2305)) {
+        try (ServerSocket listener = new ServerSocket(Integer.parseInt(portProperty))) {
             System.out.println("The server is running...");
             ExecutorService pool = Executors.newFixedThreadPool(10);
             while (true) {

@@ -1,5 +1,6 @@
-
 package com.lukichova.olenyn.app.network;
+
+
 
 import com.lukichova.olenyn.app.classes.Processor;
 import com.lukichova.olenyn.app.entities.Message;
@@ -13,11 +14,12 @@ import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+
 public class UDPNetwork implements Network {
     private DatagramSocket socket;
     private Boolean isServer = false;
 
-    @Override
+
     public void listen() throws IOException {
         String portProperty = NetworkProperties.getProperty("port");
         if (portProperty == null)
@@ -38,8 +40,10 @@ public class UDPNetwork implements Network {
             ByteBuffer byteBuffer = ByteBuffer.wrap(maxPacketBuffer);
             Integer wLen = byteBuffer.getInt(Packet.packetPartFirstLengthWithoutwLen);
 
-            byte fullPacket[] = byteBuffer.slice(0, Packet.packetPartFirstLength + Message.BYTES_WITHOUT_MESSAGE + wLen).array();
-
+        //    byte fullPacket[] = byteBuffer.get(0, Packet.packetPartFirstLength + Message.BYTES_WITHOUT_MESSAGE + wLen).array();
+            byte[] byteBuffer1 = byteBuffer.array();
+            ByteBuffer byteBuffer2=byteBuffer.put(byteBuffer1,0, Packet.packetPartFirstLength + Message.BYTES_WITHOUT_MESSAGE + wLen);
+            byte fullPacket[] = byteBuffer2.array();
             System.out.println("Received");
             System.out.println(Arrays.toString(fullPacket) + "\n");
 
@@ -60,13 +64,15 @@ public class UDPNetwork implements Network {
         return null;
     }
 
-    @Override
+
+
+
     public void connect() throws IOException {
         socket = new DatagramSocket();
     }
 
     @Override
-    public void send(Packet packet) throws IOException {
+    public void send(Packet packet) throws Exception {
         String hostProperty = NetworkProperties.getProperty("host");
         if (hostProperty == null)
             hostProperty = "localhost";
