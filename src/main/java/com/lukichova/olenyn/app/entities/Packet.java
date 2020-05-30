@@ -17,6 +17,7 @@ public class Packet {
     public final static Integer packetPartFirstLengthWithoutwLen = bMagic.BYTES + Byte.BYTES + Long.BYTES;
     public final static Integer packetPartFirstLength = packetPartFirstLengthWithoutwLen + Integer.BYTES;
     public final static Integer packetPartFirstLengthWithCRC16 = packetPartFirstLength + Short.BYTES;
+    public final static Integer packetMaxSize = packetPartFirstLengthWithCRC16 + Message.BYTES_MAX_SIZE;
 
 
 
