@@ -1,6 +1,7 @@
 package com.lukichova.olenyn.app.classes;
 
 import com.lukichova.olenyn.app.Exceptions.wrongDecryptException;
+import com.lukichova.olenyn.app.Exceptions.wrongEcryptException;
 import lombok.SneakyThrows;
 
 import javax.crypto.BadPaddingException;
@@ -21,14 +22,21 @@ public class AES {
     static String secret = "sonyaandsvetathebestprogrammers";
     private static byte[] key;
 
-    public static String encrypt(String strToEncrypt) throws Exception {
-        setKey();
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-        return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
-
+    public static String encrypt(String strToEncrypt) throws wrongEcryptException {
+        try {
+            setKey();
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+            return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
+        } catch (UnsupportedEncodingException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e){
+        throw new wrongEcryptException();
 
     }
+    }
+
+
+
+
 
     @SneakyThrows
     public static String decrypt(String strToDecrypt)
