@@ -6,4 +6,5 @@ public class wrongConnectionException extends Exception {
     public wrongConnectionException(String exp) {
         super(exp);
     }
+
 }

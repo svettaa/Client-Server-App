@@ -4,6 +4,7 @@ import com.google.common.primitives.UnsignedLong;
 import com.lukichova.olenyn.app.Exceptions.wrongBMagicException;
 import com.lukichova.olenyn.app.Exceptions.wrongCrc1Exception;
 import com.lukichova.olenyn.app.Exceptions.wrongCrc2Exception;
+import com.lukichova.olenyn.app.Exceptions.wrongDecryptException;
 import com.lukichova.olenyn.app.entities.Message;
 import com.lukichova.olenyn.app.entities.Packet;
 import org.junit.Assert;
@@ -23,14 +24,14 @@ public class TestPacket {
     }
 
     @Test
-    public void test_coder() throws Exception {
+    public void test_coder() throws Exception, wrongDecryptException {
         byte[] encodedPacket = packet.toPacket();
         Packet decodedPacket = new Packet(encodedPacket);
         Assert.assertEquals(packet, decodedPacket);
     }
 
     @Test(expected = wrongBMagicException.class)
-    public void test_wrongMagic() throws Exception {
+    public void test_wrongMagic() throws Exception, wrongDecryptException {
         byte[] encodedPacket = packet.toPacket();
         encodedPacket[0] = 0x14;
         new Packet(encodedPacket);
@@ -38,7 +39,7 @@ public class TestPacket {
 
 
     @Test(expected = wrongCrc1Exception.class)
-    public void test_wrongCrc16() throws Exception {
+    public void test_wrongCrc16() throws Exception, wrongDecryptException {
         byte[] encodedPacket = packet.toPacket();
         encodedPacket[1] = 6;
         new Packet(encodedPacket);
@@ -46,7 +47,7 @@ public class TestPacket {
     }
 
     @Test(expected = wrongCrc2Exception.class)
-    public void test_wrongCrc16_2() throws Exception {
+    public void test_wrongCrc16_2() throws Exception, wrongDecryptException {
         byte[] encodedPacket = packet.toPacket();
         encodedPacket[21] = 6;
         new Packet(encodedPacket);

@@ -2,6 +2,7 @@ package com.lukichova.olenyn.app;
 
 import com.google.common.primitives.UnsignedLong;
 import com.lukichova.olenyn.app.Exceptions.wrongConnectionException;
+import com.lukichova.olenyn.app.Exceptions.wrongDecryptException;
 import com.lukichova.olenyn.app.entities.Message;
 import com.lukichova.olenyn.app.entities.Packet;
 import org.junit.Assert;
@@ -15,7 +16,7 @@ public class TestClient {
     UnsignedLong unsignedLongbPktId = UnsignedLong.valueOf(Long.MAX_VALUE);
 
     @Test
-    public void testClient() throws Exception {
+    public void testClient() throws Exception, wrongDecryptException {
         Client client = new Client();
         client.connect(2305);
         unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("2305"));
@@ -30,7 +31,7 @@ public class TestClient {
     }
 
     @Test(expected = wrongConnectionException.class)
-    public void testWrongConnection() throws Exception {
+    public void testWrongConnection() throws Exception, wrongDecryptException {
         Client client = new Client();
         unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("2305"));
         testMessage = new Message(3, 4, "time");
@@ -62,6 +63,8 @@ public class TestClient {
                     }
                     client.disconnect();
                 } catch (Exception e) {
+                    e.printStackTrace();
+                } catch (wrongDecryptException e) {
                     e.printStackTrace();
                 }
             });

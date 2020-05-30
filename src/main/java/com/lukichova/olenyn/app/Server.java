@@ -1,5 +1,6 @@
 package com.lukichova.olenyn.app;
 
+import com.lukichova.olenyn.app.Exceptions.wrongDecryptException;
 import com.lukichova.olenyn.app.classes.Processor;
 import com.lukichova.olenyn.app.entities.Packet;
 import com.lukichova.olenyn.app.network.Network;
@@ -90,6 +91,8 @@ public class Server {
                 network.close();
                 System.out.println("Connection closed");
             } catch (Exception e) {
+                e.printStackTrace();
+            } catch (wrongDecryptException e) {
                 e.printStackTrace();
             }
         }

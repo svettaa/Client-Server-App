@@ -2,6 +2,7 @@ package com.lukichova.olenyn.app;
 
 import com.google.common.primitives.UnsignedLong;
 import com.lukichova.olenyn.app.Exceptions.wrongConnectionException;
+import com.lukichova.olenyn.app.Exceptions.wrongDecryptException;
 import com.lukichova.olenyn.app.entities.Message;
 import com.lukichova.olenyn.app.entities.Packet;
 import com.lukichova.olenyn.app.network.Network;
@@ -20,7 +21,7 @@ public class Client {
     Client() {
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception, wrongDecryptException {
         Message testMessage = new Message(Message.cTypes.ADD_PRODUCT.ordinal(), 1, "time");
         Packet packet = new Packet((byte) 1, UnsignedLong.ONE, testMessage);
 
@@ -44,11 +45,11 @@ public class Client {
         System.out.println("Client running via " + network + " connection");
     }
 
-    public Packet request(Packet packet) throws Exception {
+    public Packet request(Packet packet) throws Exception, wrongDecryptException {
         if (network == null) {
             throw new wrongConnectionException("Not connected");
         }
-        try
+
         network.send(packet);
         return network.receive();
     }

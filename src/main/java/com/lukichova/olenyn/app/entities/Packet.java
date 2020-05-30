@@ -4,6 +4,7 @@ import com.github.snksoft.crc.CRC;
 import com.lukichova.olenyn.app.Exceptions.wrongBMagicException;
 import com.lukichova.olenyn.app.Exceptions.wrongCrc1Exception;
 import com.lukichova.olenyn.app.Exceptions.wrongCrc2Exception;
+import com.lukichova.olenyn.app.Exceptions.wrongDecryptException;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -47,7 +48,7 @@ public class Packet {
     Message bMsq;
 
 
-    public Packet(byte[] encodedPacket) throws wrongBMagicException, wrongCrc1Exception, wrongCrc2Exception {
+    public Packet(byte[] encodedPacket) throws Exception, wrongDecryptException {
         ByteBuffer buffer = ByteBuffer.wrap(encodedPacket);
 
         Byte expectedBMagic = buffer.get();

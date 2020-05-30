@@ -2,6 +2,7 @@ package com.lukichova.olenyn.app.network;
 
 
 
+import com.lukichova.olenyn.app.Exceptions.wrongDecryptException;
 import com.lukichova.olenyn.app.classes.Processor;
 import com.lukichova.olenyn.app.entities.Message;
 import com.lukichova.olenyn.app.entities.Packet;
@@ -67,6 +68,8 @@ public class UDPNetwork implements Network {
             return packet;
         } catch (Exception e) {
             System.err.println("Error:" + socket);
+            e.printStackTrace();
+        } catch (wrongDecryptException e) {
             e.printStackTrace();
         }
         return null;
