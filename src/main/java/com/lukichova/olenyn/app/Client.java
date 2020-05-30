@@ -35,9 +35,11 @@ public class Client {
     public void connect(int serverPort) throws Exception {
 
         if (NETWORK_TYPE.toLowerCase().equals("tcp"))
-            network = new TCPNetwork(new Socket(NETWORK_HOST,NETWORK_PORT));
-        else
+            network = new TCPNetwork(new Socket(NETWORK_HOST, NETWORK_PORT));
+        else {
             network = new UDPNetwork();
+            network.connect();
+        }
 
         System.out.println("Client running via " + network + " connection");
     }
@@ -46,6 +48,7 @@ public class Client {
         if (network == null) {
             throw new wrongConnectionException("Not connected");
         }
+        try
         network.send(packet);
         return network.receive();
     }

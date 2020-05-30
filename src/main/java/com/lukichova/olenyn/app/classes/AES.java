@@ -1,8 +1,12 @@
 package com.lukichova.olenyn.app.classes;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -24,17 +28,23 @@ public class AES {
 
     }
 
-    public static String decrypt(String strToDecrypt) throws Exception
-    {
-            setKey();
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
-            cipher.init(Cipher.DECRYPT_MODE, secretKey);
-            return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
+    public static String decrypt(String strToDecrypt)
+            throws DecoderException {
 
+            try {
+                setKey();
+                Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+                cipher.init(Cipher.DECRYPT_MODE, secretKey);
+                return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
+            } catch (UnsupportedEncodingException | NoSuchAlgorithmException,
+                NoSuchPaddingException, InvalidKeyException,
+                BadPaddingException, IllegalBlockSizeException e){
+                throw new DecoderException();
+        }
+        }
     }
 
-    public static void setKey() throws Exception
-    {
+    public static void setKey() throws UnsupportedEncodingException, NoSuchAlgorithmException {
         if (key == null) {
         MessageDigest sha = null;
         key = secret.getBytes("UTF-8");

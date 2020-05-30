@@ -30,7 +30,7 @@ public class TCPNetwork implements Network {
     }
 
     @Override
-    public Packet receive() throws Exception {
+    public Packet receive() throws IOException {
         PacketProcessing pr = new PacketProcessing();
         ByteArrayOutputStream packetBytes = pr.processing(serverInputStream);
         if(packetBytes == null)

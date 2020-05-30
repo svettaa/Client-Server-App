@@ -47,7 +47,7 @@ public class Packet {
     Message bMsq;
 
 
-    public Packet(byte[] encodedPacket) throws Exception {
+    public Packet(byte[] encodedPacket) throws wrongBMagicException, wrongCrc1Exception, wrongCrc2Exception {
         ByteBuffer buffer = ByteBuffer.wrap(encodedPacket);
 
         Byte expectedBMagic = buffer.get();

@@ -7,26 +7,48 @@ import com.lukichova.olenyn.app.network.TCPNetwork;
 import com.lukichova.olenyn.app.network.UDPNetwork;
 
 
+import javax.sound.sampled.Port;
+import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.lukichova.olenyn.app.resoures.Resoures.NETWORK_PORT;
-import static com.lukichova.olenyn.app.resoures.Resoures.NETWORK_TYPE;
+import static com.lukichova.olenyn.app.resoures.Resoures.*;
 
 public class Server {
 
-    public static void main(String[] args) throws Exception {
-       // String portProperty = "2305";
+    private static ExecutorService processPool = Executors.newFixedThreadPool(10);
 
-            try (ServerSocket listener = new ServerSocket(NETWORK_PORT))  {
+    public static void main(String[] args) throws Exception {
+        // String portProperty = "2305";
+        if (NETWORK_TYPE.toLowerCase().equals("tcp")) {
+            try (ServerSocket listener = new ServerSocket(NETWORK_PORT)) {
                 System.out.println("Server is running...");
-            ExecutorService pool = Executors.newFixedThreadPool(10);
-            while (true) {
-                pool.execute(new Server.Listener(listener.accept()));
+                ExecutorService pool = Executors.newFixedThreadPool(15);
+                while (true) {
+                    pool.execute(new Server.Listener(listener.accept()));
+                }
             }
+        } else {
+            DatagramSocket socket = new DatagramSocket(NETWORK_PORT);
+            boolean running = true;
+
+            UDPNetwork network = new UDPNetwork(socket);
+            while (running) {
+                Packet incoming = network.receive();
+                processPool.execute(() -> {
+                    try {
+                        network.send(incoming);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+            network.close();
+
         }
+
     }
 
 
@@ -51,12 +73,18 @@ public class Server {
 
                 System.out.println("Server is running via " + network + " connection");
 
-                while(true) {
+                while (true) {
                     Packet packet = network.receive();
-                    if(packet == null)
+                    if (packet == null)
                         break;
-                    Packet answer = Processor.process(packet);
-                    network.send(answer);
+                    processPool.execute(() -> {
+                        Packet answer = Processor.process(packet);
+                        try {
+                            network.send(answer);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
                 }
 
                 network.close();

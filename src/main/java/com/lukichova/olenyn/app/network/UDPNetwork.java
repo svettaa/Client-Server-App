@@ -5,6 +5,7 @@ package com.lukichova.olenyn.app.network;
 import com.lukichova.olenyn.app.classes.Processor;
 import com.lukichova.olenyn.app.entities.Message;
 import com.lukichova.olenyn.app.entities.Packet;
+import com.lukichova.olenyn.app.resoures.Resoures;
 import com.lukichova.olenyn.app.utils.NetworkProperties;
 
 import java.io.IOException;
@@ -14,10 +15,20 @@ import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+import static com.lukichova.olenyn.app.resoures.Resoures.NETWORK_HOST;
+import static com.lukichova.olenyn.app.resoures.Resoures.NETWORK_PORT;
+
 
 public class UDPNetwork implements Network {
     private DatagramSocket socket;
     private Boolean isServer = false;
+
+    public UDPNetwork(DatagramSocket socket){
+        this.socket = socket;
+    }
+
+    public UDPNetwork(){
+    }
 
 
     public void listen() throws IOException {
@@ -53,11 +64,7 @@ public class UDPNetwork implements Network {
             packet.setClientInetAddress(datagramPacket.getAddress());
             packet.setClientPort(datagramPacket.getPort());
 
-            if (isServer) {
-                Processor.process(packet);
-            }else {
-                return packet;
-            }
+            return packet;
         } catch (Exception e) {
             System.err.println("Error:" + socket);
             e.printStackTrace();
@@ -74,16 +81,9 @@ public class UDPNetwork implements Network {
 
     @Override
     public void send(Packet packet) throws Exception {
-        String hostProperty = NetworkProperties.getProperty("host");
-        if (hostProperty == null)
-            hostProperty = "localhost";
 
-        String portProperty = NetworkProperties.getProperty("port");
-        if (portProperty == null)
-            portProperty = "2305";
-
-        InetAddress inetAddress = packet.getClientInetAddress() != null ? packet.getClientInetAddress() : InetAddress.getByName(hostProperty);
-        Integer port = packet.getClientPort() != null ? packet.getClientPort() : Integer.parseInt(portProperty);
+        InetAddress inetAddress = packet.getClientInetAddress() != null ? packet.getClientInetAddress() : InetAddress.getByName(NETWORK_HOST);
+        Integer port = packet.getClientPort() != null ? packet.getClientPort() : NETWORK_PORT;
 
         byte[] packetBytes = packet.toPacket();
 
