@@ -48,7 +48,7 @@ public class Client {
         if (network == null) {
             throw new wrongConnectionException("Not connected");
         }
-        try
+
         network.send(packet);
         return network.receive();
     }

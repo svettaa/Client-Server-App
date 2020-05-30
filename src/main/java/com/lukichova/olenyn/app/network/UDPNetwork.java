@@ -1,7 +1,5 @@
 package com.lukichova.olenyn.app.network;
 
-
-
 import com.lukichova.olenyn.app.classes.Processor;
 import com.lukichova.olenyn.app.entities.Message;
 import com.lukichova.olenyn.app.entities.Packet;

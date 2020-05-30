@@ -18,40 +18,40 @@ public class AES {
     static String secret = "sonyaandsvetathebestprogrammers";
     private static byte[] key;
 
-    public static String encrypt(String strToEncrypt) throws Exception
-    {
-            setKey();
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-            return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
+    public static String encrypt(String strToEncrypt) throws Exception {
+        setKey();
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+        return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
 
 
     }
 
     public static String decrypt(String strToDecrypt)
-            throws DecoderException {
+            throws wrongDecryptException {
 
-            try {
-                setKey();
-                Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
-                cipher.init(Cipher.DECRYPT_MODE, secretKey);
-                return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
-            } catch (UnsupportedEncodingException | NoSuchAlgorithmException,
-                NoSuchPaddingException, InvalidKeyException,
-                BadPaddingException, IllegalBlockSizeException e){
-                throw new DecoderException();
-        }
+        try {
+            setKey();
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey);
+            return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
+        } catch (UnsupportedEncodingException | NoSuchAlgorithmException |
+                NoSuchPaddingException | InvalidKeyException |
+                BadPaddingException | IllegalBlockSizeException e) {
+            throw new wrongDecryptException();
         }
     }
 
+
     public static void setKey() throws UnsupportedEncodingException, NoSuchAlgorithmException {
         if (key == null) {
-        MessageDigest sha = null;
-        key = secret.getBytes("UTF-8");
-        sha = MessageDigest.getInstance("SHA-1");
-        key = sha.digest(key);
-        key = Arrays.copyOf(key, 16);
-        secretKey = new SecretKeySpec(key, algorithm);
+            MessageDigest sha = null;
+            key = secret.getBytes("UTF-8");
+            sha = MessageDigest.getInstance("SHA-1");
+            key = sha.digest(key);
+            key = Arrays.copyOf(key, 16);
+            secretKey = new SecretKeySpec(key, algorithm);
 
-    }}
+        }
+    }
 }

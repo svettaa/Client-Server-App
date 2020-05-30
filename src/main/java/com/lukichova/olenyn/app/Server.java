@@ -50,8 +50,6 @@ public class Server {
         }
 
     }
-
-
     private static class Listener implements Runnable {
         private Socket socket;
 
@@ -86,7 +84,6 @@ public class Server {
                         }
                     });
                 }
-
                 network.close();
                 System.out.println("Connection closed");
             } catch (Exception e) {

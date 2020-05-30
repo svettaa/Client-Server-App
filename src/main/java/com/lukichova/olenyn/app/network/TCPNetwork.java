@@ -1,5 +1,8 @@
 package com.lukichova.olenyn.app.network;
 
+import com.lukichova.olenyn.app.Exceptions.wrongBMagicException;
+import com.lukichova.olenyn.app.Exceptions.wrongCrc1Exception;
+import com.lukichova.olenyn.app.Exceptions.wrongCrc2Exception;
 import com.lukichova.olenyn.app.classes.PacketProcessing;
 import com.lukichova.olenyn.app.entities.Packet;
 
@@ -30,7 +33,7 @@ public class TCPNetwork implements Network {
     }
 
     @Override
-    public Packet receive() throws IOException {
+    public Packet receive() throws IOException, wrongBMagicException, wrongCrc1Exception, wrongCrc2Exception {
         PacketProcessing pr = new PacketProcessing();
         ByteArrayOutputStream packetBytes = pr.processing(serverInputStream);
         if(packetBytes == null)

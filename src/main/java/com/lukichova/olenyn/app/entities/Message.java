@@ -53,7 +53,7 @@ public class Message {
         message = AES.encrypt(message);
     }
 
-    public void decode() throws {
+    public void decode() throws Exception{
 
         message = AES.decrypt(message);
     }
