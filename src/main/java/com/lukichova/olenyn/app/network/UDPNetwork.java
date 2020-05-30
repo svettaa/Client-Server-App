@@ -1,4 +1,4 @@
-/*
+
 package com.lukichova.olenyn.app.network;
 
 import com.lukichova.olenyn.app.classes.Processor;
@@ -50,7 +50,7 @@ public class UDPNetwork implements Network {
             packet.setClientPort(datagramPacket.getPort());
 
             if (isServer)
-                Processor.process(this, packet);
+                Processor.process( packet);
             else
                 return packet;
         } catch (Exception e) {
@@ -91,4 +91,4 @@ public class UDPNetwork implements Network {
     public void close() {
         socket.close();
     }
-}*/
+}
