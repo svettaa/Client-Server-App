@@ -16,10 +16,10 @@ import java.util.concurrent.Executors;
 public class Server {
 
     public static void main(String[] args) throws Exception {
-        String portProperty = NetworkProperties.getProperty("port");
+        String portProperty = "2305";
 
             try (ServerSocket listener = new ServerSocket(Integer.parseInt(portProperty)))  {
-
+                System.out.println("Server is running...");
             ExecutorService pool = Executors.newFixedThreadPool(10);
             while (true) {
                 pool.execute(new Server.Listener(listener.accept()));

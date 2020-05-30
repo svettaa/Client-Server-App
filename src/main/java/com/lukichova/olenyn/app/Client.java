@@ -6,6 +6,7 @@ import com.lukichova.olenyn.app.entities.Message;
 import com.lukichova.olenyn.app.entities.Packet;
 import com.lukichova.olenyn.app.network.Network;
 import com.lukichova.olenyn.app.network.TCPNetwork;
+import com.lukichova.olenyn.app.network.UDPNetwork;
 import com.lukichova.olenyn.app.utils.NetworkProperties;
 
 
@@ -14,7 +15,7 @@ import java.net.Socket;
 
 
 public class Client {
-    private TCPNetwork network;
+    Network network;
 
     Client() {
     }
@@ -34,8 +35,14 @@ public class Client {
     public void connect(int serverPort) throws Exception {
         String portProperty = NetworkProperties.getProperty("port");
         String hostProperty = NetworkProperties.getProperty("host");
-        network = new TCPNetwork(new Socket(hostProperty, Integer.parseInt(portProperty)));
-        System.out.println("Client is connected");
+        String networkType = NetworkProperties.getProperty("type");
+
+        if (networkType.toLowerCase().equals("tcp"))
+            network = new TCPNetwork(new Socket(hostProperty, Integer.parseInt(portProperty)));
+        else
+            network = new UDPNetwork();
+
+        System.out.println("Client running via " + network + " connection");
     }
 
     public Packet request(Packet packet) throws Exception {
