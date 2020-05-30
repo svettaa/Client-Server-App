@@ -23,10 +23,6 @@ public class Client {
         Message testMessage = new Message(Message.cTypes.ADD_PRODUCT.ordinal(), 1, "time");
         Packet packet = new Packet((byte) 1, UnsignedLong.ONE, testMessage);
 
-/*
-        Message secondTestMessage = new Message(1, 1, "notTime");
-        Packet secondPacket = new Packet((byte) 1, UnsignedLong.ONE, secondTestMessage);
-*/
 
         Client client = new Client();
         client.connect(2305);

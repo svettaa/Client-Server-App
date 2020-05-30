@@ -12,10 +12,12 @@ import com.google.common.primitives.UnsignedLong;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 
-@EqualsAndHashCode
 @Data
 public class Packet {
     public final static Byte bMagic = 0x13;
+
+    InetAddress clientInetAddress;
+    Integer clientPort;
 
     public final static Integer packetPartFirstLengthWithoutwLen = bMagic.BYTES + Byte.BYTES + Long.BYTES;
     public final static Integer packetPartFirstLength = packetPartFirstLengthWithoutwLen + Integer.BYTES;
@@ -43,10 +45,7 @@ public class Packet {
 
     @Getter
     Message bMsq;
-    @Getter
-    InetAddress clientInetAddress;
-    @Getter
-    Integer clientPort;
+
 
     public Packet(byte[] encodedPacket) throws Exception {
         ByteBuffer buffer = ByteBuffer.wrap(encodedPacket);

@@ -53,10 +53,11 @@ public class UDPNetwork implements Network {
             packet.setClientInetAddress(datagramPacket.getAddress());
             packet.setClientPort(datagramPacket.getPort());
 
-            if (isServer)
-                Processor.process( packet);
-            else
+            if (isServer) {
+                Processor.process(packet);
+            }else {
                 return packet;
+            }
         } catch (Exception e) {
             System.err.println("Error:" + socket);
             e.printStackTrace();
