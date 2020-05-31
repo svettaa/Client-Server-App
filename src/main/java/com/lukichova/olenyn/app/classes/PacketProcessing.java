@@ -12,51 +12,13 @@ public class PacketProcessing {
     public PacketProcessing() {
     }
 
-    public ByteArrayOutputStream processing(InputStream serverInputStream) throws IOException {
-        Integer state = 0;
-        Integer wLen = 0;
-        Boolean packetIncomplete = true;
+    public byte[] processing(InputStream serverInputStream, byte maxPacketBuffer[]) throws IOException {
+        serverInputStream.read(maxPacketBuffer);
 
-        ByteBuffer byteBuffer = ByteBuffer.allocate(Long.BYTES);
-        ByteArrayOutputStream packetBytes = new ByteArrayOutputStream();
+        ByteBuffer byteBuffer = ByteBuffer.wrap(maxPacketBuffer);
+        Integer wLen = byteBuffer.getInt(Packet.packetPartFirstLengthWithoutwLen);
 
-        byte oneByte[] = new byte[1];
-
-        while (packetIncomplete && (serverInputStream.read(oneByte)) != -1) {
-            if (Packet.bMagic.equals(oneByte[0])) {
-                state = 0;
-                byteBuffer = ByteBuffer.allocate(Packet.packetPartFirstLengthWithoutwLen - Packet.bMagic.BYTES);
-                packetBytes.reset();
-            } else {
-                byteBuffer.put(oneByte);
-                switch (state) {
-                    case 0:
-                        if (!byteBuffer.hasRemaining()) {
-                            byteBuffer = ByteBuffer.allocate(Integer.BYTES);
-                            state = 1;
-                        }
-                        break;
-
-                    case 1:
-                        if (!byteBuffer.hasRemaining()) {
-                            wLen = byteBuffer.getInt(0);
-                            byteBuffer = ByteBuffer.allocate(Short.BYTES + Message.BYTES_WITHOUT_MESSAGE + wLen + Short.BYTES);
-                            state = 2;
-                        }
-                        break;
-
-                    case 2:
-                        if (!byteBuffer.hasRemaining()) {
-                            packetIncomplete = false;
-                        }
-                        break;
-                }
-            }
-
-            packetBytes.write(oneByte);
-        }
-        if(packetIncomplete)
-            return null;
-        return packetBytes;
+        byte fullPacket[] = byteBuffer.slice().array();
+        return fullPacket;
     }
 }

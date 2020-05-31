@@ -42,13 +42,10 @@ public class TCPNetwork implements Network {
 
         try {
             byte maxPacketBuffer[] = new byte[Packet.packetMaxSize];
+            PacketProcessing pr = new PacketProcessing();
+            byte fullPacket[] = pr.processing(serverInputStream, maxPacketBuffer);
 
-            serverInputStream.read(maxPacketBuffer);
 
-            ByteBuffer byteBuffer = ByteBuffer.wrap(maxPacketBuffer);
-            Integer wLen = byteBuffer.getInt(Packet.packetPartFirstLengthWithoutwLen);
-
-            byte fullPacket[] = byteBuffer.slice().array();
 
             System.out.println("Received");
             System.out.println(Arrays.toString(fullPacket) + "\n");
