@@ -57,11 +57,10 @@ public class Client {
                 network.connect();
             }
 
-            System.out.println("Client running via " + network + " connection");
+            System.out.println("Client is running via " + network + " connection");
         } catch (IOException e) {
            throw new wrongConnectionException("Client can not connect ");
         }
-        System.out.println("Client is running via " + network + " connection");
     }
 
     public void reconnect() throws unavailableServer, InterruptedException {

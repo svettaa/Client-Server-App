@@ -54,9 +54,10 @@ public class TCPNetwork implements Network {
         byte maxPacketBuffer[] = new byte[Packet.packetMaxSize];
         PacketProcessing pr = new PacketProcessing();
         byte fullPacket[] = pr.processing(serverInputStream, maxPacketBuffer);
+
+
         System.out.println("Received");
         System.out.println(Arrays.toString(fullPacket) + "\n");
-
 
         Packet packet = new Packet(fullPacket);
         System.err.println(packet.getBMsq().getMessage());
