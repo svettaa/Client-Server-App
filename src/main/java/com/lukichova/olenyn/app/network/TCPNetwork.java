@@ -47,59 +47,28 @@ public class TCPNetwork implements Network {
 
     }
 
-    @Override
-    public Packet receive() throws IOException, interruptedConnectionException {
+
+    public Packet receive() throws Exception, wrongDecryptException {
         InputStream serverInputStream = socket.getInputStream();
 
-        try {
-            byte maxPacketBuffer[] = new byte[Packet.packetMaxSize];
-            PacketProcessing pr = new PacketProcessing();
-            byte fullPacket[] = pr.processing(serverInputStream, maxPacketBuffer);
-
-           // TimeUnit.SECONDS.sleep(1000);
-
-            System.out.println("Received");
-            System.out.println(Arrays.toString(fullPacket) + "\n");
-
-            Packet packet = new Packet(fullPacket);
-            System.err.println(packet.getBMsq().getMessage());
-
-            if (serverSocket != null) {
-                Processor.process(packet);
-                send(packet);
-
-            } else {
-                return packet;
-            }
-        } catch (IOException e) {
-
-            for(int i=0;i<5;i++)
-             {
-                try {
-                    this.socket = new Socket(NETWORK_HOST, NETWORK_PORT);
-                    return receive();
-
-                } catch(IOException S) {
-
-                    try {
-                        TimeUnit.MINUTES.sleep(3);
-                    } catch(InterruptedException ie) {
-
-                    }
-                }
-
-            }
-            throw new interruptedConnectionException();
+        byte maxPacketBuffer[] = new byte[Packet.packetMaxSize];
+        PacketProcessing pr = new PacketProcessing();
+        byte fullPacket[] = pr.processing(serverInputStream, maxPacketBuffer);
+        System.out.println("Received");
+        System.out.println(Arrays.toString(fullPacket) + "\n");
 
 
+        Packet packet = new Packet(fullPacket);
+        System.err.println(packet.getBMsq().getMessage());
 
-        } catch (Exception | wrongDecryptException e) {
-            System.err.println("Error:" + socket);
-            e.printStackTrace();
+        if (serverSocket != null) {
+            Processor.process(packet);
+            send(packet);
+        } else {
+            return packet;
         }
         return null;
     }
-
 
     @Override
     public void connect() throws IOException {
