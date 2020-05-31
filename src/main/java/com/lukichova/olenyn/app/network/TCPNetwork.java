@@ -1,7 +1,9 @@
 package com.lukichova.olenyn.app.network;
 
 
+import com.lukichova.olenyn.app.Exceptions.interruptedConnectionException;
 import com.lukichova.olenyn.app.Exceptions.wrongDecryptException;
+import com.lukichova.olenyn.app.Exceptions.wrongEcryptException;
 import com.lukichova.olenyn.app.classes.PacketProcessing;
 import com.lukichova.olenyn.app.classes.Processor;
 import com.lukichova.olenyn.app.entities.Packet;
@@ -15,6 +17,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+
+import static com.lukichova.olenyn.app.resoures.Resoures.NETWORK_HOST;
+import static com.lukichova.olenyn.app.resoures.Resoures.NETWORK_PORT;
 
 public class TCPNetwork implements Network {
 
@@ -37,7 +43,7 @@ public class TCPNetwork implements Network {
     }
 
     @Override
-    public Packet receive() throws IOException {
+    public Packet receive() throws Exception {
         InputStream serverInputStream = socket.getInputStream();
 
         try {
@@ -56,9 +62,32 @@ public class TCPNetwork implements Network {
             if (serverSocket != null) {
                 Processor.process(packet);
                 send(packet);
+
             } else {
                 return packet;
             }
+        } catch (IOException e) {
+
+            for(int i=0;i<5;i++)
+             {
+                try {
+                    this.socket = new Socket(NETWORK_HOST, NETWORK_PORT);
+                    return receive();
+
+                } catch(IOException S) {
+
+                    try {
+                        TimeUnit.MINUTES.sleep(3);
+                    } catch(InterruptedException ie) {
+
+                    }
+                }
+
+            }
+            throw new interruptedConnectionException();
+
+
+
         } catch (Exception | wrongDecryptException e) {
             System.err.println("Error:" + socket);
             e.printStackTrace();

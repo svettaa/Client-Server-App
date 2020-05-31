@@ -40,6 +40,7 @@ public class Client {
             network = new TCPNetwork(new Socket(NETWORK_HOST, NETWORK_PORT));
         else {
             network = new UDPNetwork();
+
             network.connect();
         }
 
