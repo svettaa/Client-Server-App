@@ -36,6 +36,7 @@ public class Server {
             boolean running = true;
 
             UDPNetwork network = new UDPNetwork(socket);
+            System.out.println("Server is running...");
             while (running) {
                 Packet incoming = network.receive();
                 processPool.execute(() -> {
