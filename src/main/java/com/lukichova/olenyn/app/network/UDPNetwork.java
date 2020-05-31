@@ -51,14 +51,16 @@ public class UDPNetwork implements Network {
             ByteBuffer byteBuffer = ByteBuffer.wrap(maxPacketBuffer);
             Integer wLen = byteBuffer.getInt(Packet.packetPartFirstLengthWithoutwLen);
 
-           byte fullPacket[] = byteBuffer.slice().array();
-           /* byte[] byteBuffer1 = byteBuffer.array();
-            ByteBuffer byteBuffer2=byteBuffer.put(byteBuffer1,0, Packet.packetPartFirstLength + Message.BYTES_WITHOUT_MESSAGE + wLen);
-            byte fullPacket[] = byteBuffer2.array();*/
+           byte fullPacket1[] = byteBuffer.slice().array();
+            byte fullPacket[] = new byte[Packet.packetPartFirstLength + Message.BYTES_WITHOUT_MESSAGE + wLen+4];
+            for (int i = 0; i < fullPacket.length; i++) {
+                fullPacket[i] = fullPacket1[i];
+            }
+
             System.out.println("Received");
             System.out.println(Arrays.toString(fullPacket) + "\n");
 
-            Packet packet = new Packet(fullPacket);
+            Packet packet = new Packet(fullPacket1);
             System.err.println(packet.getBMsq().getMessage());
 
             packet.setClientInetAddress(datagramPacket.getAddress());
