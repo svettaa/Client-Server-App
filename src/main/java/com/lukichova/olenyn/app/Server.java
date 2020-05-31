@@ -80,18 +80,24 @@ public class Server {
 
                 System.out.println("Server is running via " + network + " connection");
 
+
                 while (true) {
                     Packet packet = network.receive();
                     if (packet == null)
                         break;
+
                     processPool.execute(() -> {
                         Packet answer = Processor.process(packet);
                         try {
                             network.send(answer);
+
                         } catch (Exception e) {
+
                             e.printStackTrace();
-                        }
-                    });
+                       }
+                   });
+
+
                 }
                 network.close();
                 System.out.println("Connection closed");

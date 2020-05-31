@@ -36,7 +36,7 @@ public class Client {
 
         Client client = new Client();
         client.connect(NETWORK_PORT);
-        Thread.sleep(10000);
+     //   Thread.sleep(10000);
         client.request(packet);
 
             client.disconnect();
