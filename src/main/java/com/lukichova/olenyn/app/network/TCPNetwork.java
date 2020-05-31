@@ -1,9 +1,7 @@
 package com.lukichova.olenyn.app.network;
 
 
-import com.lukichova.olenyn.app.Exceptions.interruptedConnectionException;
-import com.lukichova.olenyn.app.Exceptions.wrongDecryptException;
-import com.lukichova.olenyn.app.Exceptions.wrongEcryptException;
+import com.lukichova.olenyn.app.Exceptions.*;
 import com.lukichova.olenyn.app.classes.PacketProcessing;
 import com.lukichova.olenyn.app.classes.Processor;
 import com.lukichova.olenyn.app.entities.Packet;
@@ -31,10 +29,17 @@ public class TCPNetwork implements Network {
     InputStream serverInputStream;
 
 
-    public TCPNetwork(Socket socket) throws Exception {
+    public TCPNetwork(Socket socket) throws wrongConnectionException {
+
         this.socket = socket;
-        socketOutputStream = socket.getOutputStream();
-        serverInputStream = socket.getInputStream();
+        try {
+            socketOutputStream = socket.getOutputStream();
+            serverInputStream = socket.getInputStream();
+        } catch (IOException e) {
+            throw new wrongConnectionException("Wrong TCPNetwork connection");
+
+        }
+
     }
 
     @Override
@@ -43,7 +48,7 @@ public class TCPNetwork implements Network {
     }
 
     @Override
-    public Packet receive() throws Exception {
+    public Packet receive() throws IOException, interruptedConnectionException {
         InputStream serverInputStream = socket.getInputStream();
 
         try {
@@ -51,7 +56,7 @@ public class TCPNetwork implements Network {
             PacketProcessing pr = new PacketProcessing();
             byte fullPacket[] = pr.processing(serverInputStream, maxPacketBuffer);
 
-
+           // TimeUnit.SECONDS.sleep(1000);
 
             System.out.println("Received");
             System.out.println(Arrays.toString(fullPacket) + "\n");
@@ -102,19 +107,31 @@ public class TCPNetwork implements Network {
     }
 
     @Override
-    public void send(Packet packet) throws Exception {
+    public void send(Packet packet) throws wrongSendException {
+        try {
+            byte[] packetBytes = new byte[0];
 
-        byte[] packetBytes = packet.toPacket();
+            packetBytes = packet.toPacket();
+
 
         socketOutputStream.write(packetBytes);
         socketOutputStream.flush();
 
         System.out.println("Send");
+      }
+        catch (Exception e) {
+           throw new wrongSendException();
+        }
+
     }
 
     @Override
-    public void close() throws IOException {
-        socket.close();
+    public void close() throws wrongCloseSocketException {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            throw new wrongCloseSocketException();
+        }
     }
 
 }
