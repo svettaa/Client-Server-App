@@ -32,17 +32,14 @@ public class UDPNetwork implements Network {
 
         DatagramPacket datagramPacket = new DatagramPacket(maxPacketBuffer, maxPacketBuffer.length);
         socket.receive(datagramPacket);
+        ByteBuffer byteBuffer = ByteBuffer.wrap(maxPacketBuffer);
+       Integer wLen = byteBuffer.getInt(Packet.packetPartFirstLengthWithoutwLen);
 
-//        ByteBuffer byteBuffer = ByteBuffer.wrap(maxPacketBuffer);
-//        Integer wLen = byteBuffer.getInt(Packet.packetPartFirstLengthWithoutwLen);
-//
-//        byte fullPacket1[] = byteBuffer.slice().array();
-//        byte fullPacket[] = new byte[Packet.packetPartFirstLength + Message.BYTES_WITHOUT_MESSAGE + wLen + 4];
-//        for (int i = 0; i < fullPacket.length; i++) {
-//            fullPacket[i] = fullPacket1[i];
-//        }
-
-        byte fullPacket[] = datagramPacket.getData();
+        byte fullPacket1[] = datagramPacket.getData();
+        byte fullPacket[] = new byte[Packet.packetPartFirstLength + Message.BYTES_WITHOUT_MESSAGE + wLen + 4];
+       for (int i = 0; i < fullPacket.length; i++) {
+           fullPacket[i] = fullPacket1[i];
+       }
 
         System.out.println("Received");
         System.out.println(Arrays.toString(fullPacket) + "\n");
