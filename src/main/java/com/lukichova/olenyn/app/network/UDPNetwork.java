@@ -19,9 +19,8 @@ public class UDPNetwork implements Network {
     private DatagramSocket socket;
     private Boolean isServer = false;
 
-    public UDPNetwork(DatagramSocket socket) throws SocketException {
+    public UDPNetwork(DatagramSocket socket) {
         this.socket = socket;
-        socket.setSoTimeout(5000);
     }
 
     public UDPNetwork() {
@@ -42,8 +41,7 @@ public class UDPNetwork implements Network {
     }
 
     @Override
-    public Packet receive() throws interruptedConnectionException, wrongCrc1Exception, wrongBMagicException, wrongCrc2Exception, wrongDecryptException, IOException {
-      //  try {
+    public Packet receive() throws wrongCrc1Exception, wrongBMagicException, wrongCrc2Exception, wrongDecryptException, IOException {
             byte maxPacketBuffer[] = new byte[Packet.packetMaxSize];
 
             DatagramPacket datagramPacket = new DatagramPacket(maxPacketBuffer, maxPacketBuffer.length);
@@ -71,13 +69,12 @@ public class UDPNetwork implements Network {
             packet.setClientPort(datagramPacket.getPort());
 
             return packet;
-     /*   } catch (IOException e) {
-            throw new interruptedConnectionException();
-        }*/
-    }
+        }
+
 
     public void connect() throws SocketException {
         socket = new DatagramSocket();
+        socket.setSoTimeout(2000);
     }
 
     @Override

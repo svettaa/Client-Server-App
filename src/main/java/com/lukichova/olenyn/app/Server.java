@@ -50,7 +50,7 @@ public class Server {
                 }
                 network.close();
             }
-        } catch (IOException | interruptedConnectionException e) {
+        } catch (IOException e) {
             System.out.println("");
         } catch (wrongCrc2Exception e) {
             e.printStackTrace();
