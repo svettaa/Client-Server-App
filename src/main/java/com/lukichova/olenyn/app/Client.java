@@ -34,7 +34,7 @@ public class Client {
             Message testMessage = new Message(Message.cTypes.ADD_PRODUCT.ordinal(), 1, "time");
             Packet packet = new Packet((byte) 1, UnsignedLong.ONE, testMessage);
 
-
+            //Packet packet = new Packet((byte) 1, UnsignedLong.ONE, testMessage)
             Client client = new Client();
             client.connect(NETWORK_PORT);
             Thread.sleep(3000);
@@ -104,6 +104,7 @@ public class Client {
     }
 
     public Packet request(Packet packet) throws wrongDecryptException, wrongSendException, wrongConnectionException, requestFailed, unavailableServer, InterruptedException, wrongCrc2Exception, wrongBMagicException, interruptedConnectionException, wrongCrc1Exception, IOException, wrongEcryptException {
+        int k = 5;
         try {
             if (network == null) {
                 throw new wrongConnectionException("Not connected");
@@ -121,8 +122,11 @@ public class Client {
             reconnect();
             throw new requestFailed();
 
-        } catch (SocketTimeoutException ex) {
+        } catch (SocketTimeoutException e){
             System.out.println("Need to resend");
+            k--;
+            if(k==0){ System.out.println("Cant send message"); return null;}
+            request(packet);
         }
         return packet;
     }
