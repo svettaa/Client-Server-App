@@ -37,19 +37,38 @@ public class Client {
 
             Client client = new Client();
             client.connect(NETWORK_PORT);
-
             Thread.sleep(3000);
             client.request(packet);
 
 
             client.disconnect();
-        } catch (wrongDisconnectException | wrongConnectionException | InterruptedException e) {
+        } catch (wrongDisconnectException e) {
+            System.out.println("Error while disconnecting");
+        } catch (wrongConnectionException e) {
+            System.out.println("Error while connecting");
+        } catch (InterruptedException e) {
             System.out.println("Some errors occurred");
         } catch (com.lukichova.olenyn.app.Exceptions.unavailableServer unavailableServer) {
             System.out.println("Server is unavailable");
-        } catch (Exception e) {
-            e.printStackTrace();
-        } 
+        } catch (wrongDecryptException e) {
+            System.out.println("Errors in decryption");
+        } catch (wrongBMagicException e) {
+            System.out.println("Wrong bMagic");
+        } catch (wrongCrc1Exception e) {
+            System.out.println("Wrong CRC1");
+        } catch (wrongCrc2Exception e) {
+            System.out.println("Wrong CRC2");
+        } catch (IOException e) {
+            System.out.println("IOException: socket was closed");
+        } catch (interruptedConnectionException e) {
+            System.out.println("Your connection was interrupted");
+        } catch (wrongSendException e) {
+            System.out.println("Errors while sending");
+        } catch (requestFailed e) {
+            System.out.println("Errors in request()");
+        } catch (wrongEcryptException e) {
+            System.out.println("Errors in encryption");
+        }
 
     }
 
@@ -84,47 +103,30 @@ public class Client {
         throw new unavailableServer();
     }
 
-    public Packet request(Packet packet) throws wrongConnectionException, requestFailed, unavailableServer, InterruptedException {
-        int k=5;
+    public Packet request(Packet packet) throws wrongDecryptException, wrongSendException, wrongConnectionException, requestFailed, unavailableServer, InterruptedException, wrongCrc2Exception, wrongBMagicException, interruptedConnectionException, wrongCrc1Exception, IOException, wrongEcryptException {
         try {
             if (network == null) {
                 throw new wrongConnectionException("Not connected");
             }
 
-                network.send(packet);
+            network.send(packet);
 
             Packet answerPacketOne = network.receive();
             if (answerPacketOne.getBPktId().equals(packet.getBPktId()))
                 System.out.println("CORRECT PACKET RESPONSE");
             else
                 System.out.println("WRONG PACKET RESPONSE");
+
         } catch (closedSocketException | SocketException e) {
             reconnect();
             throw new requestFailed();
-        }
-        catch (SocketTimeoutException e){
-          System.out.println("Need to resend");
-            k--;
-            if(k==0){ System.out.println("Cant send message"); return null;}
-            request(packet);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        } catch (interruptedConnectionException e) {
-            e.printStackTrace();
-        } catch (wrongCrc1Exception e) {
-            e.printStackTrace();
-        } catch (wrongBMagicException e) {
-            e.printStackTrace();
-        } catch (wrongCrc2Exception e) {
-            e.printStackTrace();
-        } catch (wrongDecryptException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        } catch (SocketTimeoutException ex) {
+            System.out.println("Need to resend");
         }
         return packet;
     }
+
 
     public void disconnect() throws wrongDisconnectException {
 

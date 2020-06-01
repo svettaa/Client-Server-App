@@ -23,7 +23,7 @@ public class Server {
 
     private static ExecutorService processPool = Executors.newFixedThreadPool(10);
 
-    public static void main(String[] args) throws unavailableClient {
+    public static void main(String[] args){
         try {
             if (NETWORK_TYPE.toLowerCase().equals("tcp")) {
                 try (ServerSocket listener = new ServerSocket(NETWORK_PORT)) {
@@ -49,10 +49,17 @@ public class Server {
                     });
                 }
                 network.close();
-
             }
         } catch (IOException | interruptedConnectionException e) {
             System.out.println("");
+        } catch (wrongCrc2Exception e) {
+            e.printStackTrace();
+        } catch (wrongCrc1Exception e) {
+            e.printStackTrace();
+        } catch (wrongBMagicException e) {
+            e.printStackTrace();
+        } catch (wrongDecryptException e) {
+            e.printStackTrace();
         }
 
     }
@@ -85,11 +92,7 @@ public class Server {
 
                     try {
                         Packet packet = null;
-
-
                         packet = network.receive();
-
-
                         Packet finalPacket = packet;
                         processPool.execute(() -> {
                             Packet answer = Processor.process(finalPacket);
@@ -102,20 +105,19 @@ public class Server {
                     } catch (closedSocketException e) {
                         break;
                     } catch (SocketException e) {
-                        System.out.println("Client is unavailable");
+                        System.out.println("ERROR: Client is unavailable");
                         break;
                     }
                 }
-
                 network.close();
                 System.out.println("Connection closed");
 
             } catch (wrongConnectionException e) {
                 System.out.println("Wrong TCP connection");
             } catch (wrongDecryptException e) {
-                e.printStackTrace();
+                System.out.println("Errors in decryption");
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("IOException: socket was closed");
             } catch (wrongBMagicException e) {
                 System.out.println("Wrong bMagic");
             } catch (wrongCrc1Exception e) {

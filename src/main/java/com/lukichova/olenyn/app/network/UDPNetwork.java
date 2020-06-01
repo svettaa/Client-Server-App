@@ -19,9 +19,8 @@ public class UDPNetwork implements Network {
     private DatagramSocket socket;
     private Boolean isServer = false;
 
-    public UDPNetwork(DatagramSocket socket) throws SocketException {
+    public UDPNetwork(DatagramSocket socket) {
         this.socket = socket;
-        socket.setSoTimeout(5000);
     }
 
     public UDPNetwork() {
@@ -42,7 +41,7 @@ public class UDPNetwork implements Network {
     }
 
     @Override
-    public Packet receive() throws interruptedConnectionException {
+    public Packet receive() throws interruptedConnectionException, wrongCrc1Exception, wrongBMagicException, wrongCrc2Exception, wrongDecryptException {
         try {
             byte maxPacketBuffer[] = new byte[Packet.packetMaxSize];
 
@@ -61,18 +60,10 @@ public class UDPNetwork implements Network {
             System.out.println("Received");
             System.out.println(Arrays.toString(fullPacket) + "\n");
 
-            Packet packet = null;
-            try {
-                packet = new Packet(fullPacket1);
-            } catch (wrongBMagicException e) {
-                e.printStackTrace();
-            } catch (wrongDecryptException e) {
-                e.printStackTrace();
-            } catch (wrongCrc1Exception e) {
-                e.printStackTrace();
-            } catch (wrongCrc2Exception e) {
-                e.printStackTrace();
-            }
+            Packet packet;
+
+            packet = new Packet(fullPacket1);
+
             System.err.println(packet.getBMsq().getMessage());
 
             packet.setClientInetAddress(datagramPacket.getAddress());
@@ -84,12 +75,8 @@ public class UDPNetwork implements Network {
         }
     }
 
-    public void connect() throws wrongConnectionException {
-        try {
-            socket = new DatagramSocket();
-        } catch (SocketException e) {
-            throw new wrongConnectionException("Wrong UDP connection");
-        }
+    public void connect() throws SocketException {
+        socket = new DatagramSocket();
     }
 
     @Override
@@ -105,8 +92,8 @@ public class UDPNetwork implements Network {
 
             System.out.println("Send");
             System.out.println(Arrays.toString(packetBytes) + "\n");
-        } catch (IOException|wrongEcryptException e) {
-           throw new wrongSendException();
+        } catch (wrongEcryptException | IOException e) {
+            throw new wrongSendException();
         }
 
     }
