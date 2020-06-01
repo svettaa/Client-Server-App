@@ -66,7 +66,9 @@ public class Client {
         } catch (wrongSendException e) {
             System.out.println("Errors while sending");
         } catch (requestFailed e) {
+
             System.out.println("Errors in request()");
+
         } catch (wrongEcryptException e) {
             System.out.println("Errors in encryption");
         }
@@ -121,7 +123,8 @@ public class Client {
 
         } catch (closedSocketException | SocketException e) {
             reconnect();
-            throw new requestFailed();
+            request(packet, k);
+
 
         } catch (SocketTimeoutException e){
             System.out.println("Need to resend");

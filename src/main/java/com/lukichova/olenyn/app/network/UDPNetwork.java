@@ -2,6 +2,7 @@ package com.lukichova.olenyn.app.network;
 
 
 import com.lukichova.olenyn.app.Exceptions.*;
+import com.lukichova.olenyn.app.classes.Processor;
 import com.lukichova.olenyn.app.entities.Message;
 import com.lukichova.olenyn.app.entities.Packet;
 import com.lukichova.olenyn.app.utils.NetworkProperties;
@@ -68,8 +69,13 @@ public class UDPNetwork implements Network {
             packet.setClientInetAddress(datagramPacket.getAddress());
             packet.setClientPort(datagramPacket.getPort());
 
+        if (isServer)
+            Processor.process( packet);
+        else
             return packet;
-        }
+
+        return null;
+    }
 
 
     public void connect() throws SocketException {
@@ -80,12 +86,14 @@ public class UDPNetwork implements Network {
     @Override
     public void send(Packet packet) throws wrongSendException {
         try {
+           // Packet packet = Processor.process(answer);
             InetAddress inetAddress = packet.getClientInetAddress() != null ? packet.getClientInetAddress() : InetAddress.getByName(NETWORK_HOST);
             Integer port = packet.getClientPort() != null ? packet.getClientPort() : NETWORK_PORT;
 
             byte[] packetBytes = packet.toPacket();
 
             DatagramPacket datagramPacket = new DatagramPacket(packetBytes, packetBytes.length, inetAddress, port);
+
             socket.send(datagramPacket);
 
             System.out.println("Send");

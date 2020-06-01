@@ -40,6 +40,7 @@ public class Server {
                 System.out.println("Server is running via " + network + " connection");
                 while (running) {
                     Packet incoming = network.receive();
+                   // Packet answer = Processor.process(incoming);
                     processPool.execute(() -> {
                         try {
                             network.send(incoming);
