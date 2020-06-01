@@ -110,13 +110,5 @@ public class TestClient {
         client.disconnect();
     }
 //run client without server
-    @Test (expected = unavailableServer.class)
-    public void catchUnavailableServer() throws Exception {
-        testMessage = new Message(3, 4, "time");
-        packet = new Packet((byte) 1, unsignedLongbPktId, testMessage);
-        Client client = new Client();
-        client.connect(NETWORK_PORT);
-        Thread.sleep(3000);
-        client.request(packet, AMOUNT_OF_TRIES);
-    }
+
 }
