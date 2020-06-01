@@ -36,8 +36,8 @@ public class Server {
             } else {
                 DatagramSocket socket = new DatagramSocket(NETWORK_PORT);
                 boolean running = true;
-
                 UDPNetwork network = new UDPNetwork(socket);
+                System.out.println("Server is running via " + network + " connection");
                 while (running) {
                     Packet incoming = network.receive();
                     processPool.execute(() -> {
@@ -87,7 +87,7 @@ public class Server {
                             try {
                                 network.send(answer);
                             } catch (Exception e) {
-                                e.printStackTrace();
+                                System.out.println("Errors while sending");
                             }
                         });
                     } catch (closedSocketException e) {

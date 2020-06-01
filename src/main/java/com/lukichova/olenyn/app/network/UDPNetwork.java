@@ -79,7 +79,6 @@ public class UDPNetwork implements Network {
 
 
     public void connect() throws wrongConnectionException {
-
         try {
             socket = new DatagramSocket();
         } catch (SocketException e) {

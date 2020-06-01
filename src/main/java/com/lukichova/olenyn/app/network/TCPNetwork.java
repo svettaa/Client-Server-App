@@ -12,9 +12,6 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Arrays;
 
-import static com.lukichova.olenyn.app.resoures.Resoures.NETWORK_HOST;
-import static com.lukichova.olenyn.app.resoures.Resoures.NETWORK_PORT;
-
 public class TCPNetwork implements Network {
 
     Socket socket;
@@ -66,7 +63,7 @@ public class TCPNetwork implements Network {
     }
 
     @Override
-    public void send(Packet packet) throws Exception {
+    public void send(Packet packet) throws Exception{
         byte[] packetBytes = new byte[0];
 
         packetBytes = packet.toPacket();

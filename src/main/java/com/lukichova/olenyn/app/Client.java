@@ -16,6 +16,7 @@ import com.lukichova.olenyn.app.network.UDPNetwork;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 
 import static com.lukichova.olenyn.app.resoures.Resoures.*;
@@ -60,7 +61,6 @@ public class Client {
                 network = new TCPNetwork(new Socket(NETWORK_HOST, serverPort));
             else {
                 network = new UDPNetwork();
-
                 network.connect();
             }
 
@@ -90,16 +90,21 @@ public class Client {
             if (network == null) {
                 throw new wrongConnectionException("Not connected");
             }
-            network.send(packet);
+
+                network.send(packet);
+
             Packet answerPacketOne = network.receive();
             if (answerPacketOne.getBPktId().equals(packet.getBPktId()))
                 System.out.println("CORRECT PACKET RESPONSE");
             else
                 System.out.println("WRONG PACKET RESPONSE");
         } catch (closedSocketException | SocketException e) {
-            network.connect();
+            reconnect();
             throw new requestFailed();
         }
+        catch (SocketTimeoutException e){
+        System.out.println("Need to resend");
+    }
         return packet;
     }
 
