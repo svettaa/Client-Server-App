@@ -62,13 +62,7 @@ public class TCPNetwork implements Network {
         Packet packet = new Packet(fullPacket);
         System.err.println(packet.getBMsq().getMessage());
 
-        if (serverSocket != null) {
-            Processor.process(packet);
-            send(packet);
-        } else {
-            return packet;
-        }
-        return null;
+        return packet;
     }
 
     @Override
@@ -77,21 +71,16 @@ public class TCPNetwork implements Network {
     }
 
     @Override
-    public void send(Packet packet) throws wrongSendException {
-        try {
-            byte[] packetBytes = new byte[0];
+    public void send(Packet packet) throws Exception {
+        byte[] packetBytes = new byte[0];
 
-            packetBytes = packet.toPacket();
+        packetBytes = packet.toPacket();
 
 
         socketOutputStream.write(packetBytes);
         socketOutputStream.flush();
 
         System.out.println("Send");
-      }
-        catch (Exception e) {
-           throw new wrongSendException();
-        }
 
     }
 

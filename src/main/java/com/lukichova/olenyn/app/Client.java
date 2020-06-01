@@ -12,6 +12,7 @@ import com.lukichova.olenyn.app.entities.Packet;
 import com.lukichova.olenyn.app.network.Network;
 import com.lukichova.olenyn.app.network.TCPNetwork;
 import com.lukichova.olenyn.app.network.UDPNetwork;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
@@ -27,26 +28,32 @@ public class Client {
     Client() {
     }
 
-    public static void main(String[] args) throws Exception, wrongDecryptException {
+    public static void main(String[] args) {
         try {
             Message testMessage = new Message(Message.cTypes.ADD_PRODUCT.ordinal(), 1, "time");
             Packet packet = new Packet((byte) 1, UnsignedLong.ONE, testMessage);
 
 
+            Client client = new Client();
+            client.connect(NETWORK_PORT);
+            Thread.sleep(5000);
+            client.request(packet);
 
-        Client client = new Client();
-        client.connect(NETWORK_PORT);
-        Thread.sleep(10000);
-        client.request(packet);
 
             client.disconnect();
         } catch (wrongDisconnectException | wrongConnectionException | wrongClientRequestException | InterruptedException e) {
-           throw new wrongClientMainException();
+            System.out.println("Some errors occurred");
+        } catch (com.lukichova.olenyn.app.Exceptions.unavailableServer unavailableServer) {
+            System.out.println("Server is unavailable");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } catch (wrongDecryptException e) {
+            System.out.println("Decryption exception");
         }
 
     }
 
-    public void connect(int serverPort) throws wrongConnectionException {
+    public void connect(int serverPort) throws wrongConnectionException, unavailableServer, InterruptedException {
 
         try {
             if (NETWORK_TYPE.toLowerCase().equals("tcp"))
@@ -59,20 +66,20 @@ public class Client {
 
             System.out.println("Client is running via " + network + " connection");
         } catch (IOException e) {
-           throw new wrongConnectionException("Client can not connect ");
+            reconnect();
         }
     }
 
     public void reconnect() throws unavailableServer, InterruptedException {
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 5; i++) {
             try {
                 socket = new Socket(NETWORK_HOST, NETWORK_PORT);
                 network = new TCPNetwork(socket);
                 return;
             } catch (Exception e) {
                 System.out.println("Can't connect - trying to reconnect");
-                Thread.sleep(3000);
+                Thread.sleep(2000);
             }
         }
         throw new unavailableServer();
@@ -84,11 +91,16 @@ public class Client {
                 throw new wrongConnectionException("Not connected");
             }
             network.send(packet);
-            return network.receive();
-        } catch (SocketException | unavailableServer e) {
+            Packet answerPacketOne = network.receive();
+            if (answerPacketOne.getBPktId().equals(packet.getBPktId()))
+                System.out.println("CORRECT PACKET RESPONSE");
+            else
+                System.out.println("WRONG PACKET RESPONSE");
+        } catch (closedSocketException | SocketException e) {
             reconnect();
             throw new requestFailed();
         }
+        return packet;
     }
 
     public void disconnect() throws wrongDisconnectException {
@@ -96,7 +108,7 @@ public class Client {
         try {
             network.close();
             System.out.println("Client is disconnected");
-        } catch (IOException |wrongCloseSocketException e) {
+        } catch (IOException | wrongCloseSocketException e) {
             throw new wrongDisconnectException();
         }
 

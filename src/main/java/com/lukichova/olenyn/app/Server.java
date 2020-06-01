@@ -1,5 +1,6 @@
 package com.lukichova.olenyn.app;
 
+import com.lukichova.olenyn.app.Exceptions.closedSocketException;
 import com.lukichova.olenyn.app.Exceptions.interruptedConnectionException;
 import com.lukichova.olenyn.app.Exceptions.wrongDecryptException;
 import com.lukichova.olenyn.app.Exceptions.wrongServerMainException;
@@ -54,11 +55,12 @@ public class Server {
                 network.close();
 
             }
-        } catch (IOException|interruptedConnectionException e) {
+        } catch (IOException | interruptedConnectionException e) {
             throw new wrongServerMainException();
         }
 
     }
+
     private static class Listener implements Runnable {
         private Socket socket;
 
@@ -81,17 +83,20 @@ public class Server {
                 System.out.println("Server is running via " + network + " connection");
 
                 while (true) {
-                    Packet packet = network.receive();
-                    if (packet == null)
+
+                    try {
+                        Packet packet = network.receive();
+                        processPool.execute(() -> {
+                            Packet answer = Processor.process(packet);
+                            try {
+                                network.send(answer);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
+                    } catch (closedSocketException e) {
                         break;
-                    processPool.execute(() -> {
-                        Packet answer = Processor.process(packet);
-                        try {
-                            network.send(answer);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    });
+                    }
                 }
                 network.close();
                 System.out.println("Connection closed");

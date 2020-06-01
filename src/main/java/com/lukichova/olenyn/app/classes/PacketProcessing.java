@@ -1,5 +1,6 @@
 package com.lukichova.olenyn.app.classes;
 
+import com.lukichova.olenyn.app.Exceptions.closedSocketException;
 import com.lukichova.olenyn.app.entities.Message;
 import com.lukichova.olenyn.app.entities.Packet;
 
@@ -12,8 +13,9 @@ public class PacketProcessing {
     public PacketProcessing() {
     }
 
-    public byte[] processing(InputStream serverInputStream, byte maxPacketBuffer[]) throws IOException {
-        serverInputStream.read(maxPacketBuffer);
+    public byte[] processing(InputStream serverInputStream, byte maxPacketBuffer[]) throws IOException, closedSocketException {
+        if(serverInputStream.read(maxPacketBuffer) == -1)
+            throw new closedSocketException();
 
         ByteBuffer byteBuffer = ByteBuffer.wrap(maxPacketBuffer);
         Integer wLen = byteBuffer.getInt(Packet.packetPartFirstLengthWithoutwLen);
