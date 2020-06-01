@@ -1,4 +1,4 @@
-package com.lukichova.olenyn.app;
+/*package com.lukichova.olenyn.app;
 
 import com.google.common.primitives.UnsignedLong;
 import com.lukichova.olenyn.app.Exceptions.wrongConnectionException;
@@ -75,4 +75,4 @@ public class TestClient {
         }
         Assert.assertEquals(packetsDoneExpected, packetsDoneActual.longValue());
     }
-}
+}*/

@@ -28,6 +28,7 @@ public class Client {
 
     Client() {
     }
+    public static final int AMOUNT_OF_TRIES = 5;
 
     public static void main(String[] args) {
         try {
@@ -38,7 +39,7 @@ public class Client {
             Client client = new Client();
             client.connect(NETWORK_PORT);
             Thread.sleep(3000);
-            client.request(packet);
+            client.request(packet,AMOUNT_OF_TRIES);
 
 
             client.disconnect();
@@ -103,7 +104,8 @@ public class Client {
         throw new unavailableServer();
     }
 
-    public Packet request(Packet packet) throws wrongDecryptException, wrongSendException, wrongConnectionException, requestFailed, unavailableServer, InterruptedException, wrongCrc2Exception, wrongBMagicException, wrongCrc1Exception, IOException, wrongEcryptException, interruptedConnectionException {
+    public Packet request(Packet packet,int k) throws wrongDecryptException, wrongSendException, wrongConnectionException, requestFailed, unavailableServer, InterruptedException, wrongCrc2Exception, wrongBMagicException, interruptedConnectionException, wrongCrc1Exception, IOException, wrongEcryptException {
+
         try {
             if (network == null) {
                 throw new wrongConnectionException("Not connected");
@@ -121,8 +123,11 @@ public class Client {
             reconnect();
             throw new requestFailed();
 
-        } catch (SocketTimeoutException ex) {
+        } catch (SocketTimeoutException e){
             System.out.println("Need to resend");
+            k--;
+            if(k==0){ System.out.println("Cant send message"); return null;}
+            request(packet,k);
         }
         return packet;
     }
