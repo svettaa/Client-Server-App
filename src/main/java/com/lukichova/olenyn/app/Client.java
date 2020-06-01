@@ -84,7 +84,7 @@ public class Client {
 
             System.out.println("Client is running via " + network + " connection");
         } catch (IOException e) {
-            network.connect();
+            reconnect();
         }
     }
 
@@ -103,7 +103,7 @@ public class Client {
         throw new unavailableServer();
     }
 
-    public Packet request(Packet packet) throws wrongDecryptException, wrongSendException, wrongConnectionException, requestFailed, unavailableServer, InterruptedException, wrongCrc2Exception, wrongBMagicException, interruptedConnectionException, wrongCrc1Exception, IOException, wrongEcryptException {
+    public Packet request(Packet packet) throws wrongDecryptException, wrongSendException, wrongConnectionException, requestFailed, unavailableServer, InterruptedException, wrongCrc2Exception, wrongBMagicException, wrongCrc1Exception, IOException, wrongEcryptException, interruptedConnectionException {
         try {
             if (network == null) {
                 throw new wrongConnectionException("Not connected");
