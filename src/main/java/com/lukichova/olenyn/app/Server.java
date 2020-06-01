@@ -43,6 +43,7 @@ public class Server {
                    // Packet answer = Processor.process(incoming);
                     processPool.execute(() -> {
                         try {
+
                             network.send(incoming);
                         } catch (wrongSendException e) {
                             System.out.println("Errors while sending");
