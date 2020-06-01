@@ -50,7 +50,7 @@ public class UDPNetwork implements Network {
             ByteBuffer byteBuffer = ByteBuffer.wrap(maxPacketBuffer);
             Integer wLen = byteBuffer.getInt(Packet.packetPartFirstLengthWithoutwLen);
 
-           byte fullPacket1[] = byteBuffer.slice().array();
+            byte fullPacket1[] = byteBuffer.slice().array();
             byte fullPacket[] = new byte[Packet.packetPartFirstLength + Message.BYTES_WITHOUT_MESSAGE + wLen+4];
             for (int i = 0; i < fullPacket.length; i++) {
                 fullPacket[i] = fullPacket1[i];

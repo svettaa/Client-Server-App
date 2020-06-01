@@ -1,9 +1,6 @@
 package com.lukichova.olenyn.app.network;
 
-import com.lukichova.olenyn.app.Exceptions.wrongCloseSocketException;
-import com.lukichova.olenyn.app.Exceptions.wrongConnectionException;
-import com.lukichova.olenyn.app.Exceptions.wrongDecryptException;
-import com.lukichova.olenyn.app.Exceptions.wrongUDPListenExceprion;
+import com.lukichova.olenyn.app.Exceptions.*;
 import com.lukichova.olenyn.app.entities.Packet;
 
 import java.io.IOException;
@@ -13,7 +10,7 @@ public interface Network {
 
     Packet receive() throws Exception, wrongDecryptException;
 
-    void connect() throws IOException, wrongConnectionException;
+    void connect() throws IOException, wrongConnectionException, unavailableServer, InterruptedException;
 
     void send(Packet packet) throws Exception;
 

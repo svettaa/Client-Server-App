@@ -1,9 +1,6 @@
 package com.lukichova.olenyn.app;
 
-import com.lukichova.olenyn.app.Exceptions.closedSocketException;
-import com.lukichova.olenyn.app.Exceptions.interruptedConnectionException;
-import com.lukichova.olenyn.app.Exceptions.wrongDecryptException;
-import com.lukichova.olenyn.app.Exceptions.wrongServerMainException;
+import com.lukichova.olenyn.app.Exceptions.*;
 import com.lukichova.olenyn.app.classes.Processor;
 import com.lukichova.olenyn.app.entities.Packet;
 import com.lukichova.olenyn.app.network.Network;
@@ -26,9 +23,8 @@ public class Server {
 
     private static ExecutorService processPool = Executors.newFixedThreadPool(10);
 
-    public static void main(String[] args) throws wrongServerMainException {
+    public static void main(String[] args) throws unavailableClient {
         try {
-            // String portProperty = "2305";
             if (NETWORK_TYPE.toLowerCase().equals("tcp")) {
                 try (ServerSocket listener = new ServerSocket(NETWORK_PORT)) {
                     System.out.println("Server is running...");
@@ -47,8 +43,8 @@ public class Server {
                     processPool.execute(() -> {
                         try {
                             network.send(incoming);
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        } catch (wrongSendException e) {
+                            System.out.println("Errors while sending");
                         }
                     });
                 }
@@ -56,7 +52,7 @@ public class Server {
 
             }
         } catch (IOException | interruptedConnectionException e) {
-            throw new wrongServerMainException();
+            System.out.println("");
         }
 
     }
@@ -96,6 +92,9 @@ public class Server {
                             }
                         });
                     } catch (closedSocketException e) {
+                        break;
+                    } catch (SocketException e) {
+                        System.out.println("Client is unavailable");
                         break;
                     }
 
