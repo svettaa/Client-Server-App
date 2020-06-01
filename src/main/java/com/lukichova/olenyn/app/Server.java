@@ -23,43 +23,32 @@ public class Server {
 
     private static ExecutorService processPool = Executors.newFixedThreadPool(10);
 
-    public static void main(String[] args){
-        try {
-            if (NETWORK_TYPE.toLowerCase().equals("tcp")) {
-                try (ServerSocket listener = new ServerSocket(NETWORK_PORT)) {
-                    System.out.println("Server is running...");
-                    ExecutorService pool = Executors.newFixedThreadPool(15);
-                    while (true) {
-                        pool.execute(new Server.Listener(listener.accept()));
-                    }
+    public static void main(String[] args) throws IOException, wrongCrc2Exception, wrongCrc1Exception, wrongDecryptException, wrongBMagicException {
+
+        if (NETWORK_TYPE.toLowerCase().equals("tcp")) {
+            try (ServerSocket listener = new ServerSocket(NETWORK_PORT)) {
+                System.out.println("Server is running...");
+                ExecutorService pool = Executors.newFixedThreadPool(15);
+                while (true) {
+                    pool.execute(new Server.Listener(listener.accept()));
                 }
-            } else {
-                DatagramSocket socket = new DatagramSocket(NETWORK_PORT);
-                boolean running = true;
-                UDPNetwork network = new UDPNetwork(socket);
-                System.out.println("Server is running via " + network + " connection");
-                while (running) {
-                    Packet incoming = network.receive();
-                    processPool.execute(() -> {
-                        try {
-                            network.send(incoming);
-                        } catch (wrongSendException e) {
-                            System.out.println("Errors while sending");
-                        }
-                    });
-                }
-                network.close();
             }
-        } catch (IOException e) {
-            System.out.println("");
-        } catch (wrongCrc2Exception e) {
-            e.printStackTrace();
-        } catch (wrongCrc1Exception e) {
-            e.printStackTrace();
-        } catch (wrongBMagicException e) {
-            e.printStackTrace();
-        } catch (wrongDecryptException e) {
-            e.printStackTrace();
+        } else {
+            DatagramSocket socket = new DatagramSocket(NETWORK_PORT);
+            boolean running = true;
+            UDPNetwork network = new UDPNetwork(socket);
+            System.out.println("Server is running via " + network + " connection");
+            while (running) {
+                Packet incoming = network.receive();
+                processPool.execute(() -> {
+                    try {
+                        network.send(incoming);
+                    } catch (wrongSendException e) {
+                        System.out.println("Errors while sending");
+                    }
+                });
+            }
+            network.close();
         }
 
     }

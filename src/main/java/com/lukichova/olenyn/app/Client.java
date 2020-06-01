@@ -98,7 +98,7 @@ public class Client {
                 return;
             } catch (Exception e) {
                 System.out.println("Can't connect - trying to reconnect");
-                Thread.sleep(2000);
+                Thread.sleep(1000);
             }
         }
         throw new unavailableServer();
@@ -124,7 +124,6 @@ public class Client {
             throw new requestFailed();
 
         } catch (SocketTimeoutException e){
-            System.out.println("Need to resend");
             k--;
             if(k==0){ System.out.println("Cant send message"); return null;}
             request(packet,k);
