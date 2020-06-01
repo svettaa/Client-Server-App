@@ -3,19 +3,14 @@ package com.lukichova.olenyn.app.network;
 
 import com.lukichova.olenyn.app.Exceptions.*;
 import com.lukichova.olenyn.app.classes.PacketProcessing;
-import com.lukichova.olenyn.app.classes.Processor;
 import com.lukichova.olenyn.app.entities.Packet;
 
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
 import static com.lukichova.olenyn.app.resoures.Resoures.NETWORK_HOST;
 import static com.lukichova.olenyn.app.resoures.Resoures.NETWORK_PORT;
@@ -23,7 +18,7 @@ import static com.lukichova.olenyn.app.resoures.Resoures.NETWORK_PORT;
 public class TCPNetwork implements Network {
 
     Socket socket;
-    ServerSocket serverSocket;
+    Network network;
 
     OutputStream socketOutputStream;
     InputStream serverInputStream;
@@ -66,7 +61,7 @@ public class TCPNetwork implements Network {
     }
 
     @Override
-    public void connect() throws IOException {
+    public void connect() throws unavailableServer, InterruptedException  {
 
     }
 

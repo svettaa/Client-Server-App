@@ -36,7 +36,7 @@ public class Client {
 
             Client client = new Client();
             client.connect(NETWORK_PORT);
-            Thread.sleep(5000);
+            Thread.sleep(3000);
             client.request(packet);
 
 
@@ -53,7 +53,7 @@ public class Client {
 
     }
 
-    public void connect(int serverPort) throws wrongConnectionException, unavailableServer, InterruptedException {
+    public void connect(int serverPort) throws wrongConnectionException, unavailableServer, InterruptedException, IOException {
 
         try {
             if (NETWORK_TYPE.toLowerCase().equals("tcp"))
@@ -66,7 +66,7 @@ public class Client {
 
             System.out.println("Client is running via " + network + " connection");
         } catch (IOException e) {
-            reconnect();
+            network.connect();
         }
     }
 
@@ -97,7 +97,7 @@ public class Client {
             else
                 System.out.println("WRONG PACKET RESPONSE");
         } catch (closedSocketException | SocketException e) {
-            reconnect();
+            network.connect();
             throw new requestFailed();
         }
         return packet;
