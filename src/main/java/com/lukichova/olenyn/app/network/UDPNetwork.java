@@ -69,10 +69,8 @@ public class UDPNetwork implements Network {
         } catch (Exception e) {
             throw new interruptedConnectionException();
 
-        } catch (wrongDecryptException e) {
-            e.printStackTrace();
         }
-        return null;
+
     }
 
 

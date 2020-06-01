@@ -98,12 +98,11 @@ public class Server {
                         break;
                     }
 
+
                 }
                 network.close();
                 System.out.println("Connection closed");
-            } catch (Exception e) {
-                e.printStackTrace();
-            } catch (wrongDecryptException e) {
+            }  catch (Exception e) {
                 e.printStackTrace();
             }
         }

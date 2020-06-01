@@ -47,9 +47,7 @@ public class Client {
             System.out.println("Server is unavailable");
         } catch (Exception e) {
             e.printStackTrace();
-        } catch (wrongDecryptException e) {
-            System.out.println("Decryption exception");
-        }
+        } 
 
     }
 
