@@ -10,6 +10,8 @@ import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.lukichova.olenyn.app.resoures.Resoures.NETWORK_PORT;
+
 public class TestClient {
     public static final int AMOUNT_OF_TRIES = 5;
     private Message testMessage;
@@ -19,7 +21,7 @@ public class TestClient {
     @Test
     public void testClient() throws Exception, wrongDecryptException {
         Client client = new Client();
-        client.connect(2305);
+        client.connect(NETWORK_PORT);
         unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("2305"));
         testMessage = new Message(3, 4, "time");
         packet = new Packet((byte) 1, unsignedLongbPktId, testMessage);

@@ -23,7 +23,7 @@ public class Server {
 
     private static ExecutorService processPool = Executors.newFixedThreadPool(10);
 
-    public static void main(String[] args) throws IOException, wrongCrc2Exception, wrongCrc1Exception, wrongDecryptException, wrongBMagicException {
+    public static void main(String[] args) throws IOException{
 
         if (NETWORK_TYPE.toLowerCase().equals("tcp")) {
             try (ServerSocket listener = new ServerSocket(NETWORK_PORT)) {
@@ -34,21 +34,34 @@ public class Server {
                 }
             }
         } else {
-            DatagramSocket socket = new DatagramSocket(NETWORK_PORT);
-            boolean running = true;
-            UDPNetwork network = new UDPNetwork(socket);
-            System.out.println("Server is running via " + network + " connection");
-            while (running) {
-                Packet incoming = network.receive();
-                processPool.execute(() -> {
-                    try {
-                        network.send(incoming);
-                    } catch (wrongSendException e) {
-                        System.out.println("Errors while sending");
-                    }
-                });
+            try {
+                DatagramSocket socket = new DatagramSocket(NETWORK_PORT);
+                boolean running = true;
+                UDPNetwork network = new UDPNetwork(socket);
+                System.out.println("Server is running via " + network + " connection");
+                while (running) {
+                    Packet incoming = network.receive();
+                    processPool.execute(() -> {
+                        Packet answer = Processor.process(incoming);
+                        try {
+                            network.send(answer);
+                        } catch (Exception e) {
+                            System.out.println("Errors while sending");
+                        }
+                    });
+                }
+                network.close();
+            } catch (wrongDecryptException e) {
+                System.out.println("Errors in decryption");
+            } catch (IOException e) {
+                System.out.println("IOException occurred");
+            } catch (wrongBMagicException e) {
+                System.out.println("Wrong bMagic");
+            } catch (wrongCrc1Exception e) {
+                System.out.println("Wrong CRC1");
+            } catch (wrongCrc2Exception e) {
+                System.out.println("Wrong CRC2");
             }
-            network.close();
         }
 
     }

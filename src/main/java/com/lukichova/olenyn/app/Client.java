@@ -28,6 +28,7 @@ public class Client {
 
     Client() {
     }
+
     public static final int AMOUNT_OF_TRIES = 5;
 
     public static void main(String[] args) {
@@ -39,7 +40,7 @@ public class Client {
             Client client = new Client();
             client.connect(NETWORK_PORT);
             Thread.sleep(3000);
-            client.request(packet,AMOUNT_OF_TRIES);
+            client.request(packet, AMOUNT_OF_TRIES);
 
 
             client.disconnect();
@@ -75,18 +76,19 @@ public class Client {
 
     public void connect(int serverPort) throws wrongConnectionException, unavailableServer, InterruptedException, IOException {
 
-        try {
-            if (NETWORK_TYPE.toLowerCase().equals("tcp"))
+        if (NETWORK_TYPE.toLowerCase().equals("tcp")) {
+            try {
                 network = new TCPNetwork(new Socket(NETWORK_HOST, serverPort));
-            else {
-                network = new UDPNetwork();
-                network.connect();
+            } catch (IOException e) {
+                reconnect();
             }
-
-            System.out.println("Client is running via " + network + " connection");
-        } catch (IOException e) {
-            reconnect();
+        } else {
+            network = new UDPNetwork();
+            network.connect();
         }
+
+        System.out.println("Client is running via " + network + " connection");
+
     }
 
     public void reconnect() throws unavailableServer, InterruptedException {
@@ -104,7 +106,7 @@ public class Client {
         throw new unavailableServer();
     }
 
-    public Packet request(Packet packet,int k) throws wrongDecryptException, wrongSendException, wrongConnectionException, requestFailed, unavailableServer, InterruptedException, wrongCrc2Exception, wrongBMagicException, interruptedConnectionException, wrongCrc1Exception, IOException, wrongEcryptException {
+    public Packet request(Packet packet, int k) throws wrongDecryptException, wrongSendException, wrongConnectionException, requestFailed, unavailableServer, InterruptedException, wrongCrc2Exception, wrongBMagicException, interruptedConnectionException, wrongCrc1Exception, IOException, wrongEcryptException {
 
         try {
             if (network == null) {
@@ -123,10 +125,14 @@ public class Client {
             reconnect();
             throw new requestFailed();
 
-        } catch (SocketTimeoutException e){
+        } catch (SocketTimeoutException e) {
             k--;
-            if(k==0){ System.out.println("Cant send message"); return null;}
-            request(packet,k);
+            System.out.println("Retrying");
+            if (k == 0) {
+                System.out.println("Cant send message");
+                return null;
+            }
+            request(packet, k);
         }
         return packet;
     }
