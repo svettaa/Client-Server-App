@@ -6,13 +6,13 @@ import com.lukichova.olenyn.app.entities.Packet;
 import java.io.IOException;
 
 public interface Network {
-    void listen() throws IOException, wrongUDPListenExceprion;
+    void listen() throws IOException, wrongUDPListenException;
 
-    Packet receive() throws Exception, wrongDecryptException;
+    Packet receive() throws wrongDecryptException, IOException, closedSocketException, wrongBMagicException, wrongCrc1Exception, wrongCrc2Exception, interruptedConnectionException;
 
     void connect() throws IOException, wrongConnectionException, unavailableServer, InterruptedException;
 
     void send(Packet packet) throws Exception;
 
-    void close() throws IOException, wrongCloseSocketException;
+    void close() throws wrongCloseSocketException;
 }

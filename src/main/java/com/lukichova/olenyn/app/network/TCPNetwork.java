@@ -29,9 +29,7 @@ public class TCPNetwork implements Network {
             serverInputStream = socket.getInputStream();
         } catch (IOException e) {
             throw new wrongConnectionException("Wrong TCPNetwork connection");
-
         }
-
     }
 
     @Override
@@ -40,7 +38,7 @@ public class TCPNetwork implements Network {
     }
 
 
-    public Packet receive() throws Exception, wrongDecryptException {
+    public Packet receive() throws IOException, closedSocketException, wrongDecryptException, wrongBMagicException, wrongCrc1Exception, wrongCrc2Exception {
         InputStream serverInputStream = socket.getInputStream();
 
         byte maxPacketBuffer[] = new byte[Packet.packetMaxSize];

@@ -19,23 +19,24 @@ public class UDPNetwork implements Network {
     private DatagramSocket socket;
     private Boolean isServer = false;
 
-    public UDPNetwork(DatagramSocket socket){
+    public UDPNetwork(DatagramSocket socket) {
         this.socket = socket;
     }
 
-    public UDPNetwork(){
+    public UDPNetwork() {
     }
 
 
-    public void listen() throws wrongUDPListenExceprion {
-        try{String portProperty = NetworkProperties.getProperty("port");
-        if (portProperty == null)
-            portProperty = "2305";
+    public void listen() throws wrongUDPListenException {
+        try {
+            String portProperty = NetworkProperties.getProperty("port");
+            if (portProperty == null)
+                portProperty = "2305";
 
-        socket = new DatagramSocket(Integer.parseInt(portProperty));
-        isServer = true;
+            socket = new DatagramSocket(Integer.parseInt(portProperty));
+            isServer = true;
         } catch (SocketException e) {
-            throw new wrongUDPListenExceprion();
+            throw new wrongUDPListenException();
         }
     }
 
@@ -51,7 +52,7 @@ public class UDPNetwork implements Network {
             Integer wLen = byteBuffer.getInt(Packet.packetPartFirstLengthWithoutwLen);
 
             byte fullPacket1[] = byteBuffer.slice().array();
-            byte fullPacket[] = new byte[Packet.packetPartFirstLength + Message.BYTES_WITHOUT_MESSAGE + wLen+4];
+            byte fullPacket[] = new byte[Packet.packetPartFirstLength + Message.BYTES_WITHOUT_MESSAGE + wLen + 4];
             for (int i = 0; i < fullPacket.length; i++) {
                 fullPacket[i] = fullPacket1[i];
             }
@@ -59,22 +60,28 @@ public class UDPNetwork implements Network {
             System.out.println("Received");
             System.out.println(Arrays.toString(fullPacket) + "\n");
 
-            Packet packet = new Packet(fullPacket1);
+            Packet packet = null;
+            try {
+                packet = new Packet(fullPacket1);
+            } catch (wrongBMagicException e) {
+                e.printStackTrace();
+            } catch (wrongDecryptException e) {
+                e.printStackTrace();
+            } catch (wrongCrc1Exception e) {
+                e.printStackTrace();
+            } catch (wrongCrc2Exception e) {
+                e.printStackTrace();
+            }
             System.err.println(packet.getBMsq().getMessage());
 
             packet.setClientInetAddress(datagramPacket.getAddress());
             packet.setClientPort(datagramPacket.getPort());
 
             return packet;
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new interruptedConnectionException();
-
         }
-
     }
-
-
-
 
     public void connect() throws wrongConnectionException {
         try {
@@ -86,21 +93,20 @@ public class UDPNetwork implements Network {
 
     @Override
     public void send(Packet packet) throws wrongSendException {
-try {
-    InetAddress inetAddress = packet.getClientInetAddress() != null ? packet.getClientInetAddress() : InetAddress.getByName(NETWORK_HOST);
-    Integer port = packet.getClientPort() != null ? packet.getClientPort() : NETWORK_PORT;
+        try {
+            InetAddress inetAddress = packet.getClientInetAddress() != null ? packet.getClientInetAddress() : InetAddress.getByName(NETWORK_HOST);
+            Integer port = packet.getClientPort() != null ? packet.getClientPort() : NETWORK_PORT;
 
-    byte[] packetBytes = packet.toPacket();
+            byte[] packetBytes = packet.toPacket();
 
-    DatagramPacket datagramPacket = new DatagramPacket(packetBytes, packetBytes.length, inetAddress, port);
-    socket.send(datagramPacket);
+            DatagramPacket datagramPacket = new DatagramPacket(packetBytes, packetBytes.length, inetAddress, port);
+            socket.send(datagramPacket);
 
-    System.out.println("Send");
-    System.out.println(Arrays.toString(packetBytes) + "\n");
-} catch ( Exception e) {
-
-   throw new wrongSendException();
-}
+            System.out.println("Send");
+            System.out.println(Arrays.toString(packetBytes) + "\n");
+        } catch (Exception e) {
+            throw new wrongSendException();
+        }
 
     }
 

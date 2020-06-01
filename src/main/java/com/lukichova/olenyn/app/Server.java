@@ -71,9 +71,11 @@ public class Server {
 
                 Network network;
 
-                if (NETWORK_TYPE.toLowerCase().equals("tcp"))
+                if (NETWORK_TYPE.toLowerCase().equals("tcp")) {
+
                     network = new TCPNetwork(socket);
-                else
+
+                } else
                     network = new UDPNetwork();
 
                 System.out.println("Server is running via " + network + " connection");
@@ -82,9 +84,15 @@ public class Server {
                 while (true) {
 
                     try {
-                        Packet packet = network.receive();
+                        Packet packet = null;
+
+
+                        packet = network.receive();
+
+
+                        Packet finalPacket = packet;
                         processPool.execute(() -> {
-                            Packet answer = Processor.process(packet);
+                            Packet answer = Processor.process(finalPacket);
                             try {
                                 network.send(answer);
                             } catch (Exception e) {
@@ -97,13 +105,27 @@ public class Server {
                         System.out.println("Client is unavailable");
                         break;
                     }
-
-
                 }
+
                 network.close();
                 System.out.println("Connection closed");
-            }  catch (Exception e) {
+
+            } catch (wrongConnectionException e) {
+                System.out.println("Wrong TCP connection");
+            } catch (wrongDecryptException e) {
                 e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (wrongBMagicException e) {
+                System.out.println("Wrong bMagic");
+            } catch (wrongCrc1Exception e) {
+                System.out.println("Wrong CRC1");
+            } catch (wrongCrc2Exception e) {
+                System.out.println("Wrong CRC2");
+            } catch (wrongCloseSocketException e) {
+                System.out.println("Error while closing");
+            } catch (interruptedConnectionException e) {
+                System.out.println("Your connection was interrupted");
             }
         }
     }

@@ -111,7 +111,7 @@ public class Client {
         try {
             network.close();
             System.out.println("Client is disconnected");
-        } catch (IOException | wrongCloseSocketException e) {
+        } catch (wrongCloseSocketException e) {
             throw new wrongDisconnectException();
         }
 
