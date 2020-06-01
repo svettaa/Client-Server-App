@@ -1,4 +1,4 @@
-/*package com.lukichova.olenyn.app;
+package com.lukichova.olenyn.app;
 
 import com.google.common.primitives.UnsignedLong;
 import com.lukichova.olenyn.app.Exceptions.wrongConnectionException;
@@ -11,6 +11,7 @@ import org.junit.Test;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestClient {
+    public static final int AMOUNT_OF_TRIES = 5;
     private Message testMessage;
     private Packet packet;
     UnsignedLong unsignedLongbPktId = UnsignedLong.valueOf(Long.MAX_VALUE);
@@ -23,7 +24,7 @@ public class TestClient {
         testMessage = new Message(3, 4, "time");
         packet = new Packet((byte) 1, unsignedLongbPktId, testMessage);
 
-            Packet response = client.request(packet);
+            Packet response = client.request(packet,AMOUNT_OF_TRIES);
             String message = response.getBMsq().getMessage();
             Assert.assertEquals(message, "OK");
 
@@ -36,7 +37,7 @@ public class TestClient {
         unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("2305"));
         testMessage = new Message(3, 4, "time");
         packet = new Packet((byte) 1, unsignedLongbPktId, testMessage);
-        client.request(packet);
+        client.request(packet,AMOUNT_OF_TRIES);
     }
 
     @Test
@@ -56,7 +57,7 @@ public class TestClient {
                     Client client = new Client();
                     client.connect(2305);
                     for (int j = 0; j < packetsInside; j++) {
-                        Packet answer = client.request(packet);
+                        Packet answer = client.request(packet,AMOUNT_OF_TRIES);
                         String message = answer.getBMsq().getMessage();
                         Assert.assertEquals(message, "OK");
                         packetsDoneActual.incrementAndGet();
@@ -75,4 +76,4 @@ public class TestClient {
         }
         Assert.assertEquals(packetsDoneExpected, packetsDoneActual.longValue());
     }
-}*/
+}
