@@ -82,6 +82,7 @@ public class Server {
 
                 System.out.println("Server is running via " + network + " connection");
 
+
                 while (true) {
 
                     try {
@@ -97,6 +98,7 @@ public class Server {
                     } catch (closedSocketException e) {
                         break;
                     }
+
                 }
                 network.close();
                 System.out.println("Connection closed");
