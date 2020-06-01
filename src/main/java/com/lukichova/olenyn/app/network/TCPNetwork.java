@@ -49,22 +49,13 @@ public class TCPNetwork implements Network {
 
 
     public Packet receive() throws Exception, wrongDecryptException {
-
         InputStream serverInputStream = socket.getInputStream();
 
         byte maxPacketBuffer[] = new byte[Packet.packetMaxSize];
         PacketProcessing pr = new PacketProcessing();
         byte fullPacket[] = pr.processing(serverInputStream, maxPacketBuffer);
 
-        int k = 0;
-        for (int i = 0; i < fullPacket.length; i++) {
-            if (fullPacket[i] == 0) {
-                k++;
-            }
-        }
-        if (k == fullPacket.length) {
-            return null;
-        }
+
         System.out.println("Received");
         System.out.println(Arrays.toString(fullPacket) + "\n");
 
@@ -79,23 +70,17 @@ public class TCPNetwork implements Network {
 
     }
 
+    @Override
+    public void send(Packet packet) throws Exception {
+        byte[] packetBytes = new byte[0];
 
-    public void send(Packet packet) {
-        try {
-            byte[] packetBytes = new byte[0];
-
-            packetBytes = packet.toPacket();
+        packetBytes = packet.toPacket();
 
 
-            socketOutputStream.write(packetBytes);
-            socketOutputStream.flush();
+        socketOutputStream.write(packetBytes);
+        socketOutputStream.flush();
 
-            System.out.println("Send");
-
-        } catch (Exception e) {
-
-        }
-
+        System.out.println("Send");
 
     }
 
