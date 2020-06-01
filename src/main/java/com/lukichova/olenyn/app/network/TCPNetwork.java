@@ -15,7 +15,6 @@ import java.util.Arrays;
 public class TCPNetwork implements Network {
 
     Socket socket;
-    Network network;
 
     OutputStream socketOutputStream;
     InputStream serverInputStream;
@@ -56,13 +55,13 @@ public class TCPNetwork implements Network {
     }
 
     @Override
-    public void connect() throws unavailableServer, InterruptedException  {
+    public void connect(){
 
     }
 
     @Override
-    public void send(Packet packet) throws Exception{
-        byte[] packetBytes = new byte[0];
+    public void send(Packet packet) throws IOException, wrongEcryptException {
+        byte[] packetBytes;
 
         packetBytes = packet.toPacket();
 

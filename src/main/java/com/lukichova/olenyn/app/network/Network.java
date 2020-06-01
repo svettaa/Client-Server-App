@@ -12,7 +12,7 @@ public interface Network {
 
     void connect() throws IOException, wrongConnectionException, unavailableServer, InterruptedException;
 
-    void send(Packet packet) throws Exception;
+    void send(Packet packet) throws wrongSendException, IOException, wrongEcryptException;
 
     void close() throws wrongCloseSocketException;
 }

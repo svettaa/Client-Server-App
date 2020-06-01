@@ -42,13 +42,33 @@ public class Client {
 
 
             client.disconnect();
-        } catch (wrongDisconnectException | wrongConnectionException | wrongClientRequestException | InterruptedException e) {
+        } catch (wrongDisconnectException e) {
+            System.out.println("Error while disconnecting");
+        } catch (wrongConnectionException e) {
+            System.out.println("Error while connecting");
+        } catch (InterruptedException e) {
             System.out.println("Some errors occurred");
         } catch (com.lukichova.olenyn.app.Exceptions.unavailableServer unavailableServer) {
             System.out.println("Server is unavailable");
-        } catch (Exception e) {
-            e.printStackTrace();
-        } 
+        } catch (wrongDecryptException e) {
+            System.out.println("Errors in decryption");
+        } catch (wrongBMagicException e) {
+            System.out.println("Wrong bMagic");
+        } catch (wrongCrc1Exception e) {
+            System.out.println("Wrong CRC1");
+        } catch (wrongCrc2Exception e) {
+            System.out.println("Wrong CRC2");
+        } catch (IOException e) {
+            System.out.println("IOException: socket was closed");
+        } catch (interruptedConnectionException e) {
+            System.out.println("Your connection was interrupted");
+        } catch (wrongSendException e) {
+            System.out.println("Errors while sending");
+        } catch (requestFailed e) {
+            System.out.println("Errors in request()");
+        } catch (wrongEcryptException e) {
+            System.out.println("Errors in encryption");
+        }
 
     }
 
@@ -83,28 +103,30 @@ public class Client {
         throw new unavailableServer();
     }
 
-    public Packet request(Packet packet) throws Exception, wrongDecryptException {
+    public Packet request(Packet packet) throws wrongDecryptException, wrongSendException, wrongConnectionException, requestFailed, unavailableServer, InterruptedException, wrongCrc2Exception, wrongBMagicException, interruptedConnectionException, wrongCrc1Exception, IOException, wrongEcryptException {
         try {
             if (network == null) {
                 throw new wrongConnectionException("Not connected");
             }
 
-                network.send(packet);
+            network.send(packet);
 
             Packet answerPacketOne = network.receive();
             if (answerPacketOne.getBPktId().equals(packet.getBPktId()))
                 System.out.println("CORRECT PACKET RESPONSE");
             else
                 System.out.println("WRONG PACKET RESPONSE");
+
         } catch (closedSocketException | SocketException e) {
             reconnect();
             throw new requestFailed();
+
+        } catch (SocketTimeoutException ex) {
+            System.out.println("Need to resend");
         }
-        catch (SocketTimeoutException e){
-        System.out.println("Need to resend");
-    }
         return packet;
     }
+
 
     public void disconnect() throws wrongDisconnectException {
 
