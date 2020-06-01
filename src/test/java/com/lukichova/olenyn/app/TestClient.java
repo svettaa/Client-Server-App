@@ -109,7 +109,7 @@ public class TestClient {
 
         client.disconnect();
     }
-    
+//run client without server
     @Test (expected = unavailableServer.class)
     public void catchUnavailableServer() throws Exception {
         testMessage = new Message(3, 4, "time");
