@@ -26,9 +26,11 @@ public class TestClient {
         testMessage = new Message(3, 4, "time");
         packet = new Packet((byte) 1, unsignedLongbPktId, testMessage);
 
-            Packet response = client.request(packet,AMOUNT_OF_TRIES);
+        for (int i = 0; i < 10; i++) {
+            Packet response = client.request(packet, AMOUNT_OF_TRIES);
             String message = response.getBMsq().getMessage();
             Assert.assertEquals(message, "OK");
+        }
 
         client.disconnect();
     }
@@ -39,7 +41,7 @@ public class TestClient {
         unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("2305"));
         testMessage = new Message(3, 4, "time");
         packet = new Packet((byte) 1, unsignedLongbPktId, testMessage);
-        client.request(packet,AMOUNT_OF_TRIES);
+        client.request(packet, AMOUNT_OF_TRIES);
     }
 
     @Test
@@ -57,9 +59,9 @@ public class TestClient {
             array[i] = new Thread(() -> {
                 try {
                     Client client = new Client();
-                    client.connect(2305);
+                    client.connect(NETWORK_PORT);
                     for (int j = 0; j < packetsInside; j++) {
-                        Packet answer = client.request(packet,AMOUNT_OF_TRIES);
+                        Packet answer = client.request(packet, AMOUNT_OF_TRIES);
                         String message = answer.getBMsq().getMessage();
                         Assert.assertEquals(message, "OK");
                         packetsDoneActual.incrementAndGet();
@@ -77,5 +79,30 @@ public class TestClient {
             array[i].join();
         }
         Assert.assertEquals(packetsDoneExpected, packetsDoneActual.longValue());
+    }
+
+    @Test
+    public void testDeathPackets() throws Exception, wrongDecryptException {
+        Client client = new Client();
+        client.connect(NETWORK_PORT);
+        unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("2305"));
+        testMessage = new Message(3, 4, "time");
+        packet = new Packet((byte) 1, unsignedLongbPktId, testMessage);
+
+        Packet response;
+
+        response = client.request(packet, AMOUNT_OF_TRIES);
+        Assert.assertEquals(response.getBMsq().getMessage(), "OK");
+
+        packet.setBPktId(UnsignedLong.valueOf(0x13));
+        response = client.request(packet, AMOUNT_OF_TRIES);
+        Assert.assertEquals(response.getBMsq().getMessage(), "OK");
+
+        client.requestDeathPacket();
+
+        response = client.request(packet, AMOUNT_OF_TRIES);
+        Assert.assertEquals(response.getBMsq().getMessage(), "OK");
+
+        client.disconnect();
     }
 }

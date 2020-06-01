@@ -14,6 +14,7 @@ import com.lukichova.olenyn.app.network.TCPNetwork;
 import com.lukichova.olenyn.app.network.UDPNetwork;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -39,7 +40,7 @@ public class Client {
 
             Client client = new Client();
             client.connect(NETWORK_PORT);
-            Thread.sleep(3000);
+//            Thread.sleep(3000);
             client.request(packet, AMOUNT_OF_TRIES);
 
 
@@ -83,8 +84,9 @@ public class Client {
                 reconnect();
             }
         } else {
-            network = new UDPNetwork();
-            network.connect();
+            DatagramSocket datagramSocket = new DatagramSocket();
+            datagramSocket.setSoTimeout(2000);
+            network = new UDPNetwork(datagramSocket);
         }
 
         System.out.println("Client is running via " + network + " connection");
@@ -106,7 +108,16 @@ public class Client {
         throw new unavailableServer();
     }
 
-    public Packet request(Packet packet, int k) throws wrongDecryptException, wrongSendException, wrongConnectionException, requestFailed, unavailableServer, InterruptedException, wrongCrc2Exception, wrongBMagicException, interruptedConnectionException, wrongCrc1Exception, IOException, wrongEcryptException {
+    public void requestDeathPacket() throws IOException {
+        network.sendDeath();
+        System.out.println("sent death");
+    }
+
+    public Packet request(Packet packet, int k)
+            throws wrongDecryptException, wrongSendException, wrongConnectionException,
+            requestFailed, unavailableServer, InterruptedException, wrongCrc2Exception,
+            wrongBMagicException, interruptedConnectionException, wrongCrc1Exception,
+            IOException, wrongEcryptException {
 
         try {
             if (network == null) {
@@ -120,6 +131,7 @@ public class Client {
                 System.out.println("CORRECT PACKET RESPONSE");
             else
                 System.out.println("WRONG PACKET RESPONSE");
+            return answerPacketOne;
 
         } catch (closedSocketException | SocketException e) {
             reconnect();
@@ -127,14 +139,12 @@ public class Client {
 
         } catch (SocketTimeoutException e) {
             k--;
-            System.out.println("Retrying");
             if (k == 0) {
-                System.out.println("Cant send message");
-                return null;
+                throw new unavailableServer();
             }
-            request(packet, k);
+            System.out.println("Retrying");
+            return request(packet, k);
         }
-        return packet;
     }
 
 

@@ -19,63 +19,43 @@ public class UDPNetwork implements Network {
     private DatagramSocket socket;
     private Boolean isServer = false;
 
-    public UDPNetwork(DatagramSocket socket) {
+    public UDPNetwork(DatagramSocket socket) throws SocketException {
         this.socket = socket;
     }
 
-    public UDPNetwork() {
-    }
-
-
-    public void listen() throws wrongUDPListenException {
-        try {
-            String portProperty = NetworkProperties.getProperty("port");
-            if (portProperty == null)
-                portProperty = "2305";
-
-            socket = new DatagramSocket(Integer.parseInt(portProperty));
-            isServer = true;
-        } catch (SocketException e) {
-            throw new wrongUDPListenException();
-        }
-    }
-
     @Override
-    public Packet receive() throws wrongCrc1Exception, wrongBMagicException, wrongCrc2Exception, wrongDecryptException, IOException {
-            byte maxPacketBuffer[] = new byte[Packet.packetMaxSize];
+    public Packet receive()
+            throws wrongCrc1Exception, wrongBMagicException, wrongCrc2Exception,
+            wrongDecryptException, IOException {
+        byte maxPacketBuffer[] = new byte[Packet.packetMaxSize];
 
-            DatagramPacket datagramPacket = new DatagramPacket(maxPacketBuffer, maxPacketBuffer.length);
-            socket.receive(datagramPacket);
+        DatagramPacket datagramPacket = new DatagramPacket(maxPacketBuffer, maxPacketBuffer.length);
+        socket.receive(datagramPacket);
 
-            ByteBuffer byteBuffer = ByteBuffer.wrap(maxPacketBuffer);
-            Integer wLen = byteBuffer.getInt(Packet.packetPartFirstLengthWithoutwLen);
+//        ByteBuffer byteBuffer = ByteBuffer.wrap(maxPacketBuffer);
+//        Integer wLen = byteBuffer.getInt(Packet.packetPartFirstLengthWithoutwLen);
+//
+//        byte fullPacket1[] = byteBuffer.slice().array();
+//        byte fullPacket[] = new byte[Packet.packetPartFirstLength + Message.BYTES_WITHOUT_MESSAGE + wLen + 4];
+//        for (int i = 0; i < fullPacket.length; i++) {
+//            fullPacket[i] = fullPacket1[i];
+//        }
 
-            byte fullPacket1[] = byteBuffer.slice().array();
-            byte fullPacket[] = new byte[Packet.packetPartFirstLength + Message.BYTES_WITHOUT_MESSAGE + wLen + 4];
-            for (int i = 0; i < fullPacket.length; i++) {
-                fullPacket[i] = fullPacket1[i];
-            }
+        byte fullPacket[] = datagramPacket.getData();
 
-            System.out.println("Received");
-            System.out.println(Arrays.toString(fullPacket) + "\n");
+        System.out.println("Received");
+        System.out.println(Arrays.toString(fullPacket) + "\n");
 
-            Packet packet;
+        Packet packet = new Packet(fullPacket);
 
-            packet = new Packet(fullPacket1);
+        System.err.println(packet.getBMsq().getMessage());
 
-            System.err.println(packet.getBMsq().getMessage());
+        packet.setClientInetAddress(datagramPacket.getAddress());
+        packet.setClientPort(datagramPacket.getPort());
 
-            packet.setClientInetAddress(datagramPacket.getAddress());
-            packet.setClientPort(datagramPacket.getPort());
-
-            return packet;
-        }
-
-
-    public void connect() throws SocketException {
-        socket = new DatagramSocket();
-        socket.setSoTimeout(2000);
+        return packet;
     }
+
 
     @Override
     public void send(Packet packet) throws wrongSendException {
@@ -94,6 +74,17 @@ public class UDPNetwork implements Network {
             throw new wrongSendException();
         }
 
+    }
+
+    @Override
+    public void sendDeath() throws IOException {
+        InetAddress inetAddress = InetAddress.getByName(NETWORK_HOST);
+        Integer port = NETWORK_PORT;
+
+        byte[] packetBytes = new byte[]{19, 19, 19, 19};
+
+        DatagramPacket datagramPacket = new DatagramPacket(packetBytes, packetBytes.length, inetAddress, port);
+        socket.send(datagramPacket);
     }
 
     @Override
