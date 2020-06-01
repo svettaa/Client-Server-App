@@ -40,7 +40,7 @@ public class AES {
 
     @SneakyThrows
     public static String decrypt(String strToDecrypt)
-            throws wrongDecryptException {
+            {
 
             try {
                 setKey();

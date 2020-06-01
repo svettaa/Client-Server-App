@@ -1,4 +1,4 @@
 package com.lukichova.olenyn.app.Exceptions;
 
-public class wrongDecryptException extends Throwable {
+public class wrongDecryptException extends Exception {
 }

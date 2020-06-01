@@ -78,6 +78,7 @@ public class Server {
 
                 System.out.println("Server is running via " + network + " connection");
 
+
                 while (true) {
 
                     try {
@@ -96,12 +97,12 @@ public class Server {
                         System.out.println("Client is unavailable");
                         break;
                     }
+
+
                 }
                 network.close();
                 System.out.println("Connection closed");
-            } catch (Exception e) {
-                e.printStackTrace();
-            } catch (wrongDecryptException e) {
+            }  catch (Exception e) {
                 e.printStackTrace();
             }
         }

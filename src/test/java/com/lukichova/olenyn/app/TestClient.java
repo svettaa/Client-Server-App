@@ -64,8 +64,6 @@ public class TestClient {
                     client.disconnect();
                 } catch (Exception e) {
                     e.printStackTrace();
-                } catch (wrongDecryptException e) {
-                    e.printStackTrace();
                 }
             });
         }
