@@ -14,6 +14,7 @@ import com.lukichova.olenyn.app.network.TCPNetwork;
 import com.lukichova.olenyn.app.network.UDPNetwork;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -28,6 +29,7 @@ public class Client {
 
     Client() {
     }
+
     public static final int AMOUNT_OF_TRIES = 5;
 
     public static void main(String[] args) {
@@ -38,8 +40,8 @@ public class Client {
 
             Client client = new Client();
             client.connect(NETWORK_PORT);
-            Thread.sleep(3000);
-            client.request(packet,AMOUNT_OF_TRIES);
+//            Thread.sleep(3000);
+            client.request(packet, AMOUNT_OF_TRIES);
 
 
             client.disconnect();
@@ -77,18 +79,20 @@ public class Client {
 
     public void connect(int serverPort) throws wrongConnectionException, unavailableServer, InterruptedException, IOException {
 
-        try {
-            if (NETWORK_TYPE.toLowerCase().equals("tcp"))
+        if (NETWORK_TYPE.toLowerCase().equals("tcp")) {
+            try {
                 network = new TCPNetwork(new Socket(NETWORK_HOST, serverPort));
-            else {
-                network = new UDPNetwork();
-                network.connect();
+            } catch (IOException e) {
+                reconnect();
             }
-
-            System.out.println("Client is running via " + network + " connection");
-        } catch (IOException e) {
-            reconnect();
+        } else {
+            DatagramSocket datagramSocket = new DatagramSocket();
+            datagramSocket.setSoTimeout(2000);
+            network = new UDPNetwork(datagramSocket);
         }
+
+        System.out.println("Client is running via " + network + " connection");
+
     }
 
     public void reconnect() throws unavailableServer, InterruptedException {
@@ -100,13 +104,22 @@ public class Client {
                 return;
             } catch (Exception e) {
                 System.out.println("Can't connect - trying to reconnect");
-                Thread.sleep(2000);
+                Thread.sleep(1000);
             }
         }
         throw new unavailableServer();
     }
 
-    public Packet request(Packet packet,int k) throws wrongDecryptException, wrongSendException, wrongConnectionException, requestFailed, unavailableServer, InterruptedException, wrongCrc2Exception, wrongBMagicException, interruptedConnectionException, wrongCrc1Exception, IOException, wrongEcryptException {
+    public void requestDeathPacket() throws IOException {
+        network.sendDeath();
+        System.out.println("sent death");
+    }
+
+    public Packet request(Packet packet, int k)
+            throws wrongDecryptException, wrongSendException, wrongConnectionException,
+            requestFailed, unavailableServer, InterruptedException, wrongCrc2Exception,
+            wrongBMagicException, interruptedConnectionException, wrongCrc1Exception,
+            IOException, wrongEcryptException {
 
         try {
             if (network == null) {
@@ -120,19 +133,21 @@ public class Client {
                 System.out.println("CORRECT PACKET RESPONSE");
             else
                 System.out.println("WRONG PACKET RESPONSE");
+            return answerPacketOne;
 
         } catch (closedSocketException | SocketException e) {
             reconnect();
             request(packet, k);
 
 
-        } catch (SocketTimeoutException e){
-            System.out.println("Need to resend");
+        } catch (SocketTimeoutException e) {
             k--;
-            if(k==0){ System.out.println("Cant send message"); return null;}
-            request(packet,k);
+            if (k == 0) {
+                throw new unavailableServer();
+            }
+            System.out.println("Retrying");
+            return request(packet, k);
         }
-        return packet;
     }
 
 

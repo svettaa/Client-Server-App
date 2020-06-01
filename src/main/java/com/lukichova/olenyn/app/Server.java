@@ -23,45 +23,47 @@ public class Server {
 
     private static ExecutorService processPool = Executors.newFixedThreadPool(10);
 
-    public static void main(String[] args){
-        try {
-            if (NETWORK_TYPE.toLowerCase().equals("tcp")) {
-                try (ServerSocket listener = new ServerSocket(NETWORK_PORT)) {
-                    System.out.println("Server is running...");
-                    ExecutorService pool = Executors.newFixedThreadPool(15);
-                    while (true) {
-                        pool.execute(new Server.Listener(listener.accept()));
-                    }
+    public static void main(String[] args) throws IOException{
+
+        if (NETWORK_TYPE.toLowerCase().equals("tcp")) {
+            try (ServerSocket listener = new ServerSocket(NETWORK_PORT)) {
+                System.out.println("Server is running...");
+                ExecutorService pool = Executors.newFixedThreadPool(15);
+                while (true) {
+                    pool.execute(new Server.Listener(listener.accept()));
                 }
-            } else {
+            }
+        } else {
+            try {
                 DatagramSocket socket = new DatagramSocket(NETWORK_PORT);
                 boolean running = true;
                 UDPNetwork network = new UDPNetwork(socket);
                 System.out.println("Server is running via " + network + " connection");
                 while (running) {
-                    Packet incoming = network.receive();
-                   // Packet answer = Processor.process(incoming);
-                    processPool.execute(() -> {
-                        try {
-
-                            network.send(incoming);
-                        } catch (wrongSendException e) {
-                            System.out.println("Errors while sending");
-                        }
-                    });
+                    try {
+                        Packet incoming = network.receive();
+                        processPool.execute(() -> {
+                            Packet answer = Processor.process(incoming);
+                            try {
+                                network.send(answer);
+                            } catch (Exception e) {
+                                System.out.println("Errors while sending");
+                            }
+                        });
+                    }catch (wrongBMagicException e) {
+                        System.out.println("Wrong bMagic");
+                    } catch (wrongCrc1Exception e) {
+                        System.out.println("Wrong CRC1");
+                    } catch (wrongCrc2Exception e) {
+                        System.out.println("Wrong CRC2");
+                    } catch (wrongDecryptException e) {
+                        System.out.println("Errors in decryption");
+                    }
                 }
                 network.close();
+            } catch (IOException e) {
+                System.out.println("IOException occurred");
             }
-        } catch (IOException e) {
-            System.out.println("");
-        } catch (wrongCrc2Exception e) {
-            e.printStackTrace();
-        } catch (wrongCrc1Exception e) {
-            e.printStackTrace();
-        } catch (wrongBMagicException e) {
-            e.printStackTrace();
-        } catch (wrongDecryptException e) {
-            e.printStackTrace();
         }
 
     }
@@ -78,14 +80,7 @@ public class Server {
             try {
                 System.out.println("Connection opened");
 
-                Network network;
-
-                if (NETWORK_TYPE.toLowerCase().equals("tcp")) {
-
-                    network = new TCPNetwork(socket);
-
-                } else
-                    network = new UDPNetwork();
+                Network network = new TCPNetwork(socket);
 
                 System.out.println("Server is running via " + network + " connection");
 
@@ -93,11 +88,9 @@ public class Server {
                 while (true) {
 
                     try {
-                        Packet packet = null;
-                        packet = network.receive();
-                        Packet finalPacket = packet;
+                        Packet packet = network.receive();
                         processPool.execute(() -> {
-                            Packet answer = Processor.process(finalPacket);
+                            Packet answer = Processor.process(packet);
                             try {
                                 network.send(answer);
                             } catch (Exception e) {
@@ -109,6 +102,14 @@ public class Server {
                     } catch (SocketException e) {
                         System.out.println("ERROR: Client is unavailable");
                         break;
+                    }catch (wrongBMagicException e) {
+                        System.out.println("Wrong bMagic");
+                    } catch (wrongCrc1Exception e) {
+                        System.out.println("Wrong CRC1");
+                    } catch (wrongCrc2Exception e) {
+                        System.out.println("Wrong CRC2");
+                    }catch (wrongDecryptException e) {
+                        System.out.println("Errors in decryption");
                     }
                 }
                 network.close();
@@ -116,17 +117,9 @@ public class Server {
 
             } catch (wrongConnectionException e) {
                 System.out.println("Wrong TCP connection");
-            } catch (wrongDecryptException e) {
-                System.out.println("Errors in decryption");
             } catch (IOException e) {
                 System.out.println("IOException: socket was closed");
-            } catch (wrongBMagicException e) {
-                System.out.println("Wrong bMagic");
-            } catch (wrongCrc1Exception e) {
-                System.out.println("Wrong CRC1");
-            } catch (wrongCrc2Exception e) {
-                System.out.println("Wrong CRC2");
-            } catch (wrongCloseSocketException e) {
+            }  catch (wrongCloseSocketException e) {
                 System.out.println("Error while closing");
             } catch (interruptedConnectionException e) {
                 System.out.println("Your connection was interrupted");

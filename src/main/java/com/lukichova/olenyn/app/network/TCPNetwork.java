@@ -31,10 +31,6 @@ public class TCPNetwork implements Network {
         }
     }
 
-    @Override
-    public void listen() throws IOException {
-
-    }
 
 
     public Packet receive() throws IOException, closedSocketException, wrongDecryptException, wrongBMagicException, wrongCrc1Exception, wrongCrc2Exception {
@@ -55,11 +51,6 @@ public class TCPNetwork implements Network {
     }
 
     @Override
-    public void connect(){
-
-    }
-
-    @Override
     public void send(Packet packet) throws IOException, wrongEcryptException {
         byte[] packetBytes;
 
@@ -71,6 +62,12 @@ public class TCPNetwork implements Network {
 
         System.out.println("Send");
 
+    }
+
+    @Override
+    public void sendDeath() throws IOException {
+        socketOutputStream.write(new byte[]{19, 19, 19, 19});
+        socketOutputStream.flush();
     }
 
     @Override
