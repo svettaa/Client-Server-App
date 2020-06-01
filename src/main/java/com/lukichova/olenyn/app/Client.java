@@ -37,12 +37,13 @@ public class Client {
 
             Client client = new Client();
             client.connect(NETWORK_PORT);
+
             Thread.sleep(3000);
             client.request(packet);
 
 
             client.disconnect();
-        } catch (wrongDisconnectException | wrongConnectionException | wrongClientRequestException | InterruptedException e) {
+        } catch (wrongDisconnectException | wrongConnectionException | InterruptedException e) {
             System.out.println("Some errors occurred");
         } catch (com.lukichova.olenyn.app.Exceptions.unavailableServer unavailableServer) {
             System.out.println("Server is unavailable");
@@ -83,7 +84,8 @@ public class Client {
         throw new unavailableServer();
     }
 
-    public Packet request(Packet packet) throws Exception, wrongDecryptException {
+    public Packet request(Packet packet) throws wrongConnectionException, requestFailed, unavailableServer, InterruptedException {
+        int k=5;
         try {
             if (network == null) {
                 throw new wrongConnectionException("Not connected");
@@ -101,8 +103,26 @@ public class Client {
             throw new requestFailed();
         }
         catch (SocketTimeoutException e){
-        System.out.println("Need to resend");
-    }
+          System.out.println("Need to resend");
+            k--;
+            if(k==0){ System.out.println("Cant send message"); return null;}
+            request(packet);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        } catch (interruptedConnectionException e) {
+            e.printStackTrace();
+        } catch (wrongCrc1Exception e) {
+            e.printStackTrace();
+        } catch (wrongBMagicException e) {
+            e.printStackTrace();
+        } catch (wrongCrc2Exception e) {
+            e.printStackTrace();
+        } catch (wrongDecryptException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return packet;
     }
 

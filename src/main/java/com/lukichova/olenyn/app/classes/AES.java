@@ -38,9 +38,9 @@ public class AES {
 
 
 
-    @SneakyThrows
-    public static String decrypt(String strToDecrypt)
-            {
+
+    public static String decrypt(String strToDecrypt) throws wrongDecryptException
+    {
 
             try {
                 setKey();
@@ -49,7 +49,16 @@ public class AES {
                 return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
             } catch (UnsupportedEncodingException | NoSuchAlgorithmException e){
                 throw new wrongDecryptException();
-        }
+        } catch (BadPaddingException e) {
+                e.printStackTrace();
+            } catch (IllegalBlockSizeException e) {
+                e.printStackTrace();
+            } catch (NoSuchPaddingException e) {
+                e.printStackTrace();
+            } catch (InvalidKeyException e) {
+                e.printStackTrace();
+            }
+        return null;
     }
 
 

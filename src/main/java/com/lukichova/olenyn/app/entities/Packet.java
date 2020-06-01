@@ -1,10 +1,7 @@
 package com.lukichova.olenyn.app.entities;
 
 import com.github.snksoft.crc.CRC;
-import com.lukichova.olenyn.app.Exceptions.wrongBMagicException;
-import com.lukichova.olenyn.app.Exceptions.wrongCrc1Exception;
-import com.lukichova.olenyn.app.Exceptions.wrongCrc2Exception;
-import com.lukichova.olenyn.app.Exceptions.wrongDecryptException;
+import com.lukichova.olenyn.app.Exceptions.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -97,7 +94,7 @@ public class Packet {
         wLen = bMsq.getMessage().length();
     }
 
-    public byte[] toPacket() throws Exception{
+    public byte[] toPacket() throws wrongEcryptException {
         Message message = new Message();
         message.setCType(getBMsq().getCType());
         message.setBUserId(getBMsq().getBUserId());

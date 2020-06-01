@@ -19,8 +19,9 @@ public class UDPNetwork implements Network {
     private DatagramSocket socket;
     private Boolean isServer = false;
 
-    public UDPNetwork(DatagramSocket socket) {
+    public UDPNetwork(DatagramSocket socket) throws SocketException {
         this.socket = socket;
+        socket.setSoTimeout(5000);
     }
 
     public UDPNetwork() {
@@ -104,8 +105,8 @@ public class UDPNetwork implements Network {
 
             System.out.println("Send");
             System.out.println(Arrays.toString(packetBytes) + "\n");
-        } catch (Exception e) {
-            throw new wrongSendException();
+        } catch (IOException|wrongEcryptException e) {
+           throw new wrongSendException();
         }
 
     }

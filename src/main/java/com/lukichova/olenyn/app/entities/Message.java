@@ -1,6 +1,7 @@
 package com.lukichova.olenyn.app.entities;
 
 import com.lukichova.olenyn.app.Exceptions.wrongDecryptException;
+import com.lukichova.olenyn.app.Exceptions.wrongEcryptException;
 import com.lukichova.olenyn.app.classes.AES;
 import lombok.Data;
 
@@ -50,7 +51,7 @@ public class Message {
         return message.length();
     }
 
-    public void encode() throws Exception {
+    public void encode() throws wrongEcryptException {
         message = AES.encrypt(message);
     }
 
