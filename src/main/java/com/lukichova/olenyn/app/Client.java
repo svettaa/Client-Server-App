@@ -40,7 +40,7 @@ public class Client {
 
             Client client = new Client();
             client.connect(NETWORK_PORT);
-//            Thread.sleep(3000);
+          Thread.sleep(3000);
             client.request(packet, AMOUNT_OF_TRIES);
 
 

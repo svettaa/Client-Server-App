@@ -1,6 +1,8 @@
 package com.lukichova.olenyn.app;
 
 import com.google.common.primitives.UnsignedLong;
+import com.lukichova.olenyn.app.Exceptions.closedSocketException;
+import com.lukichova.olenyn.app.Exceptions.unavailableServer;
 import com.lukichova.olenyn.app.Exceptions.wrongConnectionException;
 import com.lukichova.olenyn.app.Exceptions.wrongDecryptException;
 import com.lukichova.olenyn.app.entities.Message;
@@ -8,6 +10,8 @@ import com.lukichova.olenyn.app.entities.Packet;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.lukichova.olenyn.app.resoures.Resoures.NETWORK_PORT;
@@ -104,5 +108,15 @@ public class TestClient {
         Assert.assertEquals(response.getBMsq().getMessage(), "OK");
 
         client.disconnect();
+    }
+    
+    @Test (expected = unavailableServer.class)
+    public void catchUnavailableServer() throws Exception {
+        testMessage = new Message(3, 4, "time");
+        packet = new Packet((byte) 1, unsignedLongbPktId, testMessage);
+        Client client = new Client();
+        client.connect(NETWORK_PORT);
+        Thread.sleep(3000);
+        client.request(packet, AMOUNT_OF_TRIES);
     }
 }
