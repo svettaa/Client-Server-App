@@ -55,6 +55,29 @@ public class Processor {
             answerMessage = new Message(1, 1,  "Product "+in+" was updated!");
 
         }
+
+        if(comand==Message.cTypes.LIST_BY_CRITERIA.ordinal())
+        {
+            String in = packet.getBMsq().getMessage();
+            String[] product = in.split(" ");
+
+            List<Goods> list=GoodsDao.listByCriteria(product);
+            StringBuilder sb = new StringBuilder();
+            String delim = "  ";
+            int i = 0;
+            while (i < list.size() - 1) {
+
+                sb.append(list.get(i));
+                sb.append(delim);
+                i++;
+            }
+            sb.append(list.get(i));
+
+            String res = sb.toString();
+            answerMessage = new Message(1, 1, res);
+
+
+        }
      /*   if (message.equals("time")) {
             answerMessage = new Message(1, 1, "OK");
         } else {

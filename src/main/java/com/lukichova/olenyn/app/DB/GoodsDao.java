@@ -102,7 +102,28 @@ public class GoodsDao
     }
 
    // @Override
-    public void listByCriteria(Goods goods) {
+    public static  List<Goods> listByCriteria(String[] params) {
 
+        String sqlQuery = "SELECT * FROM " + GOODS_TABLE +  " WHERE " +params[0]+ " = ?";
+        List<Goods> list = new ArrayList<Goods>();
+        try {
+            PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sqlQuery);
+
+            preparedStatement.setString(1, params[1]);
+
+            ResultSet rs= preparedStatement.executeQuery();
+
+            while (rs.next()) {
+                Goods g = new Goods();
+                g.setName(rs.getString("name_of_product"));
+                g.setPrice(rs.getDouble("price"));
+
+                list.add(g);
+            }
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        }
+
+        return list;
     }
 }
