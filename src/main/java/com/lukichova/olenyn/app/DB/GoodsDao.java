@@ -9,20 +9,19 @@ import java.util.Optional;
 
 import static com.lukichova.olenyn.app.resoures.Resoures.GOODS_TABLE;
 
-public class GoodsDao
-        //implements Dao<Goods>
+public class GoodsDao implements Dao<Goods>
 {
 
 
-    // @Override
+    @Override
     public Optional<Goods> read(long id) {
         return Optional.empty();
     }
 
-    // @Override
-    public static List<Goods> readAll() {
+    @Override
+    public List<Goods> readAll() {
         String sql = "SELECT * FROM " + GOODS_TABLE;
-        System.out.println("readAll()");
+        System.out.println("readAll() invoked");
         List<Goods> list = new ArrayList<Goods>();
         try { PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sql);
 
@@ -42,8 +41,8 @@ public class GoodsDao
 
     }
 
-    // @Override
-    public static void create(String[] params) {
+    @Override
+    public void create(String[] params) {
         String sqlQuery = "INSERT INTO " + GOODS_TABLE +  " (name_of_product, price) VALUES (?, ?)";
 
         try {
@@ -61,8 +60,8 @@ public class GoodsDao
         }
     }
 
-    // @Override
-    public static void update(Goods g, String[] params) {
+    @Override
+    public void update(Goods g, String[] params) {
         String sqlQuery = "UPDATE " + GOODS_TABLE + " SET price = ? WHERE name_of_product = ?";
 
         try {
@@ -81,8 +80,8 @@ public class GoodsDao
 
     }
 
-    // @Override
-    public static void delete(Goods goods) {
+    @Override
+    public void delete(Goods goods) {
         String sql = "DELETE FROM " + GOODS_TABLE + " WHERE name_of_product = ?";
 
 
@@ -101,7 +100,7 @@ public class GoodsDao
         }
     }
 
-    // @Override
+    @Override
     public void listByCriteria(Goods goods) {
 
     }

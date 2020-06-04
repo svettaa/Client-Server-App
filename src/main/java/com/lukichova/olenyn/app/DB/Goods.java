@@ -1,8 +1,10 @@
 package com.lukichova.olenyn.app.DB;
 
+import lombok.Data;
 import lombok.ToString;
 
 @ToString
+@Data
 public class Goods {
     private String name;
 
@@ -12,25 +14,5 @@ public class Goods {
         this.name = name;
         this.price = price;
 
-    }
-    public Goods(Goods g) {
-        this.name = g.name;
-        this.price = g.price;
-    }
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
     }
 }

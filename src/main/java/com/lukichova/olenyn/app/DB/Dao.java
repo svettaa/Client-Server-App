@@ -5,9 +5,9 @@ import java.util.Optional;
 
 public interface Dao<T> {
 
-    Optional<T> read(long id);
+    Optional<Goods> read(long id);
 
-    List<T> readAll();
+    List<Goods> readAll();
 
     void create(String[] params);
 

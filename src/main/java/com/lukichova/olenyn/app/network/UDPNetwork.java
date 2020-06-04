@@ -5,7 +5,6 @@ import com.lukichova.olenyn.app.Exceptions.*;
 import com.lukichova.olenyn.app.classes.Processor;
 import com.lukichova.olenyn.app.entities.Message;
 import com.lukichova.olenyn.app.entities.Packet;
-import com.lukichova.olenyn.app.utils.NetworkProperties;
 
 import java.io.IOException;
 import java.net.*;
