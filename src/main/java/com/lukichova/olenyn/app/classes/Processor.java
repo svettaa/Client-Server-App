@@ -1,6 +1,7 @@
 package com.lukichova.olenyn.app.classes;
 
 import com.google.common.primitives.UnsignedLong;
+import com.lukichova.olenyn.app.DB.GoodsDao;
 import com.lukichova.olenyn.app.entities.Message;
 import com.lukichova.olenyn.app.entities.Packet;
 import com.lukichova.olenyn.app.network.Network;
