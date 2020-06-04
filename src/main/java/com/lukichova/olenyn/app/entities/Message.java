@@ -12,11 +12,11 @@ import java.nio.ByteBuffer;
 public class Message {
 
     public enum cTypes {
-        GET_PRODUCT_COUNT,
-        GET_PRODUCT,
-        ADD_PRODUCT,
-        ADD_PRODUCT_TITLE,
+        GET_PRODUCTS,
         SET_PRODUCT_PRICE,
+        DELETE_PRODUCT,
+        CREATE_PRODUCT,
+        LIST_BY_CRITERIA,
         ADD_PRODUCT_TO_GROUP
     }
 
