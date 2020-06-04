@@ -1,5 +1,7 @@
 package com.lukichova.olenyn.app.DB;
 
+import com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,7 +21,7 @@ public class GoodsDao implements Dao<Goods>
     }
 
     @Override
-    public List<Goods> readAll() {
+    public List<Goods> readAll() throws wrongDataBaseConnection {
         String sql = "SELECT * FROM " + GOODS_TABLE;
         System.out.println("readAll() invoked");
         List<Goods> list = new ArrayList<Goods>();
@@ -34,7 +36,7 @@ public class GoodsDao implements Dao<Goods>
                 list.add(g);
             }
         }catch (SQLException sqlException) {
-            sqlException.printStackTrace();
+            throw new wrongDataBaseConnection();
         }
         return list;
 
