@@ -16,6 +16,7 @@ public class GoodsDao<Goods> implements Dao<Goods> {
 
     @Override
     public List<Goods> readAll() {
+
         return null;
     }
 
@@ -41,12 +42,13 @@ public class GoodsDao<Goods> implements Dao<Goods> {
     @Override
     public void update(Goods g, String[] params) {
         String sqlQuery = "UPDATE " + GOODS_TABLE + " SET price = ? WHERE name_of_product = ?";
-
+        com.lukichova.olenyn.app.DB.Goods ss=new com.lukichova.olenyn.app.DB.Goods("kdm",3);
+        ss.getName();
         try {
             PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sqlQuery);
 
             preparedStatement.setDouble(1, Double.parseDouble(params[0]));
-          //  preparedStatement.setString(2, g.getName());
+          // preparedStatement.setString(2, g.getName());
 
             preparedStatement.executeUpdate();
 
