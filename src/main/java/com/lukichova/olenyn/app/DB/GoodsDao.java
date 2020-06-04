@@ -9,25 +9,28 @@ import java.util.Optional;
 
 import static com.lukichova.olenyn.app.resoures.Resoures.GOODS_TABLE;
 
-public class GoodsDao implements Dao<Goods> {
+public class GoodsDao
+        //implements Dao<Goods>
+        {
 
-    @Override
+
+   // @Override
     public Optional<Goods> read(long id) {
         return Optional.empty();
     }
 
-    @Override
-    public List<Goods> readAll() {
+   // @Override
+    public static List<Goods> readAll() {
         String sql = "SELECT * FROM " + GOODS_TABLE;
-
+        System.out.println("readAll()");
         List<Goods> list = new ArrayList<Goods>();
         try { PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sql);
 
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
                 Goods g = new Goods();
-                g.setName(rs.getString("id"));
-                g.setPrice(rs.getDouble("number"));
+                g.setName(rs.getString("name_of_product"));
+                g.setPrice(rs.getDouble("price"));
 
                 list.add(g);
             }
@@ -39,30 +42,11 @@ public class GoodsDao implements Dao<Goods> {
 
     }
 
-    @Override
-    public void create(String[] params) {
-        String sqlQuery = "INSERT INTO " + GOODS_TABLE +  " (name_of_product, price) VALUES (?, ?)";
-
-        try {
-            PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sqlQuery);
-
-            preparedStatement.setString(1, params[0]);
-            preparedStatement.setDouble(2, Double.parseDouble(params[1]));
-
-            preparedStatement.executeUpdate();
-
-            System.out.println("Inserted " + params[0]+ " " + params[1]);
-            System.out.println();
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-        }
-    }
    // @Override
-    public static void create1(String[] params) {
+    public static void create(String[] params) {
         String sqlQuery = "INSERT INTO " + GOODS_TABLE +  " (name_of_product, price) VALUES (?, ?)";
 
         try {
-
             PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sqlQuery);
 
             preparedStatement.setString(1, params[0]);
@@ -77,14 +61,14 @@ public class GoodsDao implements Dao<Goods> {
         }
     }
 
-    @Override
-    public void update(Goods g, String[] params) {
+   // @Override
+    public static void update(Goods g, String[] params) {
         String sqlQuery = "UPDATE " + GOODS_TABLE + " SET price = ? WHERE name_of_product = ?";
 
         try {
             PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sqlQuery);
 
-            preparedStatement.setDouble(1, Double.parseDouble(params[0]));
+            preparedStatement.setDouble(1, Double.parseDouble(params[1]));
            preparedStatement.setString(2, g.getName());
 
             preparedStatement.executeUpdate();
@@ -97,8 +81,8 @@ public class GoodsDao implements Dao<Goods> {
 
     }
 
-    @Override
-    public  void delete(Goods goods) {
+   // @Override
+    public static void delete(Goods goods) {
         String sql = "DELETE FROM " + GOODS_TABLE + " WHERE name_of_product = ?";
 
 
@@ -110,14 +94,14 @@ public class GoodsDao implements Dao<Goods> {
 
             preparedStatement.executeUpdate();
 
-            System.out.println("Deleted " + goods);
+            System.out.println("Deleted " + goods.getName());
             System.out.println();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    @Override
+   // @Override
     public void listByCriteria(Goods goods) {
 
     }

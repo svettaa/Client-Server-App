@@ -28,6 +28,7 @@ public class Packet {
         this.bPktId = bPktId;
 
         this.bMsq = bMsq;
+
         wLen = bMsq.getMessage().length();
     }
 
