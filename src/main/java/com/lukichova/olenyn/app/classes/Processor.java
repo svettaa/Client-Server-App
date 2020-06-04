@@ -32,20 +32,20 @@ public class Processor {
 
             String res = sb.toString();
            answerMessage = new Message(1, 1, res);
-        }
+        } else{
         if(comand==Message.cTypes.DELETE_PRODUCT.ordinal()){
              Goods goos= new Goods(packet.getBMsq().getMessage(),0);
              GoodsDao.delete(goos);
             answerMessage = new Message(1, 1, "Product "+goos.getName()+" was deleted!");
 
-        }
+        } else{
         if(comand==Message.cTypes.CREATE_PRODUCT.ordinal()){
             String in = packet.getBMsq().getMessage();
             String[] product = in.split(" ");
 
             GoodsDao.create(product);
             answerMessage = new Message(1, 1,  "Product "+in+" was created!");
-        }
+        } else{
         if(comand==Message.cTypes.SET_PRODUCT_PRICE.ordinal()){
 
             String in = packet.getBMsq().getMessage();
@@ -54,7 +54,7 @@ public class Processor {
             GoodsDao.update(goos,product);
             answerMessage = new Message(1, 1,  "Product "+in+" was updated!");
 
-        }
+        } else{
 
         if(comand==Message.cTypes.LIST_BY_CRITERIA.ordinal())
         {
@@ -77,13 +77,11 @@ public class Processor {
             answerMessage = new Message(1, 1, res);
 
 
-        }
-     /*   if (message.equals("time")) {
-            answerMessage = new Message(1, 1, "OK");
         } else {
-            answerMessage = new Message(1, 1, "other");
-        }
-        */
+
+            answerMessage = new Message(1, 1, "Ivalid comand");
+        }}}}}
+
         Packet answerPacket = new Packet((byte) 1, packet.getBPktId(), answerMessage);
         answerPacket.setClientInetAddress(packet.getClientInetAddress());
         answerPacket.setClientPort(packet.getClientPort());
