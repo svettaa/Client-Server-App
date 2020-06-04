@@ -34,7 +34,7 @@ public class Client {
 
     public static void main(String[] args) {
         try {
-            Message testMessage = new Message(Message.cTypes.GET_PRODUCTS.ordinal(), 1, "cola");
+            Message testMessage = new Message(Message.cTypes.LIST_BY_CRITERIA.ordinal(), 1, "price 30");
             Packet packet = new Packet((byte) 1, UnsignedLong.ONE, testMessage);
 
 
