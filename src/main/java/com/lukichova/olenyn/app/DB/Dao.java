@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface Dao<T> {
-
     Optional<Goods> read(long id);
 
     List<Goods> readAll() throws wrongDataBaseConnection;
@@ -17,6 +16,5 @@ public interface Dao<T> {
 
     void delete(T t);
 
-    void listByCriteria(T t);
-
+    List<Goods> listByCriteria(String[] params);
 }
