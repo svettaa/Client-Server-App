@@ -34,7 +34,7 @@ public class Client {
 
     public static void main(String[] args) {
         try {
-            Message testMessage = new Message(Message.cTypes.ADD_PRODUCT.ordinal(), 1, "time");
+            Message testMessage = new Message(Message.cTypes.DELETE_PRODUCT.ordinal(), 1, "cola");
             Packet packet = new Packet((byte) 1, UnsignedLong.ONE, testMessage);
 
 

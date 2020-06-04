@@ -9,7 +9,9 @@ public interface Dao<T> {
 
     List<T> readAll();
 
-    void create(String[] params);
+    void create(String[] params) ;
+
+
 
     void update(T t, String[] params);
 

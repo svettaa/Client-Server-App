@@ -12,7 +12,7 @@ public class DataBase {
 
     public static void connect() {
         try {
-            String url = "jdbc:sqlite:" + DATABASE_NAME;
+            String url = "jdbc:sqlite:" + "test.db";
             connection = DriverManager.getConnection(url);
 
             System.out.println("Connection to SQLite has been established.");

@@ -10,7 +10,7 @@ public class TestMessage {
 
     @Test
     public void test_endecodeMessage() throws Exception, wrongDecryptException {
-        Message testMessage = new Message(Message.cTypes.ADD_PRODUCT_TITLE.ordinal(), 4, "We love programming!!!");
+        Message testMessage = new Message(Message.cTypes.DELETE_PRODUCT.ordinal(), 4, "We love programming!!!");
         Message encodedMessage = new Message(3, 4, "We love programming!!!");
         encodedMessage.encode();
         encodedMessage.decode();
