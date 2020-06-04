@@ -62,8 +62,8 @@ public class Processor {
         {
             String in = packet.getBMsq().getMessage();
             String[] product = in.split(" ");
-
-            List<Goods> list= Dao.listByCriteria(product);
+            Dao<Goods> dao = new GoodsDao();
+            List<Goods> list= dao.listByCriteria(product);
             StringBuilder sb = new StringBuilder();
             String delim = "  ";
             int i = 0;

@@ -44,7 +44,7 @@ public class GoodsDao implements Dao<Goods>
     @Override
     public void create(String[] params) {
         String sqlQuery = "INSERT INTO " + GOODS_TABLE +  " (name_of_product, price) VALUES (?, ?)";
-
+        System.out.println("create() invoked");
         try {
             PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sqlQuery);
 
@@ -63,7 +63,7 @@ public class GoodsDao implements Dao<Goods>
     @Override
     public void update(Goods g, String[] params) {
         String sqlQuery = "UPDATE " + GOODS_TABLE + " SET price = ? WHERE name_of_product = ?";
-
+        System.out.println("update() invoked");
         try {
             PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sqlQuery);
 
@@ -83,9 +83,7 @@ public class GoodsDao implements Dao<Goods>
     @Override
     public void delete(Goods goods) {
         String sql = "DELETE FROM " + GOODS_TABLE + " WHERE name_of_product = ?";
-
-
-
+        System.out.println("delete() invoked");
         try {
             PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sql);
 
@@ -102,9 +100,8 @@ public class GoodsDao implements Dao<Goods>
 
     @Override
     public List<Goods> listByCriteria(String[] params) {
-
-
         String sqlQuery = "SELECT * FROM " + GOODS_TABLE +  " WHERE " +params[0]+ " = ?";
+        System.out.println("listByCriteria() invoked");
         List<Goods> list = new ArrayList<Goods>();
         try {
             PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sqlQuery);
