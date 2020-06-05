@@ -83,7 +83,7 @@ public class GoodsDao implements Dao<Goods>
     }
 
     @Override
-    public void create(Goods goods) throws wrongDataBaseConnection {
+    public boolean create(Goods goods) throws wrongDataBaseConnection {
         String sqlQuery = "INSERT INTO " + GOODS_TABLE +
                 " (name, price, left_amount, producer, description, group_id) " +
                 " VALUES (?, ?, ?, ?, ?, ?)";
@@ -106,10 +106,11 @@ public class GoodsDao implements Dao<Goods>
         } catch (SQLException sqlException) {
             throw new wrongDataBaseConnection();
         }
+        return false;
     }
 
     @Override
-    public void update(Goods goods) throws wrongDataBaseConnection {
+    public boolean update(Goods goods) throws wrongDataBaseConnection {
         String sqlQuery = "UPDATE " + GOODS_TABLE + " " +
                 "SET price = ?, " +
                 "left_amount = ?," +
@@ -134,11 +135,11 @@ public class GoodsDao implements Dao<Goods>
         } catch (SQLException sqlException) {
             throw new wrongDataBaseConnection();
         }
-
+        return false;
     }
 
     @Override
-    public void delete(int id) throws wrongDataBaseConnection {
+    public boolean delete(int id) throws wrongDataBaseConnection {
         String sql = "DELETE FROM " + GOODS_TABLE + " WHERE id = ?";
         System.out.println("delete() invoked");
         try {
@@ -151,6 +152,18 @@ public class GoodsDao implements Dao<Goods>
             System.out.println("Deleted " + id);
             System.out.println();
         } catch (SQLException e) {
+            throw new wrongDataBaseConnection();
+        }
+        return false;
+    }
+
+    @Override
+    public void deleteAll() throws wrongDataBaseConnection {
+        String sql = "DELETE FROM " + GOODS_TABLE;
+        System.out.println("deleteAll() invoked");
+        try { PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sql);
+            preparedStatement.executeQuery();
+        }catch (SQLException sqlException) {
             throw new wrongDataBaseConnection();
         }
     }

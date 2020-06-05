@@ -3,7 +3,6 @@ package com.lukichova.olenyn.app.DB;
 import com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface Dao<T> {
 
@@ -13,9 +12,11 @@ public interface Dao<T> {
 
     List<T> readAll() throws wrongDataBaseConnection;
 
-    void create(T t) throws wrongDataBaseConnection;
+    boolean create(T t) throws wrongDataBaseConnection;
 
-    void update(T t) throws wrongDataBaseConnection;
+    boolean update(T t) throws wrongDataBaseConnection;
 
-    void delete(int id) throws wrongDataBaseConnection;
+    boolean delete(int id) throws wrongDataBaseConnection;
+
+    void deleteAll() throws wrongDataBaseConnection;
 }

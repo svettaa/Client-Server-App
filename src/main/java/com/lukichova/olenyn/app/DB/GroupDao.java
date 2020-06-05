@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.lukichova.olenyn.app.resoures.Resoures.GOODS_TABLE;
-import static com.lukichova.olenyn.app.resoures.Resoures.GROUPS_TABLE;
+import static com.lukichova.olenyn.app.resoures.Resoures.GROUP_TABLE;
 
 public class GroupDao implements Dao<Group>{
     @Override
     public Group getById(int id) throws wrongDataBaseConnection {
-        String sqlQuery = "SELECT * FROM " + GROUPS_TABLE +  " WHERE " + id + " = ?";
+        String sqlQuery = "SELECT * FROM " + GROUP_TABLE +  " WHERE " + id + " = ?";
         System.out.println("getById() invoked");
         List<Goods> list = new ArrayList<Goods>();
         try {
@@ -41,7 +41,7 @@ public class GroupDao implements Dao<Group>{
 
     @Override
     public Group getByName(String name) throws wrongDataBaseConnection {
-        String sqlQuery = "SELECT * FROM " + GROUPS_TABLE +  " WHERE " +name+ " = ?";
+        String sqlQuery = "SELECT * FROM " + GROUP_TABLE +  " WHERE " +name+ " = ?";
         System.out.println("getByName() invoked");
         List<Goods> list = new ArrayList<Goods>();
         try {
@@ -61,7 +61,7 @@ public class GroupDao implements Dao<Group>{
 
     @Override
     public List<Group> readAll() throws wrongDataBaseConnection {
-        String sql = "SELECT * FROM " + GROUPS_TABLE;
+        String sql = "SELECT * FROM " + GROUP_TABLE;
         System.out.println("readAll() invoked");
         List<Group> list = new ArrayList<Group>();
         try { PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sql);
@@ -77,7 +77,7 @@ public class GroupDao implements Dao<Group>{
     }
 
     @Override
-    public void create(Group group) throws wrongDataBaseConnection {
+    public boolean create(Group group) throws wrongDataBaseConnection {
         String sqlQuery = "INSERT INTO " + GOODS_TABLE +
                 " (name, price, description) " +
                 " VALUES (?, ?, ?)";
@@ -86,7 +86,7 @@ public class GroupDao implements Dao<Group>{
             PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sqlQuery);
 
             preparedStatement.setString(1, group.getName());
-            preparedStatement.setString(4, group.getDescription());
+            preparedStatement.setString(2, group.getDescription());
 
 
             preparedStatement.executeUpdate();
@@ -96,11 +96,12 @@ public class GroupDao implements Dao<Group>{
         } catch (SQLException sqlException) {
             throw new wrongDataBaseConnection();
         }
+        return false;
     }
 
     @Override
-    public void update(Group group) throws wrongDataBaseConnection {
-        String sqlQuery = "UPDATE " + GROUPS_TABLE + " " +
+    public boolean update(Group group) throws wrongDataBaseConnection {
+        String sqlQuery = "UPDATE " + GROUP_TABLE + " " +
                 "SET description = ? WHERE name = ?";
         System.out.println("update() invoked");
         try {
@@ -115,15 +116,15 @@ public class GroupDao implements Dao<Group>{
         } catch (SQLException sqlException) {
             throw new wrongDataBaseConnection();
         }
+        return false;
     }
 
     @Override
-    public void delete(int id) throws wrongDataBaseConnection {
-        String sql = "DELETE FROM " + GROUPS_TABLE + " WHERE id = ?";
+    public boolean delete(int id) throws wrongDataBaseConnection {
+        String sql = "DELETE FROM " + GROUP_TABLE + " WHERE id = ?";
         System.out.println("delete() invoked");
         try {
             PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sql);
-
             preparedStatement.setInt(1, id);
 
             preparedStatement.executeUpdate();
@@ -131,6 +132,18 @@ public class GroupDao implements Dao<Group>{
             System.out.println("Deleted " + id);
             System.out.println();
         } catch (SQLException e) {
+            throw new wrongDataBaseConnection();
+        }
+        return false;
+    }
+
+    @Override
+    public void deleteAll() throws wrongDataBaseConnection {
+        String sql = "DELETE FROM " + GROUP_TABLE;
+        System.out.println("deleteAll() invoked");
+        try { PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sql);
+            preparedStatement.executeQuery();
+        }catch (SQLException sqlException) {
             throw new wrongDataBaseConnection();
         }
     }
