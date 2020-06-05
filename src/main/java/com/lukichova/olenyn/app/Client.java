@@ -34,13 +34,13 @@ public class Client {
 
     public static void main(String[] args) {
         try {
-            Message testMessage = new Message(Message.cTypes.GET_PRODUCTS.ordinal(), 1, "price 30");
+            Message testMessage = new Message(Message.cTypes.GET_PRODUCTS.ordinal(), 1, "milk 50");
             Packet packet = new Packet((byte) 1, UnsignedLong.ONE, testMessage);
 
 
             Client client = new Client();
             client.connect(NETWORK_PORT);
-          Thread.sleep(3000);
+            //Thread.sleep(3000);
             client.request(packet, AMOUNT_OF_TRIES);
 
 
@@ -68,13 +68,10 @@ public class Client {
         } catch (wrongSendException e) {
             System.out.println("Errors while sending");
         } catch (requestFailed e) {
-
             System.out.println("Errors in request()");
-
         } catch (wrongEcryptException e) {
             System.out.println("Errors in encryption");
         }
-
     }
 
     public void connect(int serverPort) throws wrongConnectionException, unavailableServer, InterruptedException, IOException {

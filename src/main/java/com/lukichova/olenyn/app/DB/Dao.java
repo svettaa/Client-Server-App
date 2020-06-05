@@ -6,15 +6,16 @@ import java.util.List;
 import java.util.Optional;
 
 public interface Dao<T> {
-    Optional<Goods> read(long id);
 
-    List<Goods> readAll() throws wrongDataBaseConnection;
+    T getById(int id) throws wrongDataBaseConnection;
 
-    void create(String[] params);
+    T getByName(String name) throws wrongDataBaseConnection;
 
-    void update(T t, String[] params);
+    List<T> readAll() throws wrongDataBaseConnection;
 
-    void delete(T t);
+    void create(T t) throws wrongDataBaseConnection;
 
-    List<Goods> listByCriteria(String[] params);
+    void update(T t) throws wrongDataBaseConnection;
+
+    void delete(int id) throws wrongDataBaseConnection;
 }

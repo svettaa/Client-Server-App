@@ -1,6 +1,7 @@
 package com.lukichova.olenyn.app;
 
 import com.google.common.primitives.UnsignedLong;
+import com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection;
 import com.lukichova.olenyn.app.classes.Processor;
 import com.lukichova.olenyn.app.entities.Message;
 import com.lukichova.olenyn.app.entities.Packet;
@@ -15,7 +16,7 @@ public class TestProcessor {
     UnsignedLong unsignedLongbPktId = UnsignedLong.valueOf(Long.MAX_VALUE);
 
     @Test
-    public void process1() {
+    public void process1() throws wrongDataBaseConnection {
 
         unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("2305"));
         testMessage = new Message(3, 4, "time");
@@ -24,7 +25,7 @@ public class TestProcessor {
         Assert.assertEquals("OK",answer.getBMsq().getMessage());
     }
     @Test
-    public void process2() {
+    public void process2() throws wrongDataBaseConnection {
 
         unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("2305"));
         testMessage = new Message(3, 4, "notime");

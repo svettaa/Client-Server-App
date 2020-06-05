@@ -9,13 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.lukichova.olenyn.app.resoures.Resoures.GOODS_TABLE;
+import static com.lukichova.olenyn.app.resoures.Resoures.GROUPS_TABLE;
 
-public class GoodsDao implements Dao<Goods>
-{
-
+public class GroupDao implements Dao<Group>{
     @Override
-    public Goods getById(int id) throws wrongDataBaseConnection {
-        String sqlQuery = "SELECT * FROM " + GOODS_TABLE +  " WHERE " +id+ " = ?";
+    public Group getById(int id) throws wrongDataBaseConnection {
+        String sqlQuery = "SELECT * FROM " + GROUPS_TABLE +  " WHERE " + id + " = ?";
         System.out.println("getById() invoked");
         List<Goods> list = new ArrayList<Goods>();
         try {
@@ -24,7 +23,7 @@ public class GoodsDao implements Dao<Goods>
             ResultSet rs= preparedStatement.executeQuery();
 
             if (rs.next()) {
-                return createGoods(rs);
+                return createGroup(rs);
             } else {
                 return null; //custom exception no such id
             }
@@ -33,21 +32,16 @@ public class GoodsDao implements Dao<Goods>
         }
     }
 
-    private Goods createGoods(ResultSet rs) throws SQLException {
-        Goods g = new Goods();
+    private Group createGroup(ResultSet rs) throws SQLException {
+        Group g = new Group();
         g.setName(rs.getString("name"));
-        g.setPrice(rs.getBigDecimal("price"));
-        g.setLeft_amount(rs.getInt("left_amount"));
-        g.setProducer(rs.getString("producer"));
         g.setDescription(rs.getString("description"));
-        g.setGroup_id(rs.getInt("group_id"));
-
         return g;
     }
 
     @Override
-    public Goods getByName(String name) throws wrongDataBaseConnection {
-        String sqlQuery = "SELECT * FROM " + GOODS_TABLE +  " WHERE " +name+ " = ?";
+    public Group getByName(String name) throws wrongDataBaseConnection {
+        String sqlQuery = "SELECT * FROM " + GROUPS_TABLE +  " WHERE " +name+ " = ?";
         System.out.println("getByName() invoked");
         List<Goods> list = new ArrayList<Goods>();
         try {
@@ -56,7 +50,7 @@ public class GoodsDao implements Dao<Goods>
             ResultSet rs= preparedStatement.executeQuery();
 
             if (rs.next()) {
-                return createGoods(rs);
+                return createGroup(rs);
             } else {
                 return null; //custom exception no such name
             }
@@ -66,15 +60,15 @@ public class GoodsDao implements Dao<Goods>
     }
 
     @Override
-    public List<Goods> readAll() throws wrongDataBaseConnection {
-        String sql = "SELECT * FROM " + GOODS_TABLE;
+    public List<Group> readAll() throws wrongDataBaseConnection {
+        String sql = "SELECT * FROM " + GROUPS_TABLE;
         System.out.println("readAll() invoked");
-        List<Goods> list = new ArrayList<Goods>();
+        List<Group> list = new ArrayList<Group>();
         try { PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sql);
 
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
-                list.add(createGoods(rs));
+                list.add(createGroup(rs));
             }
         }catch (SQLException sqlException) {
             throw new wrongDataBaseConnection();
@@ -83,25 +77,21 @@ public class GoodsDao implements Dao<Goods>
     }
 
     @Override
-    public void create(Goods goods) throws wrongDataBaseConnection {
+    public void create(Group group) throws wrongDataBaseConnection {
         String sqlQuery = "INSERT INTO " + GOODS_TABLE +
-                " (name, price, left_amount, producer, description, group_id) " +
-                " VALUES (?, ?, ?, ?, ?, ?)";
+                " (name, price, description) " +
+                " VALUES (?, ?, ?)";
         System.out.println("create() invoked");
         try {
             PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sqlQuery);
 
-            preparedStatement.setString(1, goods.getName());
-            preparedStatement.setBigDecimal(2, goods.getPrice());
-            preparedStatement.setInt(3, goods.getLeft_amount());
-            preparedStatement.setString(4, goods.getProducer());
-            preparedStatement.setString(4, goods.getDescription());
-            preparedStatement.setInt(4, goods.getGroup_id());
+            preparedStatement.setString(1, group.getName());
+            preparedStatement.setString(4, group.getDescription());
+
 
             preparedStatement.executeUpdate();
 
-            System.out.println("Inserted " + goods.getName() + " " + goods.getPrice() + " "
-                    + goods.getLeft_amount() + " " + goods.getProducer()+ " " + goods.getDescription()) ;
+            System.out.println("Inserted " + group.getName() + " " + group.getDescription()) ;
             System.out.println();
         } catch (SQLException sqlException) {
             throw new wrongDataBaseConnection();
@@ -109,37 +99,27 @@ public class GoodsDao implements Dao<Goods>
     }
 
     @Override
-    public void update(Goods goods) throws wrongDataBaseConnection {
-        String sqlQuery = "UPDATE " + GOODS_TABLE + " " +
-                "SET price = ?, " +
-                "left_amount = ?," +
-                "producer = ?," +
-                "description = ?," +
-                "group_id = ? WHERE name = ?";
+    public void update(Group group) throws wrongDataBaseConnection {
+        String sqlQuery = "UPDATE " + GROUPS_TABLE + " " +
+                "SET description = ? WHERE name = ?";
         System.out.println("update() invoked");
         try {
             PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sqlQuery);
-            preparedStatement.setBigDecimal(1, goods.getPrice());
-            preparedStatement.setInt(2, goods.getLeft_amount());
-            preparedStatement.setString(3, goods.getProducer());
-            preparedStatement.setString(4, goods.getDescription());
-            preparedStatement.setInt(5, goods.getGroup_id());
-            preparedStatement.setString(6, goods.getName());
+            preparedStatement.setString(1, group.getDescription());
+            preparedStatement.setString(2, group.getName());
 
             preparedStatement.executeUpdate();
 
-            System.out.println("Updated " + goods.getName() + " " + goods.getPrice() + " "
-                    + goods.getLeft_amount() + " " + goods.getProducer()+ " " + goods.getDescription()) ;
+            System.out.println("Updated " + group.getName() + " " + group.getDescription()) ;
             System.out.println();
         } catch (SQLException sqlException) {
             throw new wrongDataBaseConnection();
         }
-
     }
 
     @Override
     public void delete(int id) throws wrongDataBaseConnection {
-        String sql = "DELETE FROM " + GOODS_TABLE + " WHERE id = ?";
+        String sql = "DELETE FROM " + GROUPS_TABLE + " WHERE id = ?";
         System.out.println("delete() invoked");
         try {
             PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sql);
