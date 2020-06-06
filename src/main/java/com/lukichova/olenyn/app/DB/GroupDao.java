@@ -1,76 +1,91 @@
 package com.lukichova.olenyn.app.DB;
 
+import com.lukichova.olenyn.app.Exceptions.noItemWithSuchIdException;
+import com.lukichova.olenyn.app.Exceptions.noItemWithSuchNameException;
 import com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.lukichova.olenyn.app.resoures.Resoures.GOODS_TABLE;
 import static com.lukichova.olenyn.app.resoures.Resoures.GROUP_TABLE;
 
-public class GroupDao implements Dao<Group>{
+public class GroupDao implements Dao<Group> {
+
+
     @Override
-    public Group getById(int id) throws wrongDataBaseConnection {
-        String sqlQuery = "SELECT * FROM " + GROUP_TABLE +  " WHERE " + id + " = ?";
-        System.out.println("getById() invoked");
-        List<Goods> list = new ArrayList<Goods>();
+    public Group getById(int id) throws wrongDataBaseConnection, noItemWithSuchIdException {
+        Connection connection = null;
         try {
-            PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sqlQuery);
-            preparedStatement.setInt(0, id);
-            ResultSet rs= preparedStatement.executeQuery();
+            connection = DriverManager.getConnection(DataBase.url);
+            String sqlQuery = "SELECT * FROM " + GROUP_TABLE + " WHERE " + id + " = ?";
+            System.out.println("getById() invoked");
+            List<Goods> list = new ArrayList<Goods>();
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+            preparedStatement.setInt(1, id);
+            ResultSet rs = preparedStatement.executeQuery();
 
             if (rs.next()) {
                 return createGroup(rs);
             } else {
-                return null; //custom exception no such id
+                throw new noItemWithSuchIdException();
             }
         } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
             throw new wrongDataBaseConnection();
+        } finally {
+            close(connection);
         }
     }
 
     private Group createGroup(ResultSet rs) throws SQLException {
         Group g = new Group();
+        g.setId(rs.getInt("id"));
         g.setName(rs.getString("name"));
         g.setDescription(rs.getString("description"));
         return g;
     }
 
     @Override
-    public Group getByName(String name) throws wrongDataBaseConnection {
-        String sqlQuery = "SELECT * FROM " + GROUP_TABLE +  " WHERE " +name+ " = ?";
-        System.out.println("getByName() invoked");
-        List<Goods> list = new ArrayList<Goods>();
+    public Group getByName(String name) throws wrongDataBaseConnection, noItemWithSuchNameException {
         try {
-            PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sqlQuery);
-            preparedStatement.setString(1, name);
-            ResultSet rs= preparedStatement.executeQuery();
+            Connection connection = DriverManager.getConnection(DataBase.url);
+            String sqlQuery = "SELECT * FROM " + GROUP_TABLE + " WHERE " + name + " = ?";
+            System.out.println("getByName() invoked");
 
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+            preparedStatement.setString(1, name);
+            ResultSet rs = preparedStatement.executeQuery();
+
+            close(connection);
             if (rs.next()) {
                 return createGroup(rs);
             } else {
-                return null; //custom exception no such name
+                throw new noItemWithSuchNameException();
             }
         } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
             throw new wrongDataBaseConnection();
         }
     }
 
     @Override
     public List<Group> readAll() throws wrongDataBaseConnection {
-        String sql = "SELECT * FROM " + GROUP_TABLE;
-        System.out.println("readAll() invoked");
         List<Group> list = new ArrayList<Group>();
-        try { PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sql);
+        try {
+            Connection connection = DriverManager.getConnection(DataBase.url);
+            String sql = "SELECT * FROM " + GROUP_TABLE;
+            System.out.println("readAll() invoked");
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
                 list.add(createGroup(rs));
             }
-        }catch (SQLException sqlException) {
+            close(connection);
+        } catch (SQLException sqlException) {
             throw new wrongDataBaseConnection();
         }
         return list;
@@ -78,73 +93,110 @@ public class GroupDao implements Dao<Group>{
 
     @Override
     public boolean create(Group group) throws wrongDataBaseConnection {
-        String sqlQuery = "INSERT INTO " + GOODS_TABLE +
-                " (name, price, description) " +
-                " VALUES (?, ?, ?)";
         System.out.println("create() invoked");
         try {
-            PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sqlQuery);
+            Connection connection = DriverManager.getConnection(DataBase.url);
 
-            preparedStatement.setString(1, group.getName());
-            preparedStatement.setString(2, group.getDescription());
+            if (group.getId() == null) {
+                String sqlQuery = "INSERT INTO " + GROUP_TABLE +
+                        " (name, description) " +
+                        " VALUES (?, ?)";
 
+                PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
 
-            preparedStatement.executeUpdate();
+                preparedStatement.setString(1, group.getName());
+                preparedStatement.setString(2, group.getDescription());
 
-            System.out.println("Inserted " + group.getName() + " " + group.getDescription()) ;
-            System.out.println();
+                preparedStatement.executeUpdate();
+            } else {
+                String sqlQuery = "INSERT INTO " + GROUP_TABLE +
+                        " (id, name, description) " +
+                        " VALUES (?, ?, ?)";
+
+                PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+
+                preparedStatement.setInt(1, group.getId());
+                preparedStatement.setString(2, group.getName());
+                preparedStatement.setString(3, group.getDescription());
+
+                preparedStatement.executeUpdate();
+            }
+            System.out.println("Inserted " + group.getName() + " " + group.getDescription());
+            close(connection);
+            return true;
         } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
             throw new wrongDataBaseConnection();
         }
-        return false;
     }
 
     @Override
     public boolean update(Group group) throws wrongDataBaseConnection {
-        String sqlQuery = "UPDATE " + GROUP_TABLE + " " +
-                "SET description = ? WHERE name = ?";
-        System.out.println("update() invoked");
         try {
-            PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sqlQuery);
-            preparedStatement.setString(1, group.getDescription());
-            preparedStatement.setString(2, group.getName());
+            Connection connection = DriverManager.getConnection(DataBase.url);
+
+            String sqlQuery = "UPDATE " + GROUP_TABLE + " " +
+                    "SET name = ?, description = ? WHERE id = ?";
+            System.out.println("update() invoked");
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+
+            preparedStatement.setString(1, group.getName());
+            preparedStatement.setString(2, group.getDescription());
+            preparedStatement.setInt(3, group.getId());
 
             preparedStatement.executeUpdate();
 
-            System.out.println("Updated " + group.getName() + " " + group.getDescription()) ;
-            System.out.println();
+            System.out.println("Updated " + group.getName() + " " + group.getDescription());
+            close(connection);
         } catch (SQLException sqlException) {
             throw new wrongDataBaseConnection();
         }
-        return false;
+        return true;
     }
 
     @Override
     public boolean delete(int id) throws wrongDataBaseConnection {
-        String sql = "DELETE FROM " + GROUP_TABLE + " WHERE id = ?";
-        System.out.println("delete() invoked");
         try {
-            PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sql);
+            Connection connection = DriverManager.getConnection(DataBase.url);
+            String sql = "DELETE FROM " + GROUP_TABLE + " WHERE id = ?";
+            System.out.println("delete() invoked");
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, id);
 
             preparedStatement.executeUpdate();
 
             System.out.println("Deleted " + id);
-            System.out.println();
+            close(connection);
         } catch (SQLException e) {
             throw new wrongDataBaseConnection();
         }
-        return false;
+        return true;
     }
 
     @Override
     public void deleteAll() throws wrongDataBaseConnection {
-        String sql = "DELETE FROM " + GROUP_TABLE;
-        System.out.println("deleteAll() invoked");
-        try { PreparedStatement preparedStatement = DataBase.connection.prepareStatement(sql);
-            preparedStatement.executeQuery();
-        }catch (SQLException sqlException) {
+        try {
+            Connection connection = DriverManager.getConnection(DataBase.url);
+            String sql = "DELETE FROM " + GROUP_TABLE;
+            System.out.println("deleteAll() invoked");
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.executeUpdate();
+            close(connection);
+        } catch (SQLException sqlException) {
             throw new wrongDataBaseConnection();
+        }
+    }
+
+    public void close(Connection connection) {
+        try {
+            connection.close();
+
+            System.out.println("Connection closed");
+            System.out.println();
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
         }
     }
 }
