@@ -18,12 +18,17 @@ import java.net.DatagramSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 import static com.lukichova.olenyn.app.resoures.Resoures.*;
 
 
-public class Client {
+public class Client implements Runnable {
+    static int threadsCount = 300;
+    static ExecutorService executorService = Executors.newFixedThreadPool(threadsCount);
     Network network;
     Socket socket;
 
@@ -33,48 +38,17 @@ public class Client {
     public static final int AMOUNT_OF_TRIES = 5;
 
     public static void main(String[] args) {
+        for(int i = 0; i < threadsCount; i++)
+            executorService.submit(new Client());
+
+        executorService.shutdown();
+
         try {
-            Message testMessage = new Message(Message.cTypes.ADD_PRODUCT.ordinal(), 1, "time");
-            Packet packet = new Packet((byte) 1, UnsignedLong.ONE, testMessage);
-
-
-            Client client = new Client();
-            client.connect(NETWORK_PORT);
-          Thread.sleep(3000);
-            client.request(packet, AMOUNT_OF_TRIES);
-
-
-            client.disconnect();
-        } catch (wrongDisconnectException e) {
-            System.out.println("Error while disconnecting");
-        } catch (wrongConnectionException e) {
-            System.out.println("Error while connecting");
+            if(!executorService.awaitTermination(60, TimeUnit.SECONDS))
+                System.err.println("Can't stop clients in threads");
         } catch (InterruptedException e) {
-            System.out.println("Some errors occurred");
-        } catch (com.lukichova.olenyn.app.Exceptions.unavailableServer unavailableServer) {
-            System.out.println("Server is unavailable");
-        } catch (wrongDecryptException e) {
-            System.out.println("Errors in decryption");
-        } catch (wrongBMagicException e) {
-            System.out.println("Wrong bMagic");
-        } catch (wrongCrc1Exception e) {
-            System.out.println("Wrong CRC1");
-        } catch (wrongCrc2Exception e) {
-            System.out.println("Wrong CRC2");
-        } catch (IOException e) {
-            System.out.println("IOException: socket was closed");
-        } catch (interruptedConnectionException e) {
-            System.out.println("Your connection was interrupted");
-        } catch (wrongSendException e) {
-            System.out.println("Errors while sending");
-        } catch (requestFailed e) {
-
-            System.out.println("Errors in request()");
-
-        } catch (wrongEcryptException e) {
-            System.out.println("Errors in encryption");
+            e.printStackTrace();
         }
-
     }
 
     public void connect(int serverPort) throws wrongConnectionException, unavailableServer, InterruptedException, IOException {
@@ -161,5 +135,50 @@ public class Client {
             throw new wrongDisconnectException();
         }
 
+    }
+
+    @Override
+    public void run() {
+        try {
+            Message testMessage = new Message(Message.cTypes.ADD_PRODUCT.ordinal(), 1, "time");
+            Packet packet = new Packet((byte) 1, UnsignedLong.ONE, testMessage);
+
+
+            Client client = new Client();
+            client.connect(NETWORK_PORT);
+            Thread.sleep(3000);
+            client.request(packet, AMOUNT_OF_TRIES);
+
+
+            client.disconnect();
+        } catch (wrongDisconnectException e) {
+            System.out.println("Error while disconnecting");
+        } catch (wrongConnectionException e) {
+            System.out.println("Error while connecting");
+        } catch (InterruptedException e) {
+            System.out.println("Some errors occurred");
+        } catch (com.lukichova.olenyn.app.Exceptions.unavailableServer unavailableServer) {
+            System.out.println("Server is unavailable");
+        } catch (wrongDecryptException e) {
+            System.out.println("Errors in decryption");
+        } catch (wrongBMagicException e) {
+            System.out.println("Wrong bMagic");
+        } catch (wrongCrc1Exception e) {
+            System.out.println("Wrong CRC1");
+        } catch (wrongCrc2Exception e) {
+            System.out.println("Wrong CRC2");
+        } catch (IOException e) {
+            System.out.println("IOException: socket was closed");
+        } catch (interruptedConnectionException e) {
+            System.out.println("Your connection was interrupted");
+        } catch (wrongSendException e) {
+            System.out.println("Errors while sending");
+        } catch (requestFailed e) {
+
+            System.out.println("Errors in request()");
+
+        } catch (wrongEcryptException e) {
+            System.out.println("Errors in encryption");
+        }
     }
 }
