@@ -9,7 +9,7 @@ import static com.lukichova.olenyn.app.resoures.Resoures.DATABASE_NAME;
 
 public class DataBase {
     static Connection connection;
-    static String url = "jdbc:sqlite:" + DATABASE_NAME;
+    public static String url = "jdbc:sqlite:" + DATABASE_NAME;
     public static void connect() {
         try {
 

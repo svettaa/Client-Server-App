@@ -3,6 +3,7 @@ package com.lukichova.olenyn.app.DB;
 import com.lukichova.olenyn.app.Exceptions.noItemWithSuchIdException;
 import com.lukichova.olenyn.app.Exceptions.noItemWithSuchNameException;
 import com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection;
+import com.lukichova.olenyn.app.Exceptions.wrongNotUniqueValue;
 
 import java.util.List;
 
@@ -13,9 +14,9 @@ public interface Dao<T> {
 
     List<T> readAll() throws wrongDataBaseConnection;
 
-    boolean create(T t) throws wrongDataBaseConnection;
+    boolean create(T t) throws wrongDataBaseConnection, wrongNotUniqueValue;
 
-    boolean update(T t) throws wrongDataBaseConnection;
+    boolean update(T t) throws wrongDataBaseConnection, wrongNotUniqueValue;
 
     boolean delete(int id) throws wrongDataBaseConnection;
 

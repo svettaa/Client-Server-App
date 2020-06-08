@@ -3,6 +3,8 @@ package com.lukichova.olenyn.app.DB;
 import com.lukichova.olenyn.app.Exceptions.noItemWithSuchIdException;
 import com.lukichova.olenyn.app.Exceptions.noItemWithSuchNameException;
 import com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection;
+import com.lukichova.olenyn.app.Exceptions.wrongNotUniqueValue;
+import org.sqlite.SQLiteException;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -92,7 +94,7 @@ public class GroupDao implements Dao<Group> {
     }
 
     @Override
-    public boolean create(Group group) throws wrongDataBaseConnection {
+    public boolean create(Group group) throws wrongDataBaseConnection, wrongNotUniqueValue {
         System.out.println("create() invoked");
         try {
             Connection connection = DriverManager.getConnection(DataBase.url);
@@ -124,14 +126,18 @@ public class GroupDao implements Dao<Group> {
             System.out.println("Inserted " + group.getName() + " " + group.getDescription());
             close(connection);
             return true;
-        } catch (SQLException sqlException) {
+        } catch (SQLiteException e){
+
+            throw new wrongNotUniqueValue();
+
+        }catch (SQLException sqlException) {
             sqlException.printStackTrace();
             throw new wrongDataBaseConnection();
         }
     }
 
     @Override
-    public boolean update(Group group) throws wrongDataBaseConnection {
+    public boolean update(Group group) throws wrongDataBaseConnection,wrongNotUniqueValue {
         try {
             Connection connection = DriverManager.getConnection(DataBase.url);
 
@@ -149,7 +155,11 @@ public class GroupDao implements Dao<Group> {
 
             System.out.println("Updated " + group.getName() + " " + group.getDescription());
             close(connection);
-        } catch (SQLException sqlException) {
+        } catch (SQLiteException e){
+
+            throw new wrongNotUniqueValue();
+
+        }catch (SQLException sqlException) {
             throw new wrongDataBaseConnection();
         }
         return true;

@@ -14,7 +14,7 @@ public class Goods {
     private String description;
     private Integer group_id;
 
-    Goods(){}
+    public Goods(){}
 
     public Goods(String name, BigDecimal price, Integer left_amount, String producer, String description, Integer group_id) {
         this.name = name;
