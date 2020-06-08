@@ -18,7 +18,7 @@ import static com.lukichova.olenyn.app.resoures.Resoures.GROUP_TABLE;
 
 public class TestDBExceptions {
 
-        @Test(expected = wrongNotUniqueValue.class)
+        @Test(expected = wrongDataBaseConnection.class)
         public void testWrongConnection() throws Exception {
 
             try {
