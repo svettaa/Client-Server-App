@@ -1,14 +1,10 @@
 package com.lukichova.olenyn.app;
 
 import com.lukichova.olenyn.app.DB.DataBase;
-import com.lukichova.olenyn.app.DB.Goods;
-import com.lukichova.olenyn.app.DB.GoodsDao;
-import com.lukichova.olenyn.app.Exceptions.wrongConnectionException;
 import com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection;
-import com.lukichova.olenyn.app.Exceptions.wrongNotUniqueValue;
 import org.junit.Test;
 
-import java.math.BigDecimal;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
