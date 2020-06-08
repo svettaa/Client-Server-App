@@ -16,11 +16,11 @@ public class GoodsService {
         dao = new GoodsDao();
     }
 
-    public Goods getGoods(Integer id) throws noItemWithSuchIdException, wrongDataBaseConnection {
+    public Goods listByCriteria(Integer id) throws noItemWithSuchIdException, wrongDataBaseConnection {
         return dao.getById(id);
     }
 
-    public Goods getGoods(String name) throws noItemWithSuchNameException, wrongDataBaseConnection {
+    public Goods listByCriteria(String name) throws noItemWithSuchNameException, wrongDataBaseConnection {
         return dao.getByName(name);
     }
 

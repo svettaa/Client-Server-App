@@ -60,8 +60,8 @@ public class TestDB {
         List<Goods> allGoods = goodsService.getAll();
         Assert.assertArrayEquals(goods, allGoods.toArray());
 
-        Assert.assertEquals(goods[1], goodsService.getGoods("milk"));
-        Assert.assertEquals(goods[2], goodsService.getGoods(26));
+        Assert.assertEquals(goods[1], goodsService.listByCriteria("milk"));
+        Assert.assertEquals(goods[2], goodsService.listByCriteria(26));
 
         // Update group
         Group newGroup = new Group(18, "bread", "a lot of bread");
@@ -87,18 +87,18 @@ public class TestDB {
 
         Goods newGoods = new Goods(1, "COCA COLA", new BigDecimal("15"), 99, "Coca Cola Ukraine", "best coca cola", 1);
         Assert.assertTrue(goodsService.update(newGoods));
-        Assert.assertEquals(newGoods, goodsService.getGoods(1));
+        Assert.assertEquals(newGoods, goodsService.listByCriteria(1));
 
         Assert.assertTrue(goodsService.delete(1));
         try {
-            goodsService.getGoods(1);
+            goodsService.listByCriteria(1);
             Assert.assertTrue(false);
         } catch (noItemWithSuchIdException e) {
             Assert.assertTrue(true);
         }
 
         try {
-            goodsService.getGoods("jbenjbeng");
+            goodsService.listByCriteria("jbenjbeng");
             Assert.assertTrue(false);
         } catch (noItemWithSuchNameException e) {
             Assert.assertTrue(true);

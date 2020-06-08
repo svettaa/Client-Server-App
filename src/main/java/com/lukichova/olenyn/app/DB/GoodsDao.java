@@ -14,6 +14,7 @@ import static com.lukichova.olenyn.app.resoures.Resoures.GOODS_TABLE;
 
 public class GoodsDao implements Dao<Goods> {
 
+
     @Override
     public Goods getById(int id) throws wrongDataBaseConnection, noItemWithSuchIdException {
         Connection connection = null;
