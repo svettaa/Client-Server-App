@@ -151,20 +151,23 @@ public class GoodsDao implements Dao<Goods> {
         try {
             Connection connection = DriverManager.getConnection(DataBase.url);
             String sqlQuery = "UPDATE " + GOODS_TABLE + " " +
-                    "SET price = ?, " +
+                    "SET name = ?, " +
+                    "price = ?, " +
                     "left_amount = ?," +
                     "producer = ?," +
                     "description = ?," +
-                    "group_id = ? WHERE name = ?";
+                    "group_id = ? WHERE id = ?";
             System.out.println("update() invoked");
 
             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
-            preparedStatement.setBigDecimal(1, goods.getPrice());
-            preparedStatement.setInt(2, goods.getLeft_amount());
-            preparedStatement.setString(3, goods.getProducer());
-            preparedStatement.setString(4, goods.getDescription());
-            preparedStatement.setInt(5, goods.getGroup_id());
-            preparedStatement.setString(6, goods.getName());
+            preparedStatement.setString(1, goods.getName());
+            preparedStatement.setBigDecimal(2, goods.getPrice());
+            preparedStatement.setInt(3, goods.getLeft_amount());
+            preparedStatement.setString(4, goods.getProducer());
+            preparedStatement.setString(5, goods.getDescription());
+            preparedStatement.setInt(6, goods.getGroup_id());
+            preparedStatement.setInt(7, goods.getId());
+
 
             preparedStatement.executeUpdate();
 
