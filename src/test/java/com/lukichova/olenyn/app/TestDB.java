@@ -43,10 +43,7 @@ public class TestDB {
         group1 = new Group(id, "bread", "a lot of bread");
         Assert.assertTrue(groupDao.update(group1));
 
-
-
         Assert.assertTrue(groupDao.delete(id+2));
-
 
         groupDao.readAll();
 
@@ -56,15 +53,15 @@ public class TestDB {
         Assert.assertTrue(goodsDao.create(goods1));
 
         BigDecimal priceFor2 = new BigDecimal(25.0);
-        Goods goods2 = new Goods(id+1, "fanta", priceFor1, 50, "Coca Cola Ukraine", "best fanta", 1);
+        Goods goods2 = new Goods(id+1, "fanta", priceFor2, 50, "Coca Cola Ukraine", "best fanta", 1);
         Assert.assertTrue(goodsDao.create(goods2));
 
         BigDecimal priceFor3 = new BigDecimal(20.0);
-        Goods goods3 = new Goods(id+2, "milk", priceFor1, 35, "Yagotinske", "best milk", 2);
+        Goods goods3 = new Goods(id+2, "milk", priceFor3, 35, "Yagotinske", "best milk", 2);
         Assert.assertTrue(goodsDao.create(goods3));
 
         BigDecimal priceFor4 = new BigDecimal(20.0);
-        Goods goods4 = new Goods("kefir", priceFor1, 200, "Slovianochka", "best kefir", 2);
+        Goods goods4 = new Goods("kefir", priceFor4, 200, "Slovianochka", "best kefir", 2);
         Assert.assertTrue(goodsDao.create(goods4));
 
         Goods getGoods1 = goodsDao.getById(id);
@@ -82,7 +79,7 @@ public class TestDB {
         groupDao.deleteAll();
 
         goodsDao.readAll();
-        //get categories
+        //get group
         Group[] categories = new Group[]{
                 new Group(1, "bread", "a lot of bread"),
                 new Group(2, "dairy products", "so many dairy products"),
