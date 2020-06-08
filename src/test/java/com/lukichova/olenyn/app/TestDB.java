@@ -117,8 +117,6 @@ public class TestDB {
        goodsDao.create(g3);
         List<Goods> allGoods = goodsDao.readAll();
         Assert.assertArrayEquals(goods, allGoods.toArray());
-
-
         Assert.assertEquals(group1, groupDao.getByName("bread"));
     }
 
