@@ -3,8 +3,11 @@ package com.lukichova.olenyn.app;
 import com.lukichova.olenyn.app.DB.DataBase;
 import com.lukichova.olenyn.app.DB.Goods;
 import com.lukichova.olenyn.app.DB.GoodsDao;
+import com.lukichova.olenyn.app.DB.GroupDao;
 import com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection;
 import com.lukichova.olenyn.app.Exceptions.wrongNotUniqueValue;
+import com.lukichova.olenyn.app.service.GoodsService;
+import com.lukichova.olenyn.app.service.GroupService;
 import org.junit.Test;
 
 
@@ -17,6 +20,8 @@ import java.sql.SQLException;
 import static com.lukichova.olenyn.app.resoures.Resoures.GROUP_TABLE;
 
 public class TestDBExceptions {
+
+    GoodsService goodsService = new GoodsService(new GoodsDao());
 
     @Test(expected = wrongDataBaseConnection.class)
     public void testWrongConnection() throws Exception {
@@ -39,8 +44,8 @@ public class TestDBExceptions {
         Goods gg1 = new Goods(1, "rice", new BigDecimal("33"), 333, "Rice",
                 "Description", 2);
         GoodsDao gd = new GoodsDao();
-        gd.create(gg);
-        gd.create(gg1);
+        goodsService.create(gg);
+        goodsService.create(gg1);
     }
 }
 

@@ -6,7 +6,6 @@ import com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection;
 import com.lukichova.olenyn.app.Exceptions.wrongNotUniqueValue;
 import org.sqlite.SQLiteException;
 
-import javax.print.attribute.standard.PresentationDirection;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +13,6 @@ import java.util.List;
 import static com.lukichova.olenyn.app.resoures.Resoures.GROUP_TABLE;
 
 public class GroupDao implements Dao<Group> {
-
 
     @Override
     public Group getById(int id) throws wrongDataBaseConnection, noItemWithSuchIdException {

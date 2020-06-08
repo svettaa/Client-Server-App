@@ -6,23 +6,24 @@ import com.lukichova.olenyn.app.DB.Group;
 import com.lukichova.olenyn.app.DB.GroupDao;
 import com.lukichova.olenyn.app.Exceptions.noItemWithSuchIdException;
 import com.lukichova.olenyn.app.Exceptions.noItemWithSuchNameException;
+import com.lukichova.olenyn.app.service.GoodsService;
+import com.lukichova.olenyn.app.service.GroupService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 
 public class TestDB {
 
-    private GoodsDao goodsDao = new GoodsDao();
-    private GroupDao groupDao = new GroupDao();
+    GroupService groupService = new GroupService(new GroupDao());
+    GoodsService goodsService = new GoodsService(new GoodsDao());
 
     @Before
     public void before() throws Exception {
-        goodsDao.deleteAll();
-        groupDao.deleteAll();
+        goodsService.deleteAll();
+        groupService.deleteAll();
     }
 
     @Test
@@ -34,16 +35,16 @@ public class TestDB {
                 new Group(18, "unnecessary", "unnecessary")
 
         };
-        groupDao.create(groups[0]);
-        groupDao.create(groups[1]);
-        groupDao.create(groups[2]);
+        groupService.create(groups[0]);
+        groupService.create(groups[1]);
+        groupService.create(groups[2]);
 
-        List<Group> allGroups = groupDao.readAll();
+        List<Group> allGroups = groupService.getAll();
         Assert.assertArrayEquals(groups, allGroups.toArray());
 
 
-        Assert.assertEquals(groups[0], groupDao.getByName("drinks"));
-        Assert.assertEquals(groups[1], groupDao.getById(2));
+        Assert.assertEquals(groups[0], groupService.getGroup("drinks"));
+        Assert.assertEquals(groups[1], groupService.getGroup(2));
 
 
         Goods[] goods = new Goods[]{
@@ -52,31 +53,31 @@ public class TestDB {
                 new Goods(26, "kefir", new BigDecimal("10"), 200, "Slovianochka", "best kefir", 2)
         };
 
-        goodsDao.create(goods[0]);
-        goodsDao.create(goods[1]);
-        goodsDao.create(goods[2]);
+        goodsService.create(goods[0]);
+        goodsService.create(goods[1]);
+        goodsService.create(goods[2]);
 
-        List<Goods> allGoods = goodsDao.readAll();
+        List<Goods> allGoods = goodsService.getAll();
         Assert.assertArrayEquals(goods, allGoods.toArray());
 
-        Assert.assertEquals(goods[1], goodsDao.getByName("milk"));
-        Assert.assertEquals(goods[2], goodsDao.getById(26));
+        Assert.assertEquals(goods[1], goodsService.getGoods("milk"));
+        Assert.assertEquals(goods[2], goodsService.getGoods(26));
 
         // Update group
         Group newGroup = new Group(18, "bread", "a lot of bread");
-        Assert.assertTrue(groupDao.update(newGroup));
-        Assert.assertEquals(newGroup, groupDao.getById(18));
+        Assert.assertTrue(groupService.update(newGroup));
+        Assert.assertEquals(newGroup, groupService.getGroup(18));
 
-        Assert.assertTrue(groupDao.delete(18));
+        Assert.assertTrue(groupService.delete(18));
         try {
-            groupDao.getById(18);
+            groupService.getGroup(18);
             Assert.assertTrue(false);
         } catch (noItemWithSuchIdException e) {
             Assert.assertTrue(true);
         }
 
         try {
-            groupDao.getByName("jbenjbeng");
+            groupService.getGroup("jbenjbeng");
             Assert.assertTrue(false);
         } catch (noItemWithSuchNameException e) {
             Assert.assertTrue(true);
@@ -85,19 +86,19 @@ public class TestDB {
         // Update goods
 
         Goods newGoods = new Goods(1, "COCA COLA", new BigDecimal("15"), 99, "Coca Cola Ukraine", "best coca cola", 1);
-        Assert.assertTrue(goodsDao.update(newGoods));
-        Assert.assertEquals(newGoods, goodsDao.getById(1));
+        Assert.assertTrue(goodsService.update(newGoods));
+        Assert.assertEquals(newGoods, goodsService.getGoods(1));
 
-        Assert.assertTrue(goodsDao.delete(1));
+        Assert.assertTrue(goodsService.delete(1));
         try {
-            goodsDao.getById(1);
+            goodsService.getGoods(1);
             Assert.assertTrue(false);
         } catch (noItemWithSuchIdException e) {
             Assert.assertTrue(true);
         }
 
         try {
-            goodsDao.getByName("jbenjbeng");
+            goodsService.getGoods("jbenjbeng");
             Assert.assertTrue(false);
         } catch (noItemWithSuchNameException e) {
             Assert.assertTrue(true);
