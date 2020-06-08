@@ -10,6 +10,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
 
 public class TestDB {
 
@@ -77,6 +79,48 @@ public class TestDB {
         Assert.assertTrue(goodsDao.delete(id+1));
 
         goodsDao.readAll();
+        groupDao.deleteAll();
+
+        goodsDao.readAll();
+        //get categories
+        Group[] categories = new Group[]{
+                new Group(1, "bread", "a lot of bread"),
+                new Group(2, "dairy products", "so many dairy products"),
+                new Group(18, "unnecessary", "unnecessary"),
+               // new Group(104, "_C4", null),
+        };
+        Group gr1 = new Group(1, "bread", "a lot of bread");
+        groupDao.create(gr1);
+        Group gr2 = new Group(2, "dairy products", "so many dairy products");
+        groupDao.create(gr2);
+        Group gr3 = new Group(18, "unnecessary", "unnecessary");
+        groupDao.create(gr3);
+
+        List<Group> allGroups = groupDao.readAll();
+        Assert.assertArrayEquals(categories, allGroups.toArray());
+
+
+        // getProducts
+
+        goodsDao.deleteAll();
+
+        Goods[] goods = new Goods[]{
+                new Goods(1, "fanta", priceFor1, 50, "Coca Cola Ukraine", "best fanta", 1),
+                new Goods(id+2, "milk", priceFor1, 35, "Yagotinske", "best milk", 2),
+                new Goods(26,"kefir", priceFor1, 200, "Slovianochka", "best kefir", 2),
+
+        };
+        Goods g1 = new Goods(1, "fanta", priceFor1, 50, "Coca Cola Ukraine", "best fanta", 1);
+        goodsDao.create(g1);
+
+        Goods g2 = new Goods(id+2, "milk", priceFor1, 35, "Yagotinske", "best milk", 2);
+        goodsDao.create(g2);
+
+        Goods g3 = new Goods(26,"kefir", priceFor1, 200, "Slovianochka", "best kefir", 2);
+       goodsDao.create(g3);
+        List<Goods> allGoods = goodsDao.readAll();
+        Assert.assertArrayEquals(goods, allGoods.toArray());
+
     }
 
 

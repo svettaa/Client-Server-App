@@ -85,6 +85,7 @@ public class GroupDao implements Dao<Group> {
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
                 list.add(createGroup(rs));
+                System.out.println(createGroup(rs));
             }
             close(connection);
         } catch (SQLException sqlException) {
