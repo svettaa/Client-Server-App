@@ -7,8 +7,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses(
         {
                 TestDB.class,
-                TestDBExceptions.class,
-                TestWrongNotUniqueValue.class
+                TestDBExceptions.class
 
         }
 )

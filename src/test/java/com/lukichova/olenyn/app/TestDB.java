@@ -63,7 +63,6 @@ public class TestDB {
         Assert.assertEquals(goods[2], goodsDao.getById(26));
 
         // Update group
-
         Group newGroup = new Group(18, "bread", "a lot of bread");
         Assert.assertTrue(groupDao.update(newGroup));
         Assert.assertEquals(newGroup, groupDao.getById(18));

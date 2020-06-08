@@ -97,6 +97,7 @@ public class GoodsDao implements Dao<Goods> {
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
                 list.add(createGoods(rs));
+                System.out.println(createGoods(rs));
             }
             rs.close();
             return list;
@@ -134,7 +135,6 @@ public class GoodsDao implements Dao<Goods> {
                 String sqlQuery = "INSERT INTO " + GOODS_TABLE +
                         " (id, name, price, left_amount, producer, description, group_id) " +
                         " VALUES (?, ?, ?, ?, ?, ?, ?)";
-                System.out.println("create() invoked");
                 preparedStatement = connection.prepareStatement(sqlQuery);
 
                 preparedStatement.setInt(1, goods.getId());
@@ -151,10 +151,8 @@ public class GoodsDao implements Dao<Goods> {
 
             System.out.println("Inserted " + goods.getName() + " " + goods.getPrice() + " "
                     + goods.getLeft_amount() + " " + goods.getProducer() + " " + goods.getDescription());
-            System.out.println();
             return true;
         } catch (SQLiteException e) {
-            e.printStackTrace();
             throw new wrongNotUniqueValue();
 
         } catch (SQLException sqlException) {
@@ -223,7 +221,6 @@ public class GoodsDao implements Dao<Goods> {
             preparedStatement.executeUpdate();
 
             System.out.println("Deleted " + id);
-            System.out.println();
             return true;
         } catch (SQLException e) {
             throw new wrongDataBaseConnection();
