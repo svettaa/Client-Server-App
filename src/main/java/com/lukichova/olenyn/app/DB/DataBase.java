@@ -9,10 +9,10 @@ import static com.lukichova.olenyn.app.resoures.Resoures.DATABASE_NAME;
 
 public class DataBase {
     static Connection connection;
-
+    static String url = "jdbc:sqlite:" + DATABASE_NAME;
     public static void connect() {
         try {
-            String url = "jdbc:sqlite:" + "test.db";
+
             connection = DriverManager.getConnection(url);
 
             System.out.println("Connection to SQLite has been established.");

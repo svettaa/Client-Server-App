@@ -43,7 +43,12 @@ public class Server {
                     try {
                         Packet incoming = network.receive();
                         processPool.execute(() -> {
-                            Packet answer = Processor.process(incoming);
+                            Packet answer = null;
+                            try {
+                                answer = Processor.process(incoming);
+                            } catch (wrongDataBaseConnection e) {
+                                System.out.println("Errors in database connection");
+                            }
                             try {
                                 network.send(answer);
                             } catch (Exception e) {
@@ -90,7 +95,13 @@ public class Server {
                     try {
                         Packet packet = network.receive();
                         processPool.execute(() -> {
-                            Packet answer = Processor.process(packet);
+
+                            Packet answer = null;
+                            try {
+                                answer = Processor.process(packet);
+                            } catch (wrongDataBaseConnection e) {
+                                System.out.println("Errors in database connection");
+                            }
                             try {
                                 network.send(answer);
                             } catch (Exception e) {

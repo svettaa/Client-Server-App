@@ -16,6 +16,8 @@ public class Main {
         UnsignedLong unsignedLongbPktId = UnsignedLong.valueOf(Long.MAX_VALUE);
         unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("2305"));
         DataBase.connect();
+
+
       // Goods good = new Goods();
     //   String[] dd ={"meat", "45"};
       //  GoodsDao.create1(dd);
@@ -28,5 +30,6 @@ public class Main {
         Packet decodedPacket = new Packet(encodedPacket);
         System.out.println("-----------------------------In packet------------------------------");
         System.out.println(decodedPacket);
+        DataBase.close();
     }
 }

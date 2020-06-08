@@ -1,18 +1,23 @@
 package com.lukichova.olenyn.app.DB;
 
+import com.lukichova.olenyn.app.Exceptions.noItemWithSuchIdException;
+import com.lukichova.olenyn.app.Exceptions.noItemWithSuchNameException;
+import com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection;
+
 import java.util.List;
-import java.util.Optional;
 
 public interface Dao<T> {
-    Optional<Goods> read(long id);
+    T getById(int id) throws wrongDataBaseConnection, noItemWithSuchIdException;
 
-    List<Goods> readAll();
+    T getByName(String name) throws wrongDataBaseConnection, noItemWithSuchNameException;
 
-    void create(String[] params);
+    List<T> readAll() throws wrongDataBaseConnection;
 
-    void update(T t, String[] params);
+    boolean create(T t) throws wrongDataBaseConnection;
 
-    void delete(T t);
+    boolean update(T t) throws wrongDataBaseConnection;
 
-    List<Goods> listByCriteria(String[] params);
+    boolean delete(int id) throws wrongDataBaseConnection;
+
+    void deleteAll() throws wrongDataBaseConnection;
 }

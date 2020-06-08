@@ -90,7 +90,7 @@ public class TestClient {
         Client client = new Client();
         client.connect(NETWORK_PORT);
         unsignedLongbPktId = unsignedLongbPktId.plus(UnsignedLong.valueOf("2305"));
-        testMessage = new Message(3, 4, "time");
+        testMessage = new Message(4, 4, "time");
         packet = new Packet((byte) 1, unsignedLongbPktId, testMessage);
 
         Packet response;
@@ -109,6 +109,4 @@ public class TestClient {
 
         client.disconnect();
     }
-//run client without server
-
 }

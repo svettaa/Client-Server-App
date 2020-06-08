@@ -42,14 +42,12 @@ public class Client implements Runnable {
         for(int i = 0; i < threadsCount; i++)
             executorService.submit(new Client());
 
-
         executorService.shutdown();
 
         try {
             if(!executorService.awaitTermination(60, TimeUnit.SECONDS))
                 System.err.println("Can't stop clients in threads");
         } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 

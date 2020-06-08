@@ -11,13 +11,16 @@ import java.nio.ByteBuffer;
 @Data
 public class Message {
 
+
     public enum cTypes {
-        GET_PRODUCTS,
-        SET_PRODUCT_PRICE,
-        DELETE_PRODUCT,
-        CREATE_PRODUCT,
-        LIST_BY_CRITERIA,
-        ADD_PRODUCT_TO_GROUP
+        GET_PRODUCTS, //0
+        UPDATE_PRODUCT, //1
+        DELETE_PRODUCT, //2
+        CREATE_PRODUCT, //3
+        LIST_BY_CRITERIA, //4
+        GET_GROUPS,
+        ADD_GROUP,
+        ADD_PRODUCT_TO_GROUP //
     }
 
 
