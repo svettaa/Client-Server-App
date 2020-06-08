@@ -53,23 +53,25 @@ public class GroupDao implements Dao<Group> {
     public Group getByName(String name) throws wrongDataBaseConnection, noItemWithSuchNameException {
         try {
             Connection connection = DriverManager.getConnection(DataBase.url);
-            String sqlQuery = "SELECT * FROM " + GROUP_TABLE + " WHERE " + name + " = ?";
+            String sqlQuery = "SELECT * FROM " + GROUP_TABLE + " WHERE " + "name" + " = ?";
             System.out.println("getByName() invoked");
 
             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
             preparedStatement.setString(1, name);
             ResultSet rs = preparedStatement.executeQuery();
 
-            close(connection);
+
             if (rs.next()) {
                 return createGroup(rs);
             } else {
                 throw new noItemWithSuchNameException();
             }
+          //  close(connection);
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
             throw new wrongDataBaseConnection();
         }
+
     }
 
     @Override

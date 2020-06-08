@@ -43,10 +43,10 @@ public class TestDB {
         group1 = new Group(id, "bread", "a lot of bread");
         Assert.assertTrue(groupDao.update(group1));
 
-        /*Group get2 = groupDao.getByName("dairyproducts");
-        Assert.assertEquals(group2, get2);*/
+
 
         Assert.assertTrue(groupDao.delete(id+2));
+
 
         groupDao.readAll();
 
@@ -87,7 +87,7 @@ public class TestDB {
                 new Group(1, "bread", "a lot of bread"),
                 new Group(2, "dairy products", "so many dairy products"),
                 new Group(18, "unnecessary", "unnecessary"),
-               // new Group(104, "_C4", null),
+
         };
         Group gr1 = new Group(1, "bread", "a lot of bread");
         groupDao.create(gr1);
@@ -121,6 +121,8 @@ public class TestDB {
         List<Goods> allGoods = goodsDao.readAll();
         Assert.assertArrayEquals(goods, allGoods.toArray());
 
+
+        Assert.assertEquals(group1, groupDao.getByName("bread"));
     }
 
 
