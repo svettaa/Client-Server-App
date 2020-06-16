@@ -34,4 +34,5 @@ public class Goods {
         this.description = description;
         this.group_id = group_id;
     }
+
 }

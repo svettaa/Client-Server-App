@@ -1,5 +1,10 @@
 package com.lukichova.olenyn.app.http;
 
+import com.lukichova.olenyn.app.DB.Goods;
+import com.lukichova.olenyn.app.Exceptions.MissedJsonFieldEsxception;
+import com.lukichova.olenyn.app.Exceptions.WrongJsoneException;
+import com.lukichova.olenyn.app.JSON.ReadJSON;
+import com.lukichova.olenyn.app.JSON.WriteJSON;
 import com.lukichova.olenyn.app.dto.Response;
 import com.lukichova.olenyn.app.views.View;
 import com.sun.net.httpserver.HttpExchange;
@@ -17,6 +22,9 @@ import java.util.regex.Pattern;
 
 public class Controller implements HttpHandler {
     private static View view;
+    private final ReadJSON readJSON = new ReadJSON();
+    private final WriteJSON writeJSON = new WriteJSON();
+    private final
 
     public static void setView(View newView) {
         view = newView;
@@ -79,15 +87,30 @@ public class Controller implements HttpHandler {
     }
 
     public void putGoods(HttpExchange httpExchange, Map result) {
+        Response response = new Response();
+        response.setHttpExchange(httpExchange);
         try {
-            String postRequest = getBodyString(httpExchange);
+            String body = getBodyString(httpExchange);
+            Goods goods = readJSON.selectGoods(body);
 
-            Map<String, Object> postRequestParameters = HttpUtil.parseQuery(postRequest);
-            result.put("postRequestParameters", postRequestParameters);
+            // add
 
+            // get by name
+            // take id
+
+            response.setStatusCode(204);
+            response.setData(writeJSON.createCreatedIdReply(id));
         } catch (IOException e) {
-            e.printStackTrace();
+            response.setStatusCode(40);
+            response.setData(writeJSON.createErrorReply("No body"));
+        } catch (MissedJsonFieldEsxception missedJsonFieldEsxception) {
+            response.setStatusCode(204);
+            response.setData(writeJSON.createErrorReply("Field missing"));
+        } catch (WrongJsoneException e) {
+            response.setStatusCode(204);
+            response.setData(writeJSON.createErrorReply("WrongJson"));
         }
+        view.view(response);
     }
 
 
