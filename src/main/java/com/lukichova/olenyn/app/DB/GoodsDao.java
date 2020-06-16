@@ -14,17 +14,20 @@ import static com.lukichova.olenyn.app.resoures.Resoures.GOODS_TABLE;
 
 public class GoodsDao implements Dao<Goods> {
 
+
     @Override
     public Goods getById(int id) throws wrongDataBaseConnection, noItemWithSuchIdException {
         Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = null;
         try {
             connection = DriverManager.getConnection(DataBase.url);
-            String sqlQuery = "SELECT * FROM " + GOODS_TABLE + " WHERE " + id + " = ?";
+            String sqlQuery = "SELECT * FROM " + GOODS_TABLE + " WHERE id = ?";
             System.out.println("getById() invoked");
 
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+            preparedStatement = connection.prepareStatement(sqlQuery);
             preparedStatement.setInt(1, id);
-            ResultSet rs = preparedStatement.executeQuery();
+            rs = preparedStatement.executeQuery();
 
             if (rs.next()) {
                 return createGoods(rs);
@@ -35,7 +38,7 @@ public class GoodsDao implements Dao<Goods> {
             sqlException.printStackTrace();
             throw new wrongDataBaseConnection();
         } finally {
-            close(connection);
+            close(connection, preparedStatement, rs);
         }
     }
 
@@ -54,61 +57,72 @@ public class GoodsDao implements Dao<Goods> {
 
     @Override
     public Goods getByName(String name) throws wrongDataBaseConnection, noItemWithSuchNameException {
+
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = null;
         try {
-            Connection connection = DriverManager.getConnection(DataBase.url);
-            String sqlQuery = "SELECT * FROM " + GOODS_TABLE + " WHERE " + name + " = ?";
+            connection = DriverManager.getConnection(DataBase.url);
+            String sqlQuery = "SELECT * FROM " + GOODS_TABLE + " WHERE name = ?";
             System.out.println("getByName() invoked");
             List<Goods> list = new ArrayList<Goods>();
 
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+            preparedStatement = connection.prepareStatement(sqlQuery);
             preparedStatement.setString(1, name);
-            ResultSet rs = preparedStatement.executeQuery();
-            close(connection);
+             rs = preparedStatement.executeQuery();
             if (rs.next()) {
                 return createGoods(rs);
             } else {
                 throw new noItemWithSuchNameException();
             }
-
         } catch (SQLException sqlException) {
             throw new wrongDataBaseConnection();
+        } finally {
+            close(connection, preparedStatement, rs);
         }
     }
 
     @Override
     public List<Goods> readAll() throws wrongDataBaseConnection {
         List<Goods> list = new ArrayList<Goods>();
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            Connection connection = DriverManager.getConnection(DataBase.url);
+            connection = DriverManager.getConnection(DataBase.url);
             String sql = "SELECT * FROM " + GOODS_TABLE;
             System.out.println("readAll() invoked");
 
 
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement = connection.prepareStatement(sql);
 
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
                 list.add(createGoods(rs));
+                System.out.println(createGoods(rs));
             }
-            close(connection);
+            rs.close();
+            return list;
         } catch (SQLException sqlException) {
             throw new wrongDataBaseConnection();
+        } finally {
+            close(connection, preparedStatement);
         }
-        return list;
     }
 
     @Override
-    public boolean create(Goods goods) throws wrongDataBaseConnection,wrongNotUniqueValue {
+    public boolean create(Goods goods) throws wrongDataBaseConnection, wrongNotUniqueValue {
         System.out.println("create() invoked");
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            Connection connection = DriverManager.getConnection(DataBase.url);
+            connection = DriverManager.getConnection(DataBase.url);
 
             if (goods.getId() == null) {
                 String sqlQuery = "INSERT INTO " + GOODS_TABLE +
                         " (name, price, left_amount, producer, description, group_id) " +
                         " VALUES (?, ?, ?, ?, ?, ?)";
                 System.out.println("create() invoked");
-                PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+                preparedStatement = connection.prepareStatement(sqlQuery);
 
                 preparedStatement.setString(1, goods.getName());
                 preparedStatement.setBigDecimal(2, goods.getPrice());
@@ -122,8 +136,7 @@ public class GoodsDao implements Dao<Goods> {
                 String sqlQuery = "INSERT INTO " + GOODS_TABLE +
                         " (id, name, price, left_amount, producer, description, group_id) " +
                         " VALUES (?, ?, ?, ?, ?, ?, ?)";
-                System.out.println("create() invoked");
-                PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+                preparedStatement = connection.prepareStatement(sqlQuery);
 
                 preparedStatement.setInt(1, goods.getId());
                 preparedStatement.setString(2, goods.getName());
@@ -139,23 +152,24 @@ public class GoodsDao implements Dao<Goods> {
 
             System.out.println("Inserted " + goods.getName() + " " + goods.getPrice() + " "
                     + goods.getLeft_amount() + " " + goods.getProducer() + " " + goods.getDescription());
-            System.out.println();
-            close(connection);
-        } catch (SQLiteException e){
-
+            return true;
+        } catch (SQLiteException e) {
             throw new wrongNotUniqueValue();
 
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
             throw new wrongDataBaseConnection();
+        } finally {
+            close(connection, preparedStatement);
         }
-        return true;
     }
 
     @Override
-    public boolean update(Goods goods) throws wrongDataBaseConnection,wrongNotUniqueValue {
+    public boolean update(Goods goods) throws wrongDataBaseConnection, wrongNotUniqueValue {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            Connection connection = DriverManager.getConnection(DataBase.url);
+            connection = DriverManager.getConnection(DataBase.url);
             String sqlQuery = "UPDATE " + GOODS_TABLE + " " +
                     "SET name = ?, " +
                     "price = ?, " +
@@ -165,7 +179,7 @@ public class GoodsDao implements Dao<Goods> {
                     "group_id = ? WHERE id = ?";
             System.out.println("update() invoked");
 
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+            preparedStatement = connection.prepareStatement(sqlQuery);
             preparedStatement.setString(1, goods.getName());
             preparedStatement.setBigDecimal(2, goods.getPrice());
             preparedStatement.setInt(3, goods.getLeft_amount());
@@ -180,51 +194,57 @@ public class GoodsDao implements Dao<Goods> {
             System.out.println("Updated " + goods.getName() + " " + goods.getPrice() + " "
                     + goods.getLeft_amount() + " " + goods.getProducer() + " " + goods.getDescription());
             System.out.println();
-            close(connection);
-        }catch (SQLiteException e){
+            return true;
+        } catch (SQLiteException e) {
 
             throw new wrongNotUniqueValue();
 
         } catch (SQLException sqlException) {
             throw new wrongDataBaseConnection();
+        } finally {
+            close(connection, preparedStatement);
         }
-        return true;
     }
 
     @Override
     public boolean delete(int id) throws wrongDataBaseConnection {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            Connection connection = DriverManager.getConnection(DataBase.url);
+            connection = DriverManager.getConnection(DataBase.url);
             String sql = "DELETE FROM " + GOODS_TABLE + " WHERE id = ?";
             System.out.println("delete() invoked");
 
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement = connection.prepareStatement(sql);
 
             preparedStatement.setInt(1, id);
 
             preparedStatement.executeUpdate();
 
             System.out.println("Deleted " + id);
-            System.out.println();
-            close(connection);
+            return true;
         } catch (SQLException e) {
             throw new wrongDataBaseConnection();
+        } finally {
+            close(connection, preparedStatement);
         }
-        return true;
     }
 
     @Override
     public void deleteAll() throws wrongDataBaseConnection {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
         try {
-            Connection connection = DriverManager.getConnection(DataBase.url);
+            connection = DriverManager.getConnection(DataBase.url);
             String sql = "DELETE FROM " + GOODS_TABLE;
             System.out.println("deleteAll() invoked");
 
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement = connection.prepareStatement(sql);
             preparedStatement.executeUpdate();
-            close(connection);
         } catch (SQLException sqlException) {
             throw new wrongDataBaseConnection();
+        } finally {
+            close(connection, preparedStatement);
         }
     }
 
@@ -235,6 +255,31 @@ public class GoodsDao implements Dao<Goods> {
             System.out.println("Connection closed");
             System.out.println();
         } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public void close(Connection connection, PreparedStatement preparedStatement) {
+        try {
+            connection.close();
+            preparedStatement.close();
+
+            System.out.println("Connection closed");
+            System.out.println();
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public void close(Connection connection, PreparedStatement preparedStatement, ResultSet resultSet) {
+        try {
+            connection.close();
+            preparedStatement.close();
+            resultSet.close();
+
+            System.out.println("Connection closed");
+            System.out.println();
+        } catch (SQLException | NullPointerException ex) {
             System.out.println(ex.getMessage());
         }
     }
