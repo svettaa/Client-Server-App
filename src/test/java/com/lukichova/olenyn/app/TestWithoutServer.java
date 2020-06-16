@@ -1,3 +1,4 @@
+/*
 package com.lukichova.olenyn.app;
 
 import com.google.common.primitives.UnsignedLong;
@@ -21,3 +22,4 @@ public class TestWithoutServer {
         client.request(packet, AMOUNT_OF_TRIES);
     }
 }
+*/

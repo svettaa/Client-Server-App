@@ -1,3 +1,4 @@
+/*
 package com.lukichova.olenyn.app;
 
 import com.google.common.primitives.UnsignedLong;
@@ -109,4 +110,4 @@ public class TestClient {
 
         client.disconnect();
     }
-}
+}*/
