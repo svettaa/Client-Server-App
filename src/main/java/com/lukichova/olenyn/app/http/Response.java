@@ -1,4 +1,4 @@
-package com.lukichova.olenyn.app.dto;
+package com.lukichova.olenyn.app.http;
 
 import com.sun.net.httpserver.HttpExchange;
 import lombok.Data;

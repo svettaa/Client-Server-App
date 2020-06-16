@@ -21,11 +21,11 @@ public class GroupService {
         dao = new GroupDao();
     }
 
-    public Group getGroup(Integer id) throws noItemWithSuchIdException, wrongDataBaseConnection {
+    public Group listByCriteria(Integer id) throws noItemWithSuchIdException, wrongDataBaseConnection {
         return dao.getById(id);
     }
 
-    public Group getGroup(String name) throws noItemWithSuchNameException, wrongDataBaseConnection {
+    public Group listByCriteria(String name) throws noItemWithSuchNameException, wrongDataBaseConnection {
         return dao.getByName(name);
     }
 

@@ -6,38 +6,38 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lukichova.olenyn.app.DB.Goods;
 import com.lukichova.olenyn.app.DB.Group;
-import com.lukichova.olenyn.app.Exceptions.MissedJsonFieldEsxception;
-import com.lukichova.olenyn.app.Exceptions.WrongJsoneException;
+import com.lukichova.olenyn.app.Exceptions.MissedJsonFieldException;
+import com.lukichova.olenyn.app.Exceptions.WrongJsonException;
 
 import java.math.BigDecimal;
 
 public class ReadJSON {
 
 
-    public String selectToken(String json) throws WrongJsoneException {
+    public String selectToken(String json) throws WrongJsonException {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readValue(json, JsonNode.class);
 
             return root.get("token").asText();
         } catch (JsonProcessingException e) {
-            throw new WrongJsoneException();
+            throw new WrongJsonException();
         }
     }
 
-    public Integer selectId(String json) throws WrongJsoneException {
+    public Integer selectId(String json) throws WrongJsonException {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readValue(json, JsonNode.class);
 
             return root.get("id").asInt();
         } catch (JsonProcessingException e) {
-            throw new WrongJsoneException();
+            throw new WrongJsonException();
         }
     }
 
 
-    public Group selectGroup(String json) throws WrongJsoneException, MissedJsonFieldEsxception {
+    public Group selectGroup(String json) throws WrongJsonException, MissedJsonFieldException {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readValue(json, JsonNode.class);
@@ -48,21 +48,20 @@ public class ReadJSON {
 
             return new Group(id, name, description);
         } catch (JsonProcessingException e) {
-            throw new WrongJsoneException();
+            throw new WrongJsonException();
         } catch (NullPointerException e) {
-            throw new MissedJsonFieldEsxception();
+            throw new MissedJsonFieldException();
         }
     }
 
 
-    public Goods selectGoods(String json) throws WrongJsoneException, MissedJsonFieldEsxception {
+    public Goods selectGoods(String json) throws WrongJsonException, MissedJsonFieldException {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readValue(json, JsonNode.class);
 
             Integer id = getIntFieldIfExists(root, "id");
             String name = root.get("name").asText();
-
             Integer leftAmount = getIntFieldIfExists(root, "left_amount");
             String producer = root.get("producer").asText();
             String description = getStringFieldIfExists(root, "description");
@@ -71,44 +70,44 @@ public class ReadJSON {
 
             return new Goods(id, name, price, leftAmount, producer, description, categoryId);
         } catch (JsonProcessingException | NumberFormatException e) {
-            throw new WrongJsoneException();
+            throw new WrongJsonException();
         } catch (NullPointerException e) {
-            throw new MissedJsonFieldEsxception();
+            throw new MissedJsonFieldException();
         }
     }
 
-    public Integer selectGroupId(String json) throws WrongJsoneException {
+    public Integer selectGroupId(String json) throws WrongJsonException {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readValue(json, JsonNode.class);
 
             return root.get("group_id").asInt();
         } catch (JsonProcessingException e) {
-            throw new WrongJsoneException();
+            throw new WrongJsonException();
         }
     }
 
 
-    public String selectName(String json) throws WrongJsoneException {
+    public String selectName(String json) throws WrongJsonException {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readValue(json, JsonNode.class);
 
             return root.get("name").asText();
         } catch (JsonProcessingException e) {
-            throw new WrongJsoneException();
+            throw new WrongJsonException();
         }
     }
 
 
-    public Integer selectLeftAmount(String json) throws WrongJsoneException {
+    public Integer selectLeftAmount(String json) throws WrongJsonException {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readValue(json, JsonNode.class);
 
             return root.get("left_amount").asInt();
         } catch (JsonProcessingException e) {
-            throw new WrongJsoneException();
+            throw new WrongJsonException();
         }
     }
 

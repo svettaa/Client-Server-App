@@ -1,7 +1,5 @@
 package com.lukichova.olenyn.app.views;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lukichova.olenyn.app.dto.Response;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
@@ -15,30 +13,28 @@ public class JsonView implements View {
         String responseBody = "{\"error\": \"response encoding error\"}";
         Integer statusCode = 500;
 
-        try {
-            Object data = response.getData();
-            ObjectMapper objectMapper = new ObjectMapper();
-            responseBody = objectMapper.writeValueAsString(data);
-
-            statusCode = response.getStatusCode();
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
+        responseBody = response.getData();
+        statusCode = response.getStatusCode();
         HttpExchange httpExchange = response.getHttpExchange();
 
+        Headers responseHeaders = httpExchange.getResponseHeaders();
+        responseHeaders.set("Content-Type", "application/json");
+
         try {
-            Headers responseHeaders = httpExchange.getResponseHeaders();
-            responseHeaders.set("Content-Type", "application/json");
+            if (responseBody != null) {
 
-            httpExchange.sendResponseHeaders(statusCode, responseBody.length());
+                httpExchange.sendResponseHeaders(statusCode, responseBody.length());
+                OutputStream outputStream = httpExchange.getResponseBody();
+                outputStream.write(responseBody.getBytes());
+                System.out.println(responseBody);
+                outputStream.close();
+            } else {
 
-            OutputStream outputStream = httpExchange.getResponseBody();
-
-            outputStream.write(responseBody.getBytes());
-            outputStream.close();
+                httpExchange.sendResponseHeaders(statusCode, 0);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 }
+

@@ -43,8 +43,8 @@ public class TestDB {
         Assert.assertArrayEquals(groups, allGroups.toArray());
 
 
-        Assert.assertEquals(groups[0], groupService.getGroup("drinks"));
-        Assert.assertEquals(groups[1], groupService.getGroup(2));
+        Assert.assertEquals(groups[0], groupService.listByCriteria("drinks"));
+        Assert.assertEquals(groups[1], groupService.listByCriteria(2));
 
 
         Goods[] goods = new Goods[]{
@@ -66,18 +66,18 @@ public class TestDB {
         // Update group
         Group newGroup = new Group(18, "bread", "a lot of bread");
         Assert.assertTrue(groupService.update(newGroup));
-        Assert.assertEquals(newGroup, groupService.getGroup(18));
+        Assert.assertEquals(newGroup, groupService.listByCriteria(18));
 
         Assert.assertTrue(groupService.delete(18));
         try {
-            groupService.getGroup(18);
+            groupService.listByCriteria(18);
             Assert.assertTrue(false);
         } catch (noItemWithSuchIdException e) {
             Assert.assertTrue(true);
         }
 
         try {
-            groupService.getGroup("jbenjbeng");
+            groupService.listByCriteria("jbenjbeng");
             Assert.assertTrue(false);
         } catch (noItemWithSuchNameException e) {
             Assert.assertTrue(true);

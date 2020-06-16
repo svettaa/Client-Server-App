@@ -1,11 +1,15 @@
 package com.lukichova.olenyn.app.http;
 
 import com.lukichova.olenyn.app.DB.Goods;
-import com.lukichova.olenyn.app.Exceptions.MissedJsonFieldEsxception;
-import com.lukichova.olenyn.app.Exceptions.WrongJsoneException;
+import com.lukichova.olenyn.app.DB.GoodsDao;
+import com.lukichova.olenyn.app.DB.Group;
+import com.lukichova.olenyn.app.DB.GroupDao;
+import com.lukichova.olenyn.app.Exceptions.*;
 import com.lukichova.olenyn.app.JSON.ReadJSON;
 import com.lukichova.olenyn.app.JSON.WriteJSON;
 import com.lukichova.olenyn.app.dto.Response;
+import com.lukichova.olenyn.app.service.GoodsService;
+import com.lukichova.olenyn.app.service.GroupService;
 import com.lukichova.olenyn.app.views.View;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -13,10 +17,9 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -24,92 +27,176 @@ public class Controller implements HttpHandler {
     private static View view;
     private final ReadJSON readJSON = new ReadJSON();
     private final WriteJSON writeJSON = new WriteJSON();
-    private final
+    private final GoodsService goodsService = new GoodsService(new GoodsDao());
+    private final GroupService groupService = new GroupService(new GroupDao());
 
     public static void setView(View newView) {
         view = newView;
     }
 
-    public void getGoods(HttpExchange httpExchange, Map result) {
+    //group
 
-        Map<String, Object> params = (Map<String, Object>) (result.get("requestParameters"));
-        String categoryStr = (String) params.get("categoryId");
-        if (categoryStr != null) {
+
+    public void getGroup(HttpExchange httpExchange, Map result) {
+        try {
             Response response = new Response();
 
-            response.setTemplate("list");
+            List<Group> groupList = groupService.getAll();
+
             response.setStatusCode(200);
-            response.setData("{\"message\": \"You tried to get goods\"," +
-                    "\"category\": " + Integer.parseInt(categoryStr) + "}");
+            response.setData(writeJSON.createGroupListReply(groupList));
             response.setHttpExchange(httpExchange);
 
             view.view(response);
-        } else {
-            Response response = new Response();
 
-            response.setStatusCode(200);
-            response.setData("{\"message\": \"You tried to get goods\"}");
-            response.setHttpExchange(httpExchange);
-
-            view.view(response);
+        } catch (wrongDataBaseConnection | WrongServerJsonException e) {
+            e.printStackTrace();
         }
     }
 
-    public void getGoodsById(HttpExchange httpExchange, Map result) {
+    public void getGroupById(HttpExchange httpExchange, Map result) throws noItemWithSuchIdException, wrongDataBaseConnection, WrongServerJsonException {
 
         String[] parts = (String[]) result.get("requestUriPathParts");
         int id = Integer.parseInt(parts[3]);
 
         Response response = new Response();
+        Group group = groupService.listByCriteria(id);
         response.setStatusCode(200);
 
-        response.setData("{\"message\": \"You tried to get goods by ID\", " +
-                "\"id\": " + id + "}");
+        response.setData(writeJSON.createGroupReply(group));
         response.setHttpExchange(httpExchange);
 
         view.view(response);
     }
 
-    public void deleteGoods(HttpExchange httpExchange, Map result) {
+    public void deleteGroup(HttpExchange httpExchange, Map result) throws WrongServerJsonException {
 
         String[] parts = (String[]) result.get("requestUriPathParts");
         int id = Integer.parseInt(parts[3]);
 
-        //if don't exist in the table - 404
         Response response = new Response();
+        String message = "Successfully deleted " + id;
         response.setStatusCode(204);
 
-        response.setData("{\"message\": \"You deleted goods by ID\", " +
-                "\"id\": " + id + "}");
+        response.setData(writeJSON.createSuccessfulReply(message));
         response.setHttpExchange(httpExchange);
 
         view.view(response);
     }
 
-    public void putGoods(HttpExchange httpExchange, Map result) {
+    public void putGroup(HttpExchange httpExchange, Map result) throws noItemWithSuchNameException, wrongDataBaseConnection, wrongNotUniqueValue, IOException, WrongJsonException, MissedJsonFieldException {
         Response response = new Response();
         response.setHttpExchange(httpExchange);
+
+        String body = getBodyString(httpExchange);
+        Group group = readJSON.selectGroup(body);
+
+        groupService.create(group);
+
+        Goods fetched = goodsService.listByCriteria(group.getName());
+        int id = fetched.getId();
+
+        response.setStatusCode(201);
+        response.setData(writeJSON.createCreatedIdReply(id));
+        response.setHttpExchange(httpExchange);
+
+        view.view(response);
+    }
+
+    public void postGroup(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException {
+        Response response = new Response();
+        response.setHttpExchange(httpExchange);
+
+        String body = getBodyString(httpExchange);
+        Group group = readJSON.selectGroup(body);
+
+        groupService.update(group);
+
+        response.setStatusCode(204);
+        response.setHttpExchange(httpExchange);
+        response.setData(null);
+
+        view.view(response);
+    }
+
+
+    //goods
+    public void getGoods(HttpExchange httpExchange, Map result) {
         try {
-            String body = getBodyString(httpExchange);
-            Goods goods = readJSON.selectGoods(body);
+            Map<String, Object> params = (Map<String, Object>) (result.get("requestParameters"));
+            String categoryStr = (String) params.get("categoryId");
+            if (categoryStr != null) {
+                Response response = new Response();
 
-            // add
+                response.setTemplate("list");
+                response.setStatusCode(200);
+                response.setData("");
+                response.setHttpExchange(httpExchange);
 
-            // get by name
-            // take id
+                view.view(response);
+            } else {
+                Response response = new Response();
 
-            response.setStatusCode(204);
-            response.setData(writeJSON.createCreatedIdReply(id));
-        } catch (IOException e) {
-            response.setStatusCode(40);
-            response.setData(writeJSON.createErrorReply("No body"));
-        } catch (MissedJsonFieldEsxception missedJsonFieldEsxception) {
-            response.setStatusCode(204);
-            response.setData(writeJSON.createErrorReply("Field missing"));
-        } catch (WrongJsoneException e) {
-            response.setStatusCode(204);
-            response.setData(writeJSON.createErrorReply("WrongJson"));
+                List<Goods> goodsList = goodsService.getAll();
+
+                response.setStatusCode(200);
+                response.setData(writeJSON.createGoodsListReply(goodsList));
+                response.setHttpExchange(httpExchange);
+
+                view.view(response);
+            }
+        } catch (wrongDataBaseConnection | WrongServerJsonException e) {
+            e.printStackTrace();
         }
+    }
+
+    public void getGoodsById(HttpExchange httpExchange, Map result) throws noItemWithSuchIdException, wrongDataBaseConnection, WrongServerJsonException {
+
+        String[] parts = (String[]) result.get("requestUriPathParts");
+        int id = Integer.parseInt(parts[3]);
+
+        Response response = new Response();
+        Goods goods = goodsService.listByCriteria(id);
+        response.setStatusCode(200);
+
+        response.setData(writeJSON.createGoodsReply(goods));
+        response.setHttpExchange(httpExchange);
+
+        view.view(response);
+    }
+
+    public void deleteGoods(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection {
+
+        String[] parts = (String[]) result.get("requestUriPathParts");
+        int id = Integer.parseInt(parts[3]);
+
+        Response response = new Response();
+        response.setHttpExchange(httpExchange);
+
+        goodsService.delete(id);
+        response.setStatusCode(204);
+        response.setHttpExchange(httpExchange);
+        response.setData(null);
+
+        view.view(response);
+    }
+
+    public void putGoods(HttpExchange httpExchange, Map result) throws noItemWithSuchNameException, wrongDataBaseConnection, wrongNotUniqueValue, IOException, WrongJsonException, MissedJsonFieldException {
+        Response response = new Response();
+        response.setHttpExchange(httpExchange);
+
+        String body = getBodyString(httpExchange);
+        Goods goods = readJSON.selectGoods(body);
+
+        goodsService.create(goods);
+
+        Goods fetched = goodsService.listByCriteria(goods.getName());
+        int id = fetched.getId();
+
+        response.setStatusCode(201);
+        response.setData(writeJSON.createCreatedIdReply(id));
+        response.setHttpExchange(httpExchange);
+
         view.view(response);
     }
 
@@ -121,20 +208,23 @@ public class Controller implements HttpHandler {
         return bufferedReader.readLine();
     }
 
-    public void postGoods(HttpExchange httpExchange, Map result) {
-        try {
-            String postRequest = getBodyString(httpExchange);
+    public void postGoods(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException {
+        Response response = new Response();
+        response.setHttpExchange(httpExchange);
 
-            Map<String, Object> postRequestParameters = HttpUtil.parseQuery(postRequest);
-            result.put("postRequestParameters", postRequestParameters);
+        String body = getBodyString(httpExchange);
+        Goods goods = readJSON.selectGoods(body);
 
+        goodsService.update(goods);
+        response.setStatusCode(204);
+        response.setHttpExchange(httpExchange);
+        response.setData(null);
 
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        view.view(response);
     }
-    public void uknownEndpoint(HttpExchange httpExchange, Map result) {
+
+
+    public void unknownEndpoint(HttpExchange httpExchange, Map result) {
         Response response = new Response();
 
         response.setStatusCode(404);
@@ -144,44 +234,10 @@ public class Controller implements HttpHandler {
         view.view(response);
     }
 
-   /* public void handler(HttpExchange httpExchange, Map result) {
-        URI requestUri = httpExchange.getRequestURI();
-
-        String query = requestUri.getRawQuery();
-        result.put("query", query);
-
-        Map<String, Object> getRequestParameters = HttpUtil.parseQuery(query);
-        result.put("getRequestParameters", getRequestParameters);
-
-        String requestMethod = httpExchange.getRequestMethod();
-        String requestMethodLowercased = requestMethod.toLowerCase();
-
-        if (requestMethodLowercased.equals("post")) {
-            try {
-                InputStreamReader inputStreamReader = new InputStreamReader(httpExchange.getRequestBody(), "UTF-8");
-
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String postRequest = bufferedReader.readLine();
-
-                Map<String, Object> postRequestParameters = HttpUtil.parseQuery(postRequest);
-                result.put("postRequestParameters", postRequestParameters);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        Response response = new Response();
-
-        response.setTemplate("list");
-        response.setStatusCode(200);
-        response.setData(result);
-        response.setHttpExchange(httpExchange);
-
-        view.view(response);
-    }*/
-
     @Override
     public void handle(HttpExchange httpExchange) {
+        Response response = new Response();
+        response.setHttpExchange(httpExchange);
         try {
             String methodToCallName = null;
 
@@ -214,33 +270,47 @@ public class Controller implements HttpHandler {
             Map<String, Object> requestParameters = HttpUtil.parseQuery(paramsStr);
             result.put("requestParameters", requestParameters);
 
-            //
+
             if (method.equals("get")) {
                 if (requestUriPath.equals("/api/goods")) {
-                    methodToCallName = "getGoods";
+                    getGoods(httpExchange, result);
                 } else if (Pattern.matches("/api/goods/\\d+", requestUriPath)) {
-                    methodToCallName = "getGoodsById";
+                    getGoodsById(httpExchange, result);
                 }
-            } else if (method.equals("delete")){
+            } else if (method.equals("delete")) {
                 if (Pattern.matches("/api/goods/\\d+", requestUriPath)) {
-                    methodToCallName = "deleteGoods";
+                    deleteGoods(httpExchange, result);
                 }
-            } else if (method.equals("put")){
+            } else if (method.equals("put")) {
                 if (Pattern.matches("/api/goods", requestUriPath)) {
-                    methodToCallName = "putGoods";
+                    putGoods(httpExchange, result);
                 }
-            } /*else if(method.equals("post")){
+            } else if (method.equals("post")) {
                 if (requestUriPath.equals("/api/goods")) {
-                    methodToCallName = "postGoods";
-            }*/
-
-            if (methodToCallName == null) {
-                uknownEndpoint(httpExchange, result);
+                    postGoods(httpExchange, result);
+                }
+            } else if (methodToCallName == null) {
+                unknownEndpoint(httpExchange, result);
             }
 
-            Method controllerHandlerMethod = Controller.class.getDeclaredMethod(methodToCallName, HttpExchange.class, Map.class);
-            controllerHandlerMethod.invoke(this, httpExchange, result);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (MissedJsonFieldException missedJsonFieldEsxception) {
+            response.setStatusCode(404);
+            response.setData(writeJSON.createErrorReply("No field"));
+            view.view(response);
+        } catch (wrongDataBaseConnection e) {
+            System.out.println("Wrong database connection");
+        } catch (WrongJsonException e) {
+            response.setStatusCode(409);
+            response.setData(writeJSON.createErrorReply("Wrong data"));
+        } catch (noItemWithSuchNameException e) {
+            System.out.println("No item with such name");
+        } catch (wrongNotUniqueValue e) {
+            System.out.println("Not unique value");
+        } catch (noItemWithSuchIdException e) {
+            System.out.println("No item with such id");
+        } catch (WrongServerJsonException e) {
             e.printStackTrace();
         }
     }
