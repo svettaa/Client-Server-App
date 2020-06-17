@@ -31,7 +31,8 @@ public class UserDao {
             if (rs.next()) {
                 return createUser(rs);
             } else {
-                throw new noItemWithSuchIdException();
+                return null;
+
             }
         } catch (SQLException sqlException) {
 

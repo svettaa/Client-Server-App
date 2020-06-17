@@ -56,7 +56,7 @@ public class Controller implements HttpHandler {
            UserCredential userCredential = new UserCredential(login,password);
            System.out.println("2");
            User user = userDao.getByLogin(userCredential.getLogin());
-
+          // if(userDao.getByLogin(userCredential.getLogin())==null){ System.out.println("help me ple");}
            System.out.println("4");
            httpExchange.getResponseHeaders()
                    .add("Content-Type", "application/json");
@@ -66,13 +66,20 @@ public class Controller implements HttpHandler {
            response.setStatusCode(200);
            System.out.println("5 2");
 try {
-     loginResponse = new LoginResponse(generateToken(user), user.getLogin(), user.getRole());
+
+      if(user!=null){
+     loginResponse = new LoginResponse( user.getLogin(), user.getRole());}
+      else {
+          writeJSON.writeResponseAutorization(httpExchange, 401,writeJSON.createErrorReply("unknown user"));
+
+      }
 }catch (UnknownClassException e){}
 finally {
 
            if (user != null) {
                if (user.getPassword().equals(md5Hex(userCredential.getPassword()))) {
-                   loginResponse = new LoginResponse(generateToken(user), user.getLogin(), user.getRole());
+
+                   loginResponse = new LoginResponse( user.getLogin(), user.getRole());
 
     System.out.println("6");
     writeJSON.writeResponseAutorization(httpExchange, 200, loginResponse);
@@ -84,8 +91,6 @@ finally {
                    writeJSON.writeResponseAutorization(httpExchange, 401, writeJSON.createErrorReply("invalid password"));
 
                }
-           } else {
-               writeJSON.writeResponseAutorization(httpExchange, 401,writeJSON.createErrorReply("unknown user"));
            }
 
 }
