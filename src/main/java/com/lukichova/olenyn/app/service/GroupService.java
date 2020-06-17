@@ -1,6 +1,5 @@
 package com.lukichova.olenyn.app.service;
 
-import com.lukichova.olenyn.app.DB.Dao;
 import com.lukichova.olenyn.app.DB.Group;
 import com.lukichova.olenyn.app.DB.GroupDao;
 import com.lukichova.olenyn.app.Exceptions.noItemWithSuchIdException;
@@ -15,37 +14,33 @@ import java.util.List;
 public class GroupService {
 
 
-    private final Dao<Group> dao;
+    public final GroupDao groupDao = new GroupDao();
 
-    public GroupService(){
-        dao = new GroupDao();
+    public Group listByCriteria(Integer id) throws noItemWithSuchIdException, wrongDataBaseConnection {
+        return groupDao.getById(id);
     }
 
-    public Group getGroup(Integer id) throws noItemWithSuchIdException, wrongDataBaseConnection {
-        return dao.getById(id);
-    }
-
-    public Group getGroup(String name) throws noItemWithSuchNameException, wrongDataBaseConnection {
-        return dao.getByName(name);
+    public Group listByCriteria(String name) throws noItemWithSuchNameException, wrongDataBaseConnection {
+        return groupDao.getByName(name);
     }
 
     public List<Group> getAll() throws wrongDataBaseConnection {
-        return dao.readAll();
+        return groupDao.readAll();
     }
 
     public boolean create(Group group) throws wrongNotUniqueValue, wrongDataBaseConnection {
-        return dao.create(group);
+        return groupDao.create(group);
     }
 
     public boolean update(Group group) throws wrongNotUniqueValue, wrongDataBaseConnection {
-        return dao.update(group);
+        return groupDao.update(group);
     }
 
     public boolean delete(int id) throws wrongDataBaseConnection {
-        return dao.delete(id);
+        return groupDao.delete(id);
     }
 
     public void deleteAll() throws wrongDataBaseConnection {
-        dao.deleteAll();
+        groupDao.deleteAll();
     }
 }

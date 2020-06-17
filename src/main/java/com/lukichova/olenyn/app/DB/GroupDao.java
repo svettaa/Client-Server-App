@@ -12,9 +12,8 @@ import java.util.List;
 
 import static com.lukichova.olenyn.app.resoures.Resoures.GROUP_TABLE;
 
-public class GroupDao implements Dao<Group> {
+public class GroupDao {
 
-    @Override
     public Group getById(int id) throws wrongDataBaseConnection, noItemWithSuchIdException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -42,6 +41,7 @@ public class GroupDao implements Dao<Group> {
         }
     }
 
+
     private Group createGroup(ResultSet rs) throws SQLException {
         Group g = new Group();
         g.setId(rs.getInt("id"));
@@ -50,7 +50,6 @@ public class GroupDao implements Dao<Group> {
         return g;
     }
 
-    @Override
     public Group getByName(String name) throws wrongDataBaseConnection, noItemWithSuchNameException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -79,7 +78,6 @@ public class GroupDao implements Dao<Group> {
 
     }
 
-    @Override
     public List<Group> readAll() throws wrongDataBaseConnection {
         List<Group> list = new ArrayList<Group>();
         Connection connection = null;
@@ -105,7 +103,6 @@ public class GroupDao implements Dao<Group> {
         }
     }
 
-    @Override
     public boolean create(Group group) throws wrongDataBaseConnection, wrongNotUniqueValue {
         System.out.println("create() invoked");
 
@@ -153,7 +150,6 @@ public class GroupDao implements Dao<Group> {
         }
     }
 
-    @Override
     public boolean update(Group group) throws wrongDataBaseConnection, wrongNotUniqueValue {
 
         Connection connection = null;
@@ -187,7 +183,6 @@ public class GroupDao implements Dao<Group> {
         }
     }
 
-    @Override
     public boolean delete(int id) throws wrongDataBaseConnection {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -210,7 +205,6 @@ public class GroupDao implements Dao<Group> {
         }
     }
 
-    @Override
     public void deleteAll() throws wrongDataBaseConnection {
         Connection connection = null;
         PreparedStatement preparedStatement = null;

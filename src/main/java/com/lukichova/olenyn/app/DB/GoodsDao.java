@@ -12,10 +12,7 @@ import java.util.List;
 
 import static com.lukichova.olenyn.app.resoures.Resoures.GOODS_TABLE;
 
-public class GoodsDao implements Dao<Goods> {
-
-
-    @Override
+public class GoodsDao {
     public Goods getById(int id) throws wrongDataBaseConnection, noItemWithSuchIdException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -55,7 +52,35 @@ public class GoodsDao implements Dao<Goods> {
         return g;
     }
 
-    @Override
+    public List<Goods> getByGroupId(int group_id) throws wrongDataBaseConnection, noItemWithSuchIdException {
+        List<Goods> list = new ArrayList<Goods>();
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = null;
+        try {
+            connection = DriverManager.getConnection(DataBase.url);
+            String sqlQuery = "SELECT * FROM " + GOODS_TABLE + " WHERE group_id = ?";
+            System.out.println("getByGroupId() invoked");
+
+            preparedStatement = connection.prepareStatement(sqlQuery);
+            preparedStatement.setInt(1, group_id);
+            rs = preparedStatement.executeQuery();
+
+            if (rs.next()) {
+                list.add(createGoods(rs));
+            } else {
+                throw new noItemWithSuchIdException();
+            }
+            rs.close();
+            return list;
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+            throw new wrongDataBaseConnection();
+        } finally {
+            close(connection, preparedStatement, rs);
+        }
+    }
+
     public Goods getByName(String name) throws wrongDataBaseConnection, noItemWithSuchNameException {
 
         Connection connection = null;
@@ -82,7 +107,6 @@ public class GoodsDao implements Dao<Goods> {
         }
     }
 
-    @Override
     public List<Goods> readAll() throws wrongDataBaseConnection {
         List<Goods> list = new ArrayList<Goods>();
         Connection connection = null;
@@ -109,7 +133,6 @@ public class GoodsDao implements Dao<Goods> {
         }
     }
 
-    @Override
     public boolean create(Goods goods) throws wrongDataBaseConnection, wrongNotUniqueValue {
         System.out.println("create() invoked");
         Connection connection = null;
@@ -164,7 +187,6 @@ public class GoodsDao implements Dao<Goods> {
         }
     }
 
-    @Override
     public boolean update(Goods goods) throws wrongDataBaseConnection, wrongNotUniqueValue {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -206,7 +228,6 @@ public class GoodsDao implements Dao<Goods> {
         }
     }
 
-    @Override
     public boolean delete(int id) throws wrongDataBaseConnection {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -230,7 +251,25 @@ public class GoodsDao implements Dao<Goods> {
         }
     }
 
-    @Override
+    public void deleteAllByGroupId(int group_id) throws wrongDataBaseConnection, noItemWithSuchIdException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = null;
+        try {
+            connection = DriverManager.getConnection(DataBase.url);
+            String sql = "DELETE FROM " + GOODS_TABLE + " WHERE group_id = ?";
+            System.out.println("deleteAllByGroupId() invoked");
+
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.executeUpdate();
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+            throw new wrongDataBaseConnection();
+        } finally {
+            close(connection, preparedStatement, rs);
+        }
+    }
+
     public void deleteAll() throws wrongDataBaseConnection {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
