@@ -21,7 +21,7 @@ import static com.lukichova.olenyn.app.resoures.Resoures.GROUP_TABLE;
 
 public class TestDBExceptions {
 
-    GoodsService goodsService = new GoodsService(new GoodsDao());
+    GoodsService goodsService = new GoodsService();
 
     @Test(expected = wrongDataBaseConnection.class)
     public void testWrongConnection() throws Exception {

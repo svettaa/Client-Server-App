@@ -17,8 +17,8 @@ import java.util.List;
 
 public class TestDB {
 
-    GroupService groupService = new GroupService(new GroupDao());
-    GoodsService goodsService = new GoodsService(new GoodsDao());
+    GroupService groupService = new GroupService();
+    GoodsService goodsService = new GoodsService();
 
     @Before
     public void before() throws Exception {
