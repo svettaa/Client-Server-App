@@ -27,16 +27,14 @@ public class Controller implements HttpHandler {
     private static View view;
     private final ReadJSON readJSON = new ReadJSON();
     private final WriteJSON writeJSON = new WriteJSON();
-    private final GoodsService goodsService = new GoodsService(new GoodsDao());
-    private final GroupService groupService = new GroupService(new GroupDao());
+    private final GoodsService goodsService = new GoodsService();
+    private final GroupService groupService = new GroupService();
 
     public static void setView(View newView) {
         view = newView;
     }
 
     //group
-
-
     public void getGroup(HttpExchange httpExchange, Map result) {
         try {
             Response response = new Response();
@@ -69,19 +67,31 @@ public class Controller implements HttpHandler {
         view.view(response);
     }
 
-    public void deleteGroup(HttpExchange httpExchange, Map result) throws WrongServerJsonException {
+    public void deleteGroupById(HttpExchange httpExchange, Map result) throws WrongServerJsonException, wrongDataBaseConnection {
 
         String[] parts = (String[]) result.get("requestUriPathParts");
         int id = Integer.parseInt(parts[3]);
 
         Response response = new Response();
-        String message = "Successfully deleted " + id;
-        response.setStatusCode(204);
+        groupService.delete(id);
 
-        response.setData(writeJSON.createSuccessfulReply(message));
+        response.setStatusCode(204);
+        response.setData(null);
         response.setHttpExchange(httpExchange);
 
         view.view(response);
+    }
+
+    public void deleteAllGroups(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection, noItemWithSuchIdException {
+        Response response = new Response();
+
+        groupService.deleteAll();
+        response.setStatusCode(204);
+        response.setHttpExchange(httpExchange);
+        response.setData(null);
+
+        view.view(response);
+
     }
 
     public void putGroup(HttpExchange httpExchange, Map result) throws noItemWithSuchNameException, wrongDataBaseConnection, wrongNotUniqueValue, IOException, WrongJsonException, MissedJsonFieldException {
@@ -93,7 +103,7 @@ public class Controller implements HttpHandler {
 
         groupService.create(group);
 
-        Goods fetched = goodsService.listByCriteria(group.getName());
+        Group fetched = groupService.listByCriteria(group.getName());
         int id = fetched.getId();
 
         response.setStatusCode(201);
@@ -127,10 +137,13 @@ public class Controller implements HttpHandler {
             String categoryStr = (String) params.get("categoryId");
             if (categoryStr != null) {
                 Response response = new Response();
+                int categoryId = Integer.parseInt(categoryStr);
+
+                List<Goods> goodsList = goodsService.getByGroupId(categoryId);
 
                 response.setTemplate("list");
                 response.setStatusCode(200);
-                response.setData("");
+                response.setData(writeJSON.createGoodsListReply(goodsList));
                 response.setHttpExchange(httpExchange);
 
                 view.view(response);
@@ -139,13 +152,14 @@ public class Controller implements HttpHandler {
 
                 List<Goods> goodsList = goodsService.getAll();
 
+                response.setTemplate("list");
                 response.setStatusCode(200);
                 response.setData(writeJSON.createGoodsListReply(goodsList));
                 response.setHttpExchange(httpExchange);
 
                 view.view(response);
             }
-        } catch (wrongDataBaseConnection | WrongServerJsonException e) {
+        } catch (wrongDataBaseConnection | WrongServerJsonException | noItemWithSuchIdException e) {
             e.printStackTrace();
         }
     }
@@ -165,13 +179,39 @@ public class Controller implements HttpHandler {
         view.view(response);
     }
 
-    public void deleteGoods(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection {
+    public void deleteAllGoods(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection, noItemWithSuchIdException {
+
+        Map<String, Object> params = (Map<String, Object>) (result.get("requestParameters"));
+        String categoryStr = (String) params.get("categoryId");
+        if (categoryStr != null) {
+            Response response = new Response();
+            int categoryId = Integer.parseInt(categoryStr);
+
+            goodsService.deleteByGroupId(categoryId);
+
+            response.setStatusCode(204);
+            response.setData(null);
+            response.setHttpExchange(httpExchange);
+
+            view.view(response);
+        } else {
+            Response response = new Response();
+
+            goodsService.deleteAll();
+            response.setStatusCode(204);
+            response.setHttpExchange(httpExchange);
+            response.setData(null);
+
+            view.view(response);
+        }
+    }
+
+    public void deleteGoodsById(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection {
 
         String[] parts = (String[]) result.get("requestUriPathParts");
         int id = Integer.parseInt(parts[3]);
 
         Response response = new Response();
-        response.setHttpExchange(httpExchange);
 
         goodsService.delete(id);
         response.setStatusCode(204);
@@ -276,18 +316,32 @@ public class Controller implements HttpHandler {
                     getGoods(httpExchange, result);
                 } else if (Pattern.matches("/api/goods/\\d+", requestUriPath)) {
                     getGoodsById(httpExchange, result);
+                } else if (Pattern.matches("/api/group", requestUriPath)) {
+                    getGroup(httpExchange, result);
+                } else if (Pattern.matches("/api/group/\\d+", requestUriPath)) {
+                    getGroupById(httpExchange, result);
                 }
             } else if (method.equals("delete")) {
-                if (Pattern.matches("/api/goods/\\d+", requestUriPath)) {
-                    deleteGoods(httpExchange, result);
+                if (requestUriPath.equals("/api/goods")) {
+                    deleteAllGoods(httpExchange, result);
+                } else if (Pattern.matches("/api/goods/\\d+", requestUriPath)) {
+                    deleteGoodsById(httpExchange, result);
+                } else if (Pattern.matches("/api/group", requestUriPath)) {
+                    deleteAllGroups(httpExchange, result);
+                } else if (Pattern.matches("/api/group/\\d+", requestUriPath)) {
+                    deleteGroupById(httpExchange, result);
                 }
             } else if (method.equals("put")) {
                 if (Pattern.matches("/api/goods", requestUriPath)) {
                     putGoods(httpExchange, result);
+                } else if(Pattern.matches("/api/group", requestUriPath)){
+                    putGroup(httpExchange, result);
                 }
             } else if (method.equals("post")) {
                 if (requestUriPath.equals("/api/goods")) {
                     postGoods(httpExchange, result);
+                } else if(Pattern.matches("/api/group", requestUriPath)){
+                    postGroup(httpExchange, result);
                 }
             } else if (methodToCallName == null) {
                 unknownEndpoint(httpExchange, result);
@@ -295,7 +349,7 @@ public class Controller implements HttpHandler {
 
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (MissedJsonFieldException missedJsonFieldEsxception) {
+        } catch (MissedJsonFieldException e) {
             response.setStatusCode(404);
             response.setData(writeJSON.createErrorReply("No field"));
             view.view(response);

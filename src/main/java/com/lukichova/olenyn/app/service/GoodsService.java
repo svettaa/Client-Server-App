@@ -10,38 +10,42 @@ import java.util.List;
 
 public class GoodsService {
 
-    private final Dao<Goods> dao;
-
-    public GoodsService(GoodsDao goodsDao){
-        dao = new GoodsDao();
-    }
+    private final GoodsDao goodsDao = new GoodsDao();
 
     public Goods listByCriteria(Integer id) throws noItemWithSuchIdException, wrongDataBaseConnection {
-        return dao.getById(id);
+        return goodsDao.getById(id);
     }
 
     public Goods listByCriteria(String name) throws noItemWithSuchNameException, wrongDataBaseConnection {
-        return dao.getByName(name);
+        return goodsDao.getByName(name);
+    }
+
+    public List<Goods> getByGroupId(Integer group_id) throws noItemWithSuchIdException, wrongDataBaseConnection {
+        return goodsDao.getByGroupId(group_id);
     }
 
     public List<Goods> getAll() throws wrongDataBaseConnection {
-        return dao.readAll();
+        return goodsDao.readAll();
     }
 
     public boolean create(Goods goods) throws wrongNotUniqueValue, wrongDataBaseConnection {
-        return dao.create(goods);
+        return goodsDao.create(goods);
     }
 
     public boolean update(Goods goods) throws wrongNotUniqueValue, wrongDataBaseConnection {
-        return dao.update(goods);
+        return goodsDao.update(goods);
     }
 
     public boolean delete(int id) throws wrongDataBaseConnection {
-        return dao.delete(id);
+        return goodsDao.delete(id);
+    }
+
+    public void deleteByGroupId(int group_id) throws noItemWithSuchIdException, wrongDataBaseConnection {
+        goodsDao.deleteAllByGroupId(group_id);
     }
 
     public void deleteAll() throws wrongDataBaseConnection {
-        dao.deleteAll();
+        goodsDao.deleteAll();
     }
 
 }

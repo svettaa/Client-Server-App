@@ -29,8 +29,7 @@ public class JsonView implements View {
                 System.out.println(responseBody);
                 outputStream.close();
             } else {
-
-                httpExchange.sendResponseHeaders(statusCode, 0);
+                httpExchange.sendResponseHeaders(statusCode, -1);
             }
         } catch (IOException e) {
             e.printStackTrace();
