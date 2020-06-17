@@ -14,7 +14,9 @@ public class JsonView implements View {
         Integer statusCode = 500;
 
         responseBody = response.getData();
+
         statusCode = response.getStatusCode();
+
         HttpExchange httpExchange = response.getHttpExchange();
 
         Headers responseHeaders = httpExchange.getResponseHeaders();
@@ -28,6 +30,8 @@ public class JsonView implements View {
                 outputStream.write(responseBody.getBytes());
                 System.out.println(responseBody);
                 outputStream.close();
+
+
             } else {
                 httpExchange.sendResponseHeaders(statusCode, -1);
             }

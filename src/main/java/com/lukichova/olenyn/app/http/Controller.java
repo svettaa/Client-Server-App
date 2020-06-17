@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class Controller implements HttpHandler {
+
     private static View view;
     private final ReadJSON readJSON = new ReadJSON();
     private final WriteJSON writeJSON = new WriteJSON();
@@ -55,10 +56,13 @@ public class Controller implements HttpHandler {
     public void getGroupById(HttpExchange httpExchange, Map result) throws noItemWithSuchIdException, wrongDataBaseConnection, WrongServerJsonException {
 
         String[] parts = (String[]) result.get("requestUriPathParts");
+
         int id = Integer.parseInt(parts[3]);
 
         Response response = new Response();
+
         Group group = groupService.listByCriteria(id);
+
         response.setStatusCode(200);
 
         response.setData(writeJSON.createGroupReply(group));

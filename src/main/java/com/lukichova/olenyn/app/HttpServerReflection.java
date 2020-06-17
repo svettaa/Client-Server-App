@@ -23,6 +23,7 @@ public class HttpServerReflection {
             server.bind(new InetSocketAddress(HTTP_SERVER_PORT), 0);
 
             Controller exampleMultiactionController = new Controller();
+
             server.createContext("/", exampleMultiactionController);
 
             server.start();
