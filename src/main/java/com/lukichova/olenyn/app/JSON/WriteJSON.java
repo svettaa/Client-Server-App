@@ -8,13 +8,24 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lukichova.olenyn.app.DB.Goods;
 import com.lukichova.olenyn.app.DB.Group;
 import com.lukichova.olenyn.app.Exceptions.WrongServerJsonException;
+import com.sun.net.httpserver.HttpExchange;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.List;
 
 public class WriteJSON {
+
+
+    public void writeResponseAutorization(HttpExchange exchange,
+                                          int statusCode, Object response) throws IOException {
+        ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+        final byte[] bytes = OBJECT_MAPPER.writeValueAsBytes(response);
+        exchange.sendResponseHeaders(statusCode, bytes.length);
+        exchange.getResponseBody().write(bytes);
+    }
 
     public String createCreatedIdReply(int id){
         try {

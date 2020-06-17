@@ -1,21 +1,23 @@
 package com.lukichova.olenyn.app.http;
 
-import com.lukichova.olenyn.app.DB.Goods;
-import com.lukichova.olenyn.app.DB.GoodsDao;
-import com.lukichova.olenyn.app.DB.Group;
-import com.lukichova.olenyn.app.DB.GroupDao;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lukichova.olenyn.app.DB.*;
 import com.lukichova.olenyn.app.Exceptions.*;
 import com.lukichova.olenyn.app.JSON.ReadJSON;
 import com.lukichova.olenyn.app.JSON.WriteJSON;
 import com.lukichova.olenyn.app.dto.Response;
 import com.lukichova.olenyn.app.service.GoodsService;
 import com.lukichova.olenyn.app.service.GroupService;
+import com.lukichova.olenyn.app.service.JwtService;
 import com.lukichova.olenyn.app.views.View;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.lang.UnknownClassException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.HashMap;
@@ -23,6 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static com.lukichova.olenyn.app.service.JwtService.SECRET_KEY;
+import static com.lukichova.olenyn.app.service.JwtService.generateToken;
+import static org.apache.commons.codec.digest.DigestUtils.*;
 public class Controller implements HttpHandler {
 
     private static View view;
@@ -31,11 +36,66 @@ public class Controller implements HttpHandler {
     private final GoodsService goodsService = new GoodsService();
     private final GroupService groupService = new GroupService();
 
+
     public static void setView(View newView) {
         view = newView;
     }
 
+   private void loginHandler(final HttpExchange httpExchange,   Map<String, Object> pathParams ) {
+       System.out.println("2");
+       LoginResponse loginResponse = null;
+
+
+       try (final InputStream requestBody = httpExchange.getRequestBody()) {
+           UserDao userDao = new UserDao();
+
+          String password = (String) pathParams.get("password");
+           String  login = (String) pathParams.get("login");
+            System.out.println(password);
+
+           UserCredential userCredential = new UserCredential(login,password);
+           System.out.println("2");
+           User user = userDao.getByLogin(userCredential.getLogin());
+
+           System.out.println("4");
+           httpExchange.getResponseHeaders()
+                   .add("Content-Type", "application/json");
+           System.out.println("5");
+           Response response = new Response();
+           System.out.println("5 1");
+           response.setStatusCode(200);
+           System.out.println("5 2");
+try {
+     loginResponse = new LoginResponse(generateToken(user), user.getLogin(), user.getRole());
+}catch (UnknownClassException e){}
+finally {
+
+           if (user != null) {
+               if (user.getPassword().equals(md5Hex(userCredential.getPassword()))) {
+                   loginResponse = new LoginResponse(generateToken(user), user.getLogin(), user.getRole());
+
+    System.out.println("6");
+    writeJSON.writeResponseAutorization(httpExchange, 200, loginResponse);
+    response.setHttpExchange(httpExchange);
+    System.out.println("7");
+    view.view(response);
+
+               } else {
+                   writeJSON.writeResponseAutorization(httpExchange, 401, writeJSON.createErrorReply("invalid password"));
+
+               }
+           } else {
+               writeJSON.writeResponseAutorization(httpExchange, 401,writeJSON.createErrorReply("unknown user"));
+           }
+
+}
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
+
+   }
     //group
+
     public void getGroup(HttpExchange httpExchange, Map result) {
         try {
             Response response = new Response();
@@ -289,7 +349,7 @@ public class Controller implements HttpHandler {
 
             URI requestUri = httpExchange.getRequestURI();
             result.put("requestUri", requestUri);
-
+System.out.println(result);
             String requestUriPath = requestUri.getPath();
             result.put("requestUriPath", requestUriPath);
 
@@ -316,6 +376,14 @@ public class Controller implements HttpHandler {
 
 
             if (method.equals("get")) {
+                System.out.println(result);
+             //   if (requestUriPath.equals("/login")) {
+                if (Pattern.matches("/login", requestUriPath)){
+                    System.out.println("333");
+                    System.out.println("1");
+                    loginHandler(httpExchange,requestParameters);
+                    System.out.println("3");
+                }
                 if (requestUriPath.equals("/api/goods")) {
                     getGoods(httpExchange, result);
                 } else if (Pattern.matches("/api/goods/\\d+", requestUriPath)) {
