@@ -36,7 +36,7 @@ public class GoodsService {
         return goodsDao.create(goods);
     }
 
-    public boolean update(Goods goods) throws wrongDataBaseConnection, WrongJsonInputData, noItemWithSuchIdException {
+    public boolean update(Goods goods) throws wrongDataBaseConnection, WrongJsonInputData, noItemWithSuchIdException, wrongNotUniqueValue {
         if (goods.getId() == null || goods.getName() == null || goods.getProducer() == null ||
                 goods.getLeft_amount() < 0 || goods.getLeft_amount() == null || goods.getPrice() == null ||
                 (goods.getPrice().compareTo(new BigDecimal("0.00")) < 0) || goods.getGroup_id() == null ||
@@ -48,7 +48,7 @@ public class GoodsService {
         return goodsDao.update(goods);
     }
 
-    public boolean delete(int id) throws wrongDataBaseConnection {
+    public boolean delete(int id) throws wrongDataBaseConnection, noItemWithSuchIdException {
         return goodsDao.delete(id);
     }
 

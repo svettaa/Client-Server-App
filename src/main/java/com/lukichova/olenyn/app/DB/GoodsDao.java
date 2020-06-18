@@ -26,13 +26,18 @@ public class GoodsDao {
             preparedStatement.setInt(1, id);
             rs = preparedStatement.executeQuery();
 
+
+
             if (rs.next()) {
+
                 return createGoods(rs);
             } else {
+
                 throw new noItemWithSuchIdException();
             }
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
+
             throw new wrongDataBaseConnection();
         } finally {
             close(connection, preparedStatement, rs);
@@ -190,8 +195,8 @@ public class GoodsDao {
     public boolean update(Goods goods) throws wrongDataBaseConnection, noItemWithSuchIdException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
-        //Goods g = new Goods();
-        //g=getById(goods.getId());
+        Goods g = new Goods();
+        g=getById(goods.getId());
 
         try {
             connection = DriverManager.getConnection(DataBase.url);
@@ -231,9 +236,15 @@ public class GoodsDao {
         }
     }
 
-    public boolean delete(int id) throws wrongDataBaseConnection {
+    public boolean delete(int id) throws wrongDataBaseConnection, noItemWithSuchIdException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
+
+        Goods test = getById(id);
+        test.getName();
+
+
+
         try {
             connection = DriverManager.getConnection(DataBase.url);
             String sql = "DELETE FROM " + GOODS_TABLE + " WHERE id = ?";

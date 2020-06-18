@@ -183,9 +183,11 @@ public class GroupDao {
         }
     }
 
-    public boolean delete(int id) throws wrongDataBaseConnection {
+    public boolean delete(int id) throws wrongDataBaseConnection, noItemWithSuchIdException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
+        Group testtt = getById(id);
+       testtt.getName();
         try {
             connection = DriverManager.getConnection(DataBase.url);
             String sql = "DELETE FROM " + GROUP_TABLE + " WHERE id = ?";

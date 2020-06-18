@@ -37,7 +37,7 @@ public class GroupService {
         return groupDao.update(group);
     }
 
-    public boolean delete(int id) throws wrongDataBaseConnection {
+    public boolean delete(int id) throws wrongDataBaseConnection,  noItemWithSuchIdException {
         return groupDao.delete(id);
     }
 

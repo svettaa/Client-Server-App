@@ -139,9 +139,17 @@ public class Controller implements HttpHandler {
         int id = Integer.parseInt(parts[3]);
 
         Response response = new Response();
-        groupService.delete(id);
 
-        response.setStatusCode(204);
+        try{
+            groupService.delete(id);
+
+            response.setStatusCode(204);}
+
+        catch (noItemWithSuchIdException e) {
+
+            response.setStatusCode(404);
+        }
+
         response.setData(null);
         response.setHttpExchange(httpExchange);
 
@@ -272,17 +280,25 @@ public class Controller implements HttpHandler {
         }
     }
 
-    public void deleteGoodsById(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection {
+    public void deleteGoodsById(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection, noItemWithSuchIdException {
 
         String[] parts = (String[]) result.get("requestUriPathParts");
         int id = Integer.parseInt(parts[3]);
 
         Response response = new Response();
-
+try{
         goodsService.delete(id);
-        response.setStatusCode(204);
+
+
+        response.setStatusCode(204);}
+
+catch (noItemWithSuchIdException e){
+
+    response.setStatusCode(404);
+}
         response.setHttpExchange(httpExchange);
         response.setData(null);
+
 
         view.view(response);
     }
@@ -321,8 +337,18 @@ public class Controller implements HttpHandler {
         String body = getBodyString(httpExchange);
         Goods goods = readJSON.selectGoods(body);
 
-        goodsService.update(goods);
-        response.setStatusCode(204);
+
+        try{
+            goodsService.update(goods);
+
+
+            response.setStatusCode(204);}
+
+        catch (noItemWithSuchIdException e){
+
+            response.setStatusCode(404);
+        }
+
         response.setHttpExchange(httpExchange);
         response.setData(null);
 
@@ -421,17 +447,18 @@ public class Controller implements HttpHandler {
                     unknownEndpoint(httpExchange, result);
                 }
             }
-            } catch(IOException e){
+            }
+        catch(MissedJsonFieldException | noItemWithSuchIdException e){
+            response.setStatusCode(404);
+            response.setData(writeJSON.createErrorReply("No field"));
+            view.view(response);
+        }catch(IOException e){
                 e.printStackTrace();
             } catch(WrongJsonInputData | WrongJsonException e){
                 response.setStatusCode(409);
                 response.setData(writeJSON.createErrorReply("Wrong input data"));
                 view.view(response);
-            } catch(MissedJsonFieldException | noItemWithSuchIdException e){
-                response.setStatusCode(404);
-                response.setData(writeJSON.createErrorReply("No field"));
-                view.view(response);
-            } catch(wrongDataBaseConnection e){
+            }  catch(wrongDataBaseConnection e){
                 System.out.println("Wrong database connection");
             } catch(noItemWithSuchNameException e){
                 System.out.println("No item with such name");
