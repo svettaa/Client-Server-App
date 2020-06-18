@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 import static com.lukichova.olenyn.app.service.JwtService.SECRET_KEY;
 import static com.lukichova.olenyn.app.service.JwtService.generateToken;
 import static org.apache.commons.codec.digest.DigestUtils.*;
+
 public class Controller implements HttpHandler {
 
     private static View view;
@@ -44,61 +45,57 @@ public class Controller implements HttpHandler {
         view = newView;
     }
 
-   private void loginHandler(final HttpExchange httpExchange,   Map<String, Object> pathParams ) {
+    private void loginHandler(final HttpExchange httpExchange, Map<String, Object> pathParams) {
 
-       LoginResponse loginResponse = null;
-
-
-       try (final InputStream requestBody = httpExchange.getRequestBody()) {
-           UserDao userDao = new UserDao();
-
-          String password = (String) pathParams.get("password");
-           String  login = (String) pathParams.get("login");
+        LoginResponse loginResponse = null;
 
 
-           UserCredential userCredential = new UserCredential(login,password);
+        try (final InputStream requestBody = httpExchange.getRequestBody()) {
+            UserDao userDao = new UserDao();
 
-           User user = userDao.getByLogin(userCredential.getLogin());
-
-           httpExchange.getResponseHeaders()
-                   .add("Content-Type", "application/json");
-
-           String token = generateToken(user);
-           System.out.println(token);
-
-try {
-
-      if(user!=null){
-
-     loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
-          }
-      else {
-          writeJSON.writeResponseAutorization(httpExchange, 401,writeJSON.createErrorReply("Unauthorized"));
-
-      }
-}catch (UnknownClassException e){}
-finally {
-
-           if (user != null) {
-               if (user.getPassword().equals(md5Hex(userCredential.getPassword()))) {
-
-                   loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
+            String password = (String) pathParams.get("password");
+            String login = (String) pathParams.get("login");
 
 
-                   writeJSON.writeResponseAutorization(httpExchange, 200, loginResponse);
+            UserCredential userCredential = new UserCredential(login, password);
 
-               } else {
-                   writeJSON.writeResponseAutorization(httpExchange, 401, writeJSON.createErrorReply("invalid password"));
+            User user = userDao.getByLogin(userCredential.getLogin());
 
-               }
-           }
+            httpExchange.getResponseHeaders()
+                    .add("Content-Type", "application/json");
 
-}
-       } catch (Exception e) {
-           e.printStackTrace();
-       }
+            String token = generateToken(user);
+            System.out.println(token);
 
-   }
+            try {
+                if (user != null) {
+
+                    loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
+                } else {
+                    writeJSON.writeResponseAutorization(httpExchange, 401, writeJSON.createErrorReply("Unauthorized"));
+
+                }
+            } catch (UnknownClassException e) {
+            } finally {
+
+                if (user != null) {
+                    if (user.getPassword().equals(md5Hex(userCredential.getPassword()))) {
+
+                        loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
+
+
+                        writeJSON.writeResponseAutorization(httpExchange, 200, loginResponse);
+
+                    } else {
+                        writeJSON.writeResponseAutorization(httpExchange, 401, writeJSON.createErrorReply("invalid password"));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
     //group
 
     public void getGroup(HttpExchange httpExchange, Map result) {
@@ -354,7 +351,7 @@ finally {
 
             URI requestUri = httpExchange.getRequestURI();
             result.put("requestUri", requestUri);
-System.out.println(result);
+            System.out.println(result);
             String requestUriPath = requestUri.getPath();
             result.put("requestUriPath", requestUriPath);
 
@@ -383,12 +380,9 @@ System.out.println(result);
             if (method.equals("get")) {
                 System.out.println(result);
 
-                if (Pattern.matches("/login", requestUriPath)){
-
-                    loginHandler(httpExchange,requestParameters);
-
-                }
-                if (requestUriPath.equals("/api/goods")) {
+                if (Pattern.matches("/login", requestUriPath)) {
+                    loginHandler(httpExchange, requestParameters);
+                } else if (requestUriPath.equals("/api/goods")) {
                     getGoods(httpExchange, result);
                 } else if (Pattern.matches("/api/goods/\\d+", requestUriPath)) {
                     getGoodsById(httpExchange, result);
@@ -414,7 +408,7 @@ System.out.println(result);
                     } catch (WrongJsonInputData wrongJsonInputData) {
                         wrongJsonInputData.printStackTrace();
                     }
-                } else if(Pattern.matches("/api/group", requestUriPath)){
+                } else if (Pattern.matches("/api/group", requestUriPath)) {
                     try {
                         putGroup(httpExchange, result);
                     } catch (WrongJsonInputData wrongJsonInputData) {
@@ -428,7 +422,7 @@ System.out.println(result);
                     } catch (WrongJsonInputData wrongJsonInputData) {
                         wrongJsonInputData.printStackTrace();
                     }
-                } else if(Pattern.matches("/api/group", requestUriPath)){
+                } else if (Pattern.matches("/api/group", requestUriPath)) {
                     try {
                         postGroup(httpExchange, result);
                     } catch (WrongJsonInputData wrongJsonInputData) {
