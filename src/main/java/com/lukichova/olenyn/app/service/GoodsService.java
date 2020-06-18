@@ -36,13 +36,14 @@ public class GoodsService {
         return goodsDao.create(goods);
     }
 
-    public boolean update(Goods goods) throws wrongNotUniqueValue, wrongDataBaseConnection, WrongJsonInputData {
-        if (goods.getName() == null || goods.getProducer() == null ||
+    public boolean update(Goods goods) throws wrongDataBaseConnection, WrongJsonInputData, noItemWithSuchIdException {
+        if (goods.getId() == null || goods.getName() == null || goods.getProducer() == null ||
                 goods.getLeft_amount() < 0 || goods.getLeft_amount() == null || goods.getPrice() == null ||
                 (goods.getPrice().compareTo(new BigDecimal("0.00")) < 0) || goods.getGroup_id() == null ||
                 goods.getGroup_id() < 1){
             throw new WrongJsonInputData();
         }
+
 
         return goodsDao.update(goods);
     }

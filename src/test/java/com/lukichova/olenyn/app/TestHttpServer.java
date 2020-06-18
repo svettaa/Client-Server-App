@@ -10,9 +10,7 @@ public class TestHttpServer {
         String token;
 
 
-
         // delete all
-
         response = new ReceivedResponse("DELETE", "/api/goods",
                 null, null);
         response.assertResponse(204, null);
@@ -86,18 +84,32 @@ public class TestHttpServer {
                 "{\"id\": 5, \"name\": \"aa\", \"price\": -25, \"left_amount\": 12, \"producer\": \"Yagotinske\", \"description\": \"Tasty aa\", \"group_id\": 1}", null);
         response.assertResponse(409, null);
 
+        //error 409
+        response = new ReceivedResponse("POST", "/api/goods",
+                "{\"id\": 11, \"name\": \"fanta\", \"price\": -11, \"left_amount\": 50, \"producer\": \"Coca Cola\", \"description\": \"Tasty fanta\", \"group_id\": 2}", null);
+        response.assertResponse(409, null);
+
+        //error 404
+        response = new ReceivedResponse("POST", "/api/goods",
+                "{\"id\": 14511, \"name\": \"fanta\", \"price\": 11, \"left_amount\": 50, \"producer\": \"Coca Cola\", \"description\": \"Tasty fanta\", \"group_id\": 2}", null);
+        response.assertResponse(404, null);
+
 
         response = new ReceivedResponse("POST", "/api/goods",
                 "{\"id\": 11, \"name\": \"fanta\", \"price\": 11, \"left_amount\": 50, \"producer\": \"Coca Cola\", \"description\": \"Tasty fanta\", \"group_id\": 2}", null);
         response.assertResponse(204, null);
+
 
         response = new ReceivedResponse("GET", "/api/goods/10",
                 null, null);
         response.assertResponse(200, "{\"id\":10,\"name\":\"cola\",\"producer\":\"Coca Cola\",\"description\":\"Tasty cola\",\"left_amount\":16,\"price\":\"10\",\"group_id\":2}");
 
         //error 404
-        response = new ReceivedResponse("GET", "/api/goods/02329",
-                null, null);
-        response.assertResponse(404, null);
+//        response = new ReceivedResponse("GET", "/api/goods/02329",
+//                null, null);
+//        response.assertResponse(404, null);
+
+
+
     }
 }
