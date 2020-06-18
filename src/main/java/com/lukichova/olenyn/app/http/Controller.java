@@ -1,6 +1,8 @@
 package com.lukichova.olenyn.app.http;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lukichova.olenyn.app.DB.*;
 import com.lukichova.olenyn.app.Exceptions.*;
 import com.lukichova.olenyn.app.JSON.ReadJSON;
@@ -20,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,11 +38,31 @@ public class Controller implements HttpHandler {
     private final WriteJSON writeJSON = new WriteJSON();
     private final GoodsService goodsService = new GoodsService();
     private final GroupService groupService = new GroupService();
-
+    protected static SecureRandom random = new SecureRandom();
 
     public static void setView(View newView) {
         view = newView;
     }
+    public static String generateTokenn(String username) {
+        long longToken = Math.abs( random.nextLong() );
+        String random = Long.toString( longToken, 16 );
+        return ( username + ":" + random );
+    }
+
+    public static String generateJws(String email, String password){
+        return Jwts.builder().setSubject(email+password).signWith(SECRET_KEY).compact();
+    }
+
+    public static String generateToken(final User user) {
+
+        return Jwts.builder()
+                .setSubject(user.getLogin())
+                .signWith(SECRET_KEY)
+                .claim("role", user.getRole())
+                .compact();
+
+    }
+
 
    private void loginHandler(final HttpExchange httpExchange,   Map<String, Object> pathParams ) {
 
@@ -60,12 +83,15 @@ public class Controller implements HttpHandler {
            httpExchange.getResponseHeaders()
                    .add("Content-Type", "application/json");
 
-
+           String token = generateJws(user.getLogin(),user.getRole());
+           System.out.println(token);
 
 try {
 
       if(user!=null){
-     loginResponse = new LoginResponse(JwtService.generateToken(user), user.getLogin(), user.getRole());}
+          System.out.println("3");
+     loginResponse = new LoginResponse(generateToken(user), user.getLogin(), user.getRole());
+          System.out.println("3");}
       else {
           writeJSON.writeResponseAutorization(httpExchange, 401,writeJSON.createErrorReply("unknown user"));
 
@@ -76,12 +102,10 @@ finally {
            if (user != null) {
                if (user.getPassword().equals(md5Hex(userCredential.getPassword()))) {
 
-                   loginResponse = new LoginResponse(JwtService.generateToken(user), user.getLogin(), user.getRole());
+                   loginResponse = new LoginResponse(generateToken(user), user.getLogin(), user.getRole());
 
 
                    writeJSON.writeResponseAutorization(httpExchange, 200, loginResponse);
-
-
 
                } else {
                    writeJSON.writeResponseAutorization(httpExchange, 401, writeJSON.createErrorReply("invalid password"));

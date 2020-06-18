@@ -7,18 +7,24 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lukichova.olenyn.app.DB.User;
 import com.lukichova.olenyn.app.Exceptions.WrongJsonException;
 import com.lukichova.olenyn.app.Exceptions.WrongServerJsonException;
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
 
+import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
+import java.security.SecureRandom;
+import java.util.Date;
 
 public class JwtService {
 
     public static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-
+    public static String generateJws(String email, String password){
+        return Jwts.builder().setSubject(email+password).signWith(SECRET_KEY).compact();
+    }
 
     public static String generateToken(final User user) {
 
@@ -39,5 +45,11 @@ public class JwtService {
             .getSubject();
     }
 
+    protected static SecureRandom random = new SecureRandom();
 
+    public static String generateTokenn(String username) {
+        long longToken = Math.abs( random.nextLong() );
+        String random = Long.toString( longToken, 16 );
+        return ( random );
+    }
 }
