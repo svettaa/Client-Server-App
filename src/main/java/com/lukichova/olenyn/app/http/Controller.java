@@ -44,20 +44,6 @@ public class Controller implements HttpHandler {
         view = newView;
     }
 
-
-
-
-    public static String generateToken(final User user) {
-
-        return Jwts.builder()
-                .setSubject(user.getLogin())
-                .signWith(SECRET_KEY)
-                .claim("role", user.getRole())
-                .compact();
-
-    }
-
-
    private void loginHandler(final HttpExchange httpExchange,   Map<String, Object> pathParams ) {
 
        LoginResponse loginResponse = null;
@@ -83,9 +69,9 @@ public class Controller implements HttpHandler {
 try {
 
       if(user!=null){
-          System.out.println("3");
+
      loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
-          System.out.println("3");}
+          }
       else {
           writeJSON.writeResponseAutorization(httpExchange, 401,writeJSON.createErrorReply("Unauthorized"));
 

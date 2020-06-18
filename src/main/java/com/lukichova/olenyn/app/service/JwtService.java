@@ -22,19 +22,17 @@ public class JwtService {
 
     public static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    public static String generateJws(String email, String password){
-        return Jwts.builder().setSubject(email+password).signWith(SECRET_KEY).compact();
-    }
 
     public static String generateToken(final User user) {
 
         return Jwts.builder()
-            .setSubject(user.getLogin())
-            .signWith(SECRET_KEY)
-            .claim("role", user.getRole())
-            .compact();
+                .setSubject(user.getLogin())
+                .signWith(SECRET_KEY)
+                .claim("role", user.getRole())
+                .compact();
 
     }
+
 
     public static String getUsernameFromToken(String jwt) {
         return Jwts.parserBuilder()
@@ -45,11 +43,5 @@ public class JwtService {
             .getSubject();
     }
 
-    protected static SecureRandom random = new SecureRandom();
 
-    public static String generateTokenn(String username) {
-        long longToken = Math.abs( random.nextLong() );
-        String random = Long.toString( longToken, 16 );
-        return ( random );
-    }
 }
