@@ -1,6 +1,12 @@
 package com.lukichova.olenyn.app.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lukichova.olenyn.app.DB.User;
+import com.lukichova.olenyn.app.Exceptions.WrongJsonException;
+import com.lukichova.olenyn.app.Exceptions.WrongServerJsonException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -32,5 +38,6 @@ public class JwtService {
             .getBody()
             .getSubject();
     }
+
 
 }

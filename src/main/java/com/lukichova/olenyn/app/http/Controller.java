@@ -50,7 +50,7 @@ public class Controller implements HttpHandler {
 
           String password = (String) pathParams.get("password");
            String  login = (String) pathParams.get("login");
-            System.out.println(password);
+
 
            UserCredential userCredential = new UserCredential(login,password);
 
@@ -64,7 +64,7 @@ public class Controller implements HttpHandler {
 try {
 
       if(user!=null){
-     loginResponse = new LoginResponse( user.getLogin(), user.getRole());}
+     loginResponse = new LoginResponse(JwtService.generateToken(user), user.getLogin(), user.getRole());}
       else {
           writeJSON.writeResponseAutorization(httpExchange, 401,writeJSON.createErrorReply("unknown user"));
 
@@ -75,10 +75,10 @@ finally {
            if (user != null) {
                if (user.getPassword().equals(md5Hex(userCredential.getPassword()))) {
 
-                   loginResponse = new LoginResponse( user.getLogin(), user.getRole());
+                   loginResponse = new LoginResponse(JwtService.generateToken(user), user.getLogin(), user.getRole());
 
 
-    writeJSON.writeResponseAutorization(httpExchange, 200, loginResponse);
+                   writeJSON.writeResponseAutorization(httpExchange, 200, loginResponse);
 
 
 
