@@ -1,5 +1,8 @@
 package com.lukichova.olenyn.app.http;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lukichova.olenyn.app.DB.*;
 import com.lukichova.olenyn.app.Exceptions.*;
 import com.lukichova.olenyn.app.JSON.ReadJSON;
@@ -19,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +38,7 @@ public class Controller implements HttpHandler {
     private final WriteJSON writeJSON = new WriteJSON();
     private final GoodsService goodsService = new GoodsService();
     private final GroupService groupService = new GroupService();
-
+    protected static SecureRandom random = new SecureRandom();
 
     public static void setView(View newView) {
         view = newView;
@@ -59,14 +63,17 @@ public class Controller implements HttpHandler {
            httpExchange.getResponseHeaders()
                    .add("Content-Type", "application/json");
 
-
+           String token = generateToken(user);
+           System.out.println(token);
 
 try {
 
       if(user!=null){
-     loginResponse = new LoginResponse(JwtService.generateToken(user), user.getLogin(), user.getRole());}
+
+     loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
+          }
       else {
-          writeJSON.writeResponseAutorization(httpExchange, 401,writeJSON.createErrorReply("unknown user"));
+          writeJSON.writeResponseAutorization(httpExchange, 401,writeJSON.createErrorReply("Unauthorized"));
 
       }
 }catch (UnknownClassException e){}
@@ -75,12 +82,10 @@ finally {
            if (user != null) {
                if (user.getPassword().equals(md5Hex(userCredential.getPassword()))) {
 
-                   loginResponse = new LoginResponse(JwtService.generateToken(user), user.getLogin(), user.getRole());
+                   loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
 
 
                    writeJSON.writeResponseAutorization(httpExchange, 200, loginResponse);
-
-
 
                } else {
                    writeJSON.writeResponseAutorization(httpExchange, 401, writeJSON.createErrorReply("invalid password"));
@@ -131,14 +136,14 @@ finally {
         view.view(response);
     }
 
-    public void deleteGroupById(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection, noItemWithSuchIdException {
+    public void deleteGroupById(HttpExchange httpExchange, Map result) throws WrongServerJsonException, wrongDataBaseConnection {
 
         String[] parts = (String[]) result.get("requestUriPathParts");
         int id = Integer.parseInt(parts[3]);
 
         Response response = new Response();
         groupService.delete(id);
-        goodsService.deleteByGroupId(id);
+
         response.setStatusCode(204);
         response.setData(null);
         response.setHttpExchange(httpExchange);
@@ -158,7 +163,7 @@ finally {
 
     }
 
-    public void putGroup(HttpExchange httpExchange, Map result) throws noItemWithSuchNameException, wrongDataBaseConnection, wrongNotUniqueValue, IOException, MissedJsonFieldException, WrongJsonInputData, WrongJsonException {
+    public void putGroup(HttpExchange httpExchange, Map result) throws noItemWithSuchNameException, wrongDataBaseConnection, wrongNotUniqueValue, IOException, WrongJsonException, MissedJsonFieldException {
         Response response = new Response();
         response.setHttpExchange(httpExchange);
 
@@ -177,7 +182,7 @@ finally {
         view.view(response);
     }
 
-    public void postGroup(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
+    public void postGroup(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException {
         Response response = new Response();
         response.setHttpExchange(httpExchange);
 
@@ -285,7 +290,7 @@ finally {
         view.view(response);
     }
 
-    public void putGoods(HttpExchange httpExchange, Map result) throws noItemWithSuchNameException, wrongDataBaseConnection, wrongNotUniqueValue, IOException, WrongJsonException, MissedJsonFieldException, WrongJsonInputData {
+    public void putGoods(HttpExchange httpExchange, Map result) throws noItemWithSuchNameException, wrongDataBaseConnection, wrongNotUniqueValue, IOException, WrongJsonException, MissedJsonFieldException {
         Response response = new Response();
         response.setHttpExchange(httpExchange);
 
@@ -312,7 +317,7 @@ finally {
         return bufferedReader.readLine();
     }
 
-    public void postGoods(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
+    public void postGoods(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException {
         Response response = new Response();
         response.setHttpExchange(httpExchange);
 
@@ -376,58 +381,50 @@ System.out.println(result);
 
 
             if (method.equals("get")) {
+                System.out.println(result);
+
                 if (Pattern.matches("/login", requestUriPath)){
+
                     loginHandler(httpExchange,requestParameters);
+
                 }
-                if (Pattern.matches("^/api/goods/$", requestUriPath)) {
+                if (requestUriPath.equals("/api/goods")) {
                     getGoods(httpExchange, result);
-                } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
+                } else if (Pattern.matches("/api/goods/\\d+", requestUriPath)) {
                     getGoodsById(httpExchange, result);
-                } else if (Pattern.matches("^/api/group$", requestUriPath)) {
+                } else if (Pattern.matches("/api/group", requestUriPath)) {
                     getGroup(httpExchange, result);
-                } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {
+                } else if (Pattern.matches("/api/group/\\d+", requestUriPath)) {
                     getGroupById(httpExchange, result);
-                }else {
-                    unknownEndpoint(httpExchange, result);
                 }
             } else if (method.equals("delete")) {
-                if (Pattern.matches("^/api/goods$", requestUriPath)) {
+                if (requestUriPath.equals("/api/goods")) {
                     deleteAllGoods(httpExchange, result);
-                } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
+                } else if (Pattern.matches("/api/goods/\\d+", requestUriPath)) {
                     deleteGoodsById(httpExchange, result);
-                } else if (Pattern.matches("^/api/group$", requestUriPath)) {
+                } else if (Pattern.matches("/api/group", requestUriPath)) {
                     deleteAllGroups(httpExchange, result);
-                } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {
+                } else if (Pattern.matches("/api/group/\\d+", requestUriPath)) {
                     deleteGroupById(httpExchange, result);
-                }else {
-                    unknownEndpoint(httpExchange, result);
                 }
             } else if (method.equals("put")) {
-                if (Pattern.matches("^/api/goods$", requestUriPath)) {
+                if (Pattern.matches("/api/goods", requestUriPath)) {
                     putGoods(httpExchange, result);
-                } else if(Pattern.matches("^/api/group$", requestUriPath)){
+                } else if(Pattern.matches("/api/group", requestUriPath)){
                     putGroup(httpExchange, result);
-                }else {
-                    unknownEndpoint(httpExchange, result);
                 }
             } else if (method.equals("post")) {
-                if (requestUriPath.equals("^/api/goods$")) {
+                if (requestUriPath.equals("/api/goods")) {
                     postGoods(httpExchange, result);
-                } else if (Pattern.matches("^/api/group$", requestUriPath)) {
+                } else if(Pattern.matches("/api/group", requestUriPath)){
                     postGroup(httpExchange, result);
-                }else {
-                    unknownEndpoint(httpExchange, result);
                 }
-            } else {
+            } else if (methodToCallName == null) {
                 unknownEndpoint(httpExchange, result);
             }
 
         } catch (IOException e) {
             e.printStackTrace();
-        }catch (WrongJsonInputData e){
-            response.setStatusCode(409);
-            response.setData(writeJSON.createErrorReply("Wrong input data"));
-            view.view(response);
         } catch (MissedJsonFieldException e) {
             response.setStatusCode(404);
             response.setData(writeJSON.createErrorReply("No field"));
@@ -436,8 +433,7 @@ System.out.println(result);
             System.out.println("Wrong database connection");
         } catch (WrongJsonException e) {
             response.setStatusCode(409);
-            response.setData(writeJSON.createErrorReply("Wrong input data"));
-            view.view(response);
+            response.setData(writeJSON.createErrorReply("Wrong data"));
         } catch (noItemWithSuchNameException e) {
             System.out.println("No item with such name");
         } catch (wrongNotUniqueValue e) {
