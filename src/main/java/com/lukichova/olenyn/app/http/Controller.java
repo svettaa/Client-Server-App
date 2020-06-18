@@ -42,7 +42,7 @@ public class Controller implements HttpHandler {
     }
 
    private void loginHandler(final HttpExchange httpExchange,   Map<String, Object> pathParams ) {
-       System.out.println("2");
+
        LoginResponse loginResponse = null;
 
 
@@ -54,17 +54,14 @@ public class Controller implements HttpHandler {
             System.out.println(password);
 
            UserCredential userCredential = new UserCredential(login,password);
-           System.out.println("2");
+
            User user = userDao.getByLogin(userCredential.getLogin());
-          // if(userDao.getByLogin(userCredential.getLogin())==null){ System.out.println("help me ple");}
-           System.out.println("4");
+
            httpExchange.getResponseHeaders()
                    .add("Content-Type", "application/json");
-           System.out.println("5");
-           Response response = new Response();
-           System.out.println("5 1");
-           response.setStatusCode(200);
-           System.out.println("5 2");
+
+
+
 try {
 
       if(user!=null){
@@ -81,11 +78,10 @@ finally {
 
                    loginResponse = new LoginResponse( user.getLogin(), user.getRole());
 
-    System.out.println("6");
+
     writeJSON.writeResponseAutorization(httpExchange, 200, loginResponse);
-    response.setHttpExchange(httpExchange);
-    System.out.println("7");
-    view.view(response);
+
+
 
                } else {
                    writeJSON.writeResponseAutorization(httpExchange, 401, writeJSON.createErrorReply("invalid password"));
@@ -382,12 +378,11 @@ System.out.println(result);
 
             if (method.equals("get")) {
                 System.out.println(result);
-             //   if (requestUriPath.equals("/login")) {
+
                 if (Pattern.matches("/login", requestUriPath)){
-                    System.out.println("333");
-                    System.out.println("1");
+
                     loginHandler(httpExchange,requestParameters);
-                    System.out.println("3");
+
                 }
                 if (requestUriPath.equals("/api/goods")) {
                     getGoods(httpExchange, result);

@@ -39,7 +39,7 @@ public class UserDao {
             sqlException.printStackTrace();
             throw new wrongDataBaseConnection();
         } finally {
-            //close(connection, preparedStatement, rs);
+            close(connection, preparedStatement, rs);
         }
     }
     private User createUser(ResultSet rs) throws SQLException {
