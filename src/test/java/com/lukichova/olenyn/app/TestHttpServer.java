@@ -25,8 +25,8 @@ public class TestHttpServer {
 
         Group group = new Group(2, "dairy products", "so many dairy products");
         Goods goods = new Goods(2, "milk", new BigDecimal("20"), 35, "Yagotinske", "best milk", 2);
-                gd.create(goods);
-        groupDao.create(group);
+              //  gd.create(goods);
+       // groupDao.create(group);
 
 
         response = new ReceivedResponse("DELETE", "/api/goods/2",
