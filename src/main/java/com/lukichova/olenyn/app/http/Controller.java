@@ -1,6 +1,5 @@
 package com.lukichova.olenyn.app.http;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lukichova.olenyn.app.DB.*;
 import com.lukichova.olenyn.app.Exceptions.*;
 import com.lukichova.olenyn.app.JSON.ReadJSON;
@@ -132,14 +131,14 @@ finally {
         view.view(response);
     }
 
-    public void deleteGroupById(HttpExchange httpExchange, Map result) throws WrongServerJsonException, wrongDataBaseConnection {
+    public void deleteGroupById(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection, noItemWithSuchIdException {
 
         String[] parts = (String[]) result.get("requestUriPathParts");
         int id = Integer.parseInt(parts[3]);
 
         Response response = new Response();
         groupService.delete(id);
-
+        goodsService.deleteByGroupId(id);
         response.setStatusCode(204);
         response.setData(null);
         response.setHttpExchange(httpExchange);
@@ -159,7 +158,7 @@ finally {
 
     }
 
-    public void putGroup(HttpExchange httpExchange, Map result) throws noItemWithSuchNameException, wrongDataBaseConnection, wrongNotUniqueValue, IOException, WrongJsonException, MissedJsonFieldException {
+    public void putGroup(HttpExchange httpExchange, Map result) throws noItemWithSuchNameException, wrongDataBaseConnection, wrongNotUniqueValue, IOException, MissedJsonFieldException, WrongJsonInputData, WrongJsonException {
         Response response = new Response();
         response.setHttpExchange(httpExchange);
 
@@ -178,7 +177,7 @@ finally {
         view.view(response);
     }
 
-    public void postGroup(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException {
+    public void postGroup(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
         Response response = new Response();
         response.setHttpExchange(httpExchange);
 
@@ -286,7 +285,7 @@ finally {
         view.view(response);
     }
 
-    public void putGoods(HttpExchange httpExchange, Map result) throws noItemWithSuchNameException, wrongDataBaseConnection, wrongNotUniqueValue, IOException, WrongJsonException, MissedJsonFieldException {
+    public void putGoods(HttpExchange httpExchange, Map result) throws noItemWithSuchNameException, wrongDataBaseConnection, wrongNotUniqueValue, IOException, WrongJsonException, MissedJsonFieldException, WrongJsonInputData {
         Response response = new Response();
         response.setHttpExchange(httpExchange);
 
@@ -313,7 +312,7 @@ finally {
         return bufferedReader.readLine();
     }
 
-    public void postGoods(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException {
+    public void postGoods(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
         Response response = new Response();
         response.setHttpExchange(httpExchange);
 
@@ -377,50 +376,58 @@ System.out.println(result);
 
 
             if (method.equals("get")) {
-                System.out.println(result);
-
                 if (Pattern.matches("/login", requestUriPath)){
-
                     loginHandler(httpExchange,requestParameters);
-
                 }
-                if (requestUriPath.equals("/api/goods")) {
+                if (Pattern.matches("^/api/goods/$", requestUriPath)) {
                     getGoods(httpExchange, result);
-                } else if (Pattern.matches("/api/goods/\\d+", requestUriPath)) {
+                } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
                     getGoodsById(httpExchange, result);
-                } else if (Pattern.matches("/api/group", requestUriPath)) {
+                } else if (Pattern.matches("^/api/group$", requestUriPath)) {
                     getGroup(httpExchange, result);
-                } else if (Pattern.matches("/api/group/\\d+", requestUriPath)) {
+                } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {
                     getGroupById(httpExchange, result);
+                }else {
+                    unknownEndpoint(httpExchange, result);
                 }
             } else if (method.equals("delete")) {
-                if (requestUriPath.equals("/api/goods")) {
+                if (Pattern.matches("^/api/goods$", requestUriPath)) {
                     deleteAllGoods(httpExchange, result);
-                } else if (Pattern.matches("/api/goods/\\d+", requestUriPath)) {
+                } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
                     deleteGoodsById(httpExchange, result);
-                } else if (Pattern.matches("/api/group", requestUriPath)) {
+                } else if (Pattern.matches("^/api/group$", requestUriPath)) {
                     deleteAllGroups(httpExchange, result);
-                } else if (Pattern.matches("/api/group/\\d+", requestUriPath)) {
+                } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {
                     deleteGroupById(httpExchange, result);
+                }else {
+                    unknownEndpoint(httpExchange, result);
                 }
             } else if (method.equals("put")) {
-                if (Pattern.matches("/api/goods", requestUriPath)) {
+                if (Pattern.matches("^/api/goods$", requestUriPath)) {
                     putGoods(httpExchange, result);
-                } else if(Pattern.matches("/api/group", requestUriPath)){
+                } else if(Pattern.matches("^/api/group$", requestUriPath)){
                     putGroup(httpExchange, result);
+                }else {
+                    unknownEndpoint(httpExchange, result);
                 }
             } else if (method.equals("post")) {
-                if (requestUriPath.equals("/api/goods")) {
+                if (requestUriPath.equals("^/api/goods$")) {
                     postGoods(httpExchange, result);
-                } else if(Pattern.matches("/api/group", requestUriPath)){
+                } else if (Pattern.matches("^/api/group$", requestUriPath)) {
                     postGroup(httpExchange, result);
+                }else {
+                    unknownEndpoint(httpExchange, result);
                 }
-            } else if (methodToCallName == null) {
+            } else {
                 unknownEndpoint(httpExchange, result);
             }
 
         } catch (IOException e) {
             e.printStackTrace();
+        }catch (WrongJsonInputData e){
+            response.setStatusCode(409);
+            response.setData(writeJSON.createErrorReply("Wrong input data"));
+            view.view(response);
         } catch (MissedJsonFieldException e) {
             response.setStatusCode(404);
             response.setData(writeJSON.createErrorReply("No field"));
@@ -429,7 +436,8 @@ System.out.println(result);
             System.out.println("Wrong database connection");
         } catch (WrongJsonException e) {
             response.setStatusCode(409);
-            response.setData(writeJSON.createErrorReply("Wrong data"));
+            response.setData(writeJSON.createErrorReply("Wrong input data"));
+            view.view(response);
         } catch (noItemWithSuchNameException e) {
             System.out.println("No item with such name");
         } catch (wrongNotUniqueValue e) {

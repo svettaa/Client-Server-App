@@ -2,10 +2,7 @@ package com.lukichova.olenyn.app.service;
 
 import com.lukichova.olenyn.app.DB.Group;
 import com.lukichova.olenyn.app.DB.GroupDao;
-import com.lukichova.olenyn.app.Exceptions.noItemWithSuchIdException;
-import com.lukichova.olenyn.app.Exceptions.noItemWithSuchNameException;
-import com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection;
-import com.lukichova.olenyn.app.Exceptions.wrongNotUniqueValue;
+import com.lukichova.olenyn.app.Exceptions.*;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
@@ -28,11 +25,15 @@ public class GroupService {
         return groupDao.readAll();
     }
 
-    public boolean create(Group group) throws wrongNotUniqueValue, wrongDataBaseConnection {
+    public boolean create(Group group) throws wrongNotUniqueValue, wrongDataBaseConnection, WrongJsonInputData {
+        if(group.getName() == null)
+            throw new WrongJsonInputData();
         return groupDao.create(group);
     }
 
-    public boolean update(Group group) throws wrongNotUniqueValue, wrongDataBaseConnection {
+    public boolean update(Group group) throws wrongNotUniqueValue, wrongDataBaseConnection, WrongJsonInputData {
+        if (group.getName() == null)
+            throw new WrongJsonInputData();
         return groupDao.update(group);
     }
 

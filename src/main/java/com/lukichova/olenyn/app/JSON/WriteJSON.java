@@ -38,31 +38,7 @@ public class WriteJSON {
             return null;
         }
     }
-    public String createSuccessfulReply(String message) throws WrongServerJsonException {
-        try {
-            OutputStream outputStream = new ByteArrayOutputStream();
-            ObjectMapper mapper = new ObjectMapper();
 
-            ObjectNode rootNode = mapper.createObjectNode();
-            rootNode.put("message", message);
-
-            mapper.writeValue(outputStream, rootNode);
-            return outputStream.toString();
-        } catch (Exception e) {
-            throw new WrongServerJsonException();
-        }
-    }
-
-    public String createTokenReply(String jws) throws WrongServerJsonException {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            ObjectNode rootNode = mapper.createObjectNode();
-            rootNode.put("token", jws);
-            return mapper.writeValueAsString(rootNode);
-        } catch (JsonProcessingException e) {
-            throw new WrongServerJsonException();
-        }
-    }
 
     public String createErrorReply(String error){
         try {
@@ -75,20 +51,7 @@ public class WriteJSON {
             return null;
         }
     }
-    public String createCostReply(BigDecimal cost) throws WrongServerJsonException {
-        try {
-            OutputStream outputStream = new ByteArrayOutputStream();
-            ObjectMapper mapper = new ObjectMapper();
 
-            ObjectNode rootNode = mapper.createObjectNode();
-            rootNode.put("cost", cost.toString());
-
-            mapper.writeValue(outputStream, rootNode);
-            return outputStream.toString();
-        } catch (Exception e) {
-            throw new WrongServerJsonException();
-        }
-    }
     public String createGoodsReply(Goods goods) throws WrongServerJsonException {
         try {
             OutputStream outputStream = new ByteArrayOutputStream();

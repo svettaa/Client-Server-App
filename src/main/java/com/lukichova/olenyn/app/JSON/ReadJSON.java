@@ -14,28 +14,6 @@ import java.math.BigDecimal;
 public class ReadJSON {
 
 
-    public String selectToken(String json) throws WrongJsonException {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readValue(json, JsonNode.class);
-
-            return root.get("token").asText();
-        } catch (JsonProcessingException e) {
-            throw new WrongJsonException();
-        }
-    }
-
-    public Integer selectId(String json) throws WrongJsonException {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readValue(json, JsonNode.class);
-
-            return root.get("id").asInt();
-        } catch (JsonProcessingException e) {
-            throw new WrongJsonException();
-        }
-    }
-
 
     public Group selectGroup(String json) throws WrongJsonException, MissedJsonFieldException {
         try {
@@ -73,41 +51,6 @@ public class ReadJSON {
             throw new WrongJsonException();
         } catch (NullPointerException e) {
             throw new MissedJsonFieldException();
-        }
-    }
-
-    public Integer selectGroupId(String json) throws WrongJsonException {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readValue(json, JsonNode.class);
-
-            return root.get("group_id").asInt();
-        } catch (JsonProcessingException e) {
-            throw new WrongJsonException();
-        }
-    }
-
-
-    public String selectName(String json) throws WrongJsonException {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readValue(json, JsonNode.class);
-
-            return root.get("name").asText();
-        } catch (JsonProcessingException e) {
-            throw new WrongJsonException();
-        }
-    }
-
-
-    public Integer selectLeftAmount(String json) throws WrongJsonException {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readValue(json, JsonNode.class);
-
-            return root.get("left_amount").asInt();
-        } catch (JsonProcessingException e) {
-            throw new WrongJsonException();
         }
     }
 
