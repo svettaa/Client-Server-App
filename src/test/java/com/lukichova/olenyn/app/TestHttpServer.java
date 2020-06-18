@@ -22,7 +22,7 @@ public class TestHttpServer {
 //chek if it works without login (without token)
         response = new ReceivedResponse("GET", "/api/goods/100",
                 null, "");
-        response.assertResponse(404, null);
+        response.assertResponse(401, null);
 
 
 //chek login
