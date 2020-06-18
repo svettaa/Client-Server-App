@@ -1,5 +1,7 @@
 package com.lukichova.olenyn.app;
 
+import com.lukichova.olenyn.app.DB.User;
+import com.lukichova.olenyn.app.DB.UserDao;
 import com.lukichova.olenyn.app.http.Controller;
 import com.lukichova.olenyn.app.http.MyAuthenticator;
 import com.lukichova.olenyn.app.views.JsonView;
