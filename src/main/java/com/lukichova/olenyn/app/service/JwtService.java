@@ -1,22 +1,11 @@
 package com.lukichova.olenyn.app.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.lukichova.olenyn.app.DB.User;
-import com.lukichova.olenyn.app.Exceptions.WrongJsonException;
-import com.lukichova.olenyn.app.Exceptions.WrongServerJsonException;
-import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
-
-import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
-import java.security.SecureRandom;
-import java.util.Date;
 
 public class JwtService {
 

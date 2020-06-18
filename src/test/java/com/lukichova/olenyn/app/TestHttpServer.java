@@ -4,8 +4,6 @@ import com.lukichova.olenyn.app.DB.*;
 import com.lukichova.olenyn.app.http.LoginResponse;
 import org.junit.Test;
 
-import java.math.BigDecimal;
-
 import static com.lukichova.olenyn.app.service.JwtService.generateToken;
 
 public class TestHttpServer {
@@ -19,17 +17,15 @@ public class TestHttpServer {
         LoginResponse LoginedUser = new LoginResponse(tokenTest,userTest.getLogin(),userTest.getRole());
         String token=LoginedUser.getToken();
 
-//chek if it works without login (without token)
-        response = new ReceivedResponse("GET", "/api/goods/100",
-                null, "");
-        response.assertResponse(401, null);
 
-
-//chek login
-
+        //check login
         response = new ReceivedResponse("GET", "/login?login=lll&password=ppp",
                 null, "");
         response.assertResponse(200, null);
+
+        response = new ReceivedResponse("GET", "/login?login=1lll&password=ppp",
+                null, "");
+        response.assertResponse(401, null);
 
         // delete
         response = new ReceivedResponse("DELETE", "/api/goods/100",

@@ -10,7 +10,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.lukichova.olenyn.app.resoures.Resoures.GOODS_TABLE;
 import static com.lukichova.olenyn.app.resoures.Resoures.USERS_TABLE;
 import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
 

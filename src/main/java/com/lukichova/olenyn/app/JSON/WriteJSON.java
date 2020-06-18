@@ -10,7 +10,6 @@ import com.lukichova.olenyn.app.DB.Group;
 import com.lukichova.olenyn.app.Exceptions.WrongAuthorizationException;
 import com.lukichova.olenyn.app.Exceptions.WrongServerJsonException;
 import com.lukichova.olenyn.app.http.LoginResponse;
-import com.sun.net.httpserver.HttpExchange;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -11,15 +11,11 @@ import com.lukichova.olenyn.app.service.JwtService;
 import com.lukichova.olenyn.app.views.View;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.lang.UnknownClassException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +32,7 @@ public class Controller implements HttpHandler {
     private final GoodsService goodsService = new GoodsService();
     private final GroupService groupService = new GroupService();
     JwtService jwtService = new JwtService();
+
     public static void setView(View newView) {
         view = newView;
     }
@@ -43,65 +40,41 @@ public class Controller implements HttpHandler {
     private void loginHandler(final HttpExchange httpExchange, Map<String, Object> pathParams) throws noItemWithSuchIdException, wrongDataBaseConnection, IOException, WrongAuthorizationException {
 
         LoginResponse loginResponse = null;
+        UserDao userDao = new UserDao();
+        String password = (String) pathParams.get("password");
+        String login = (String) pathParams.get("login");
+        UserCredential userCredential = new UserCredential(login, password);
+        User user = userDao.getByLogin(userCredential.getLogin());
+        httpExchange.getResponseHeaders()
+                .add("Content-Type", "application/json");
+        Response response = new Response();
+        String token = null;
+
+        if (user != null) {
+            token = generateToken(user);
+
+        } else {
+            response.setStatusCode(401);
+            response.setData(writeJSON.createErrorReply("Unauthorized"));
+        }
 
 
+        if (user != null) {
+            if (user.getPassword().equals(md5Hex(userCredential.getPassword()))) {
 
-            UserDao userDao = new UserDao();
+                loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
 
-            String password = (String) pathParams.get("password");
-            String login = (String) pathParams.get("login");
-
-
-            UserCredential userCredential = new UserCredential(login, password);
-
-            User user = userDao.getByLogin(userCredential.getLogin());
-
-
-            httpExchange.getResponseHeaders()
-                    .add("Content-Type", "application/json");
-            Response response = new Response();
-            String token = null;
-
-
-            if (user != null) {
-                token = generateToken(user);
+                jwtService.token = token;
+                response.setStatusCode(200);
+                response.setData(writeJSON.writeResponseAutorization(loginResponse));
 
             } else {
                 response.setStatusCode(401);
-                response.setData(writeJSON.createErrorReply("Unauthorized"));
-
-
-
+                response.setData(writeJSON.createErrorReply("invalid password"));
             }
-
-
-            if (user != null) {
-                if (user.getPassword().equals(md5Hex(userCredential.getPassword()))) {
-
-                    loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
-
-
-                    jwtService.token=token;
-                    response.setStatusCode(200);
-                    response.setData(writeJSON.writeResponseAutorization(loginResponse));
-
-
-
-
-
-
-                } else {
-                    response.setStatusCode(401);
-                    response.setData(writeJSON.createErrorReply("invalid password"));
-
-
-                }
-            }
-            response.setHttpExchange(httpExchange);
-            view.view(response);
-
-
-
+        }
+        response.setHttpExchange(httpExchange);
+        view.view(response);
     }
     //group
 
@@ -408,60 +381,57 @@ public class Controller implements HttpHandler {
             if (method.equals("get") && Pattern.matches("/login", requestUriPath)) {
                 loginHandler(httpExchange, requestParameters);
 
-            }
-            else{
+            } else {
 
 
-                if(jwtService.token!=""){
+                if (jwtService.token != "") {
 
 
-            if (method.equals("get")) {
-              //  JwtService.getUsernameFromToken()
-                 if (Pattern.matches("^/api/goods/$", requestUriPath)) {
-                    getGoods(httpExchange, result);
-                } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
-                    getGoodsById(httpExchange, result);
-                } else if (Pattern.matches("^/api/group$", requestUriPath)) {
-                    getGroup(httpExchange, result);
-                } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {
-                    getGroupById(httpExchange, result);
-                } else {
-                    unknownEndpoint(httpExchange, result);
-                }
-            } else if (method.equals("delete")) {
-                if (Pattern.matches("^/api/goods$", requestUriPath)) {
-                    deleteAllGoods(httpExchange, result);
-                } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
-                    deleteGoodsById(httpExchange, result);
-                } else if (Pattern.matches("^/api/group$", requestUriPath)) {
-                    deleteAllGroups(httpExchange, result);
-                } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {
-                    deleteGroupById(httpExchange, result);
-                } else {
-                    unknownEndpoint(httpExchange, result);
-                }
-            } else if (method.equals("put")) {
-                if (Pattern.matches("^/api/goods$", requestUriPath)) {
-                    putGoods(httpExchange, result);
-                } else if (Pattern.matches("^/api/group$", requestUriPath)) {
-                    putGroup(httpExchange, result);
-                } else {
-                    unknownEndpoint(httpExchange, result);
-                }
-            } else if (method.equals("post")) {
-                if (Pattern.matches("^/api/goods$", requestUriPath)) {
-                    postGoods(httpExchange, result);
-                } else if (Pattern.matches("^/api/group$", requestUriPath)) {
-                    postGroup(httpExchange, result);
-                } else {
-                    unknownEndpoint(httpExchange, result);
-                }
-            }
+                    if (method.equals("get")) {
+                        //  JwtService.getUsernameFromToken()
+                        if (Pattern.matches("^/api/goods/$", requestUriPath)) {
+                            getGoods(httpExchange, result);
+                        } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
+                            getGoodsById(httpExchange, result);
+                        } else if (Pattern.matches("^/api/group$", requestUriPath)) {
+                            getGroup(httpExchange, result);
+                        } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {
+                            getGroupById(httpExchange, result);
+                        } else {
+                            unknownEndpoint(httpExchange, result);
+                        }
+                    } else if (method.equals("delete")) {
+                        if (Pattern.matches("^/api/goods$", requestUriPath)) {
+                            deleteAllGoods(httpExchange, result);
+                        } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
+                            deleteGoodsById(httpExchange, result);
+                        } else if (Pattern.matches("^/api/group$", requestUriPath)) {
+                            deleteAllGroups(httpExchange, result);
+                        } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {
+                            deleteGroupById(httpExchange, result);
+                        } else {
+                            unknownEndpoint(httpExchange, result);
+                        }
+                    } else if (method.equals("put")) {
+                        if (Pattern.matches("^/api/goods$", requestUriPath)) {
+                            putGoods(httpExchange, result);
+                        } else if (Pattern.matches("^/api/group$", requestUriPath)) {
+                            putGroup(httpExchange, result);
+                        } else {
+                            unknownEndpoint(httpExchange, result);
+                        }
+                    } else if (method.equals("post")) {
+                        if (Pattern.matches("^/api/goods$", requestUriPath)) {
+                            postGoods(httpExchange, result);
+                        } else if (Pattern.matches("^/api/group$", requestUriPath)) {
+                            postGroup(httpExchange, result);
+                        } else {
+                            unknownEndpoint(httpExchange, result);
+                        }
+                    }
 
 
-                }else throw new WrongAuthorizationException();
-
-
+                } else throw new WrongAuthorizationException();
 
 
             }
