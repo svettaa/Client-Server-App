@@ -19,10 +19,13 @@ public class TestHttpServer {
         LoginResponse LoginedUser = new LoginResponse(tokenTest,userTest.getLogin(),userTest.getRole());
         String token=LoginedUser.getToken();
 
-//chek if it works without login
+//chek if it works without login (without token)
         response = new ReceivedResponse("GET", "/api/goods/100",
                 null, "");
         response.assertResponse(404, null);
+
+
+//chek login
 
         response = new ReceivedResponse("GET", "/login?login=lll&password=ppp",
                 null, "");
