@@ -12,6 +12,7 @@ import java.util.List;
 
 import static com.lukichova.olenyn.app.resoures.Resoures.GOODS_TABLE;
 import static com.lukichova.olenyn.app.resoures.Resoures.USERS_TABLE;
+import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
 
 public class UserDao {
 
@@ -108,10 +109,9 @@ public class UserDao {
 
     public boolean create(User user) throws wrongDataBaseConnection, wrongNotUniqueValue {
         System.out.println("create() invoked");
-
+       String password = md5Hex(user.getPassword());
         Connection connection = null;
         PreparedStatement preparedStatement = null;
-
         try {
             connection = DriverManager.getConnection(DataBase.url);
 
@@ -123,7 +123,7 @@ public class UserDao {
                 preparedStatement = connection.prepareStatement(sqlQuery);
 
                 preparedStatement.setString(1, user.getLogin());
-                preparedStatement.setString(2, user.getPassword());
+                preparedStatement.setString(2, password);
                 preparedStatement.setString(3, user.getRole());
 
                 preparedStatement.executeUpdate();
