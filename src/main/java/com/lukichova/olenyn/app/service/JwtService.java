@@ -24,6 +24,11 @@ public class JwtService {
 
     public String token="";
 
+
+    public String getToken() {
+        return this.token;
+
+    }
     public static String generateToken(final User user) {
 
         return Jwts.builder()

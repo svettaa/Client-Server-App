@@ -14,13 +14,20 @@ public class TestHttpServer {
     public void testHTTP() throws Exception {
         ReceivedResponse response;
 
-        User userTest = new User("loginn","password","role");
+        User userTest = new User("lll","ppp","role");
         String tokenTest = generateToken(userTest);
         LoginResponse LoginedUser = new LoginResponse(tokenTest,userTest.getLogin(),userTest.getRole());
         String token=LoginedUser.getToken();
 
+//chek if it works without login
         response = new ReceivedResponse("GET", "/api/goods/100",
-                null, token);
+                null, "");
+        response.assertResponse(404, null);
+
+        response = new ReceivedResponse("GET", "/login?login=lll&password=ppp",
+                null, "");
+        response.assertResponse(200, null);
+
         // delete
         response = new ReceivedResponse("DELETE", "/api/goods/100",
                 null, token);
