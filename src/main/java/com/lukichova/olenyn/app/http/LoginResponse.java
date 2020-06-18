@@ -13,7 +13,8 @@ public class LoginResponse {
     private String login;
     private String role;
 
-    public LoginResponse(String token,String login, String role) {
+    public LoginResponse(String token, String login, String role) {
+
 
         this.login = login;
         this.token = token;
