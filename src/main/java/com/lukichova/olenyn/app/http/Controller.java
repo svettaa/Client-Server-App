@@ -34,7 +34,6 @@ public class Controller implements HttpHandler {
     private final WriteJSON writeJSON = new WriteJSON();
     private final GoodsService goodsService = new GoodsService();
     private final GroupService groupService = new GroupService();
-    protected static SecureRandom random = new SecureRandom();
 
     public static void setView(View newView) {
         view = newView;
@@ -45,7 +44,7 @@ public class Controller implements HttpHandler {
         LoginResponse loginResponse = null;
 
 
-        try (final InputStream requestBody = httpExchange.getRequestBody()) {
+        try {
             UserDao userDao = new UserDao();
 
             String password = (String) pathParams.get("password");
@@ -59,38 +58,45 @@ public class Controller implements HttpHandler {
 
             httpExchange.getResponseHeaders()
                     .add("Content-Type", "application/json");
-
+            Response response = new Response();
             String token = null;
 
 
-            try {
+            if (user != null) {
+                token = generateToken(user);
 
-                if (user != null) {
-                    token = generateToken(user);
-                    loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
-                } else {
-                    writeJSON.writeResponseAutorization(httpExchange, 401, writeJSON.createErrorReply("Unauthorized"));
-
-                }
-            } catch (UnknownClassException e) {
-
-            } finally {
-
-                if (user != null) {
-                    if (user.getPassword().equals(md5Hex(userCredential.getPassword()))) {
-
-                        loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
+            } else {
+                response.setStatusCode(401);
+                response.setData(writeJSON.createErrorReply("Unauthorized"));
 
 
-                        writeJSON.writeResponseAutorization(httpExchange, 200, loginResponse);
-
-                    } else {
-                        writeJSON.writeResponseAutorization(httpExchange, 401, writeJSON.createErrorReply("invalid password"));
-
-                    }
-                }
 
             }
+
+
+            if (user != null) {
+                if (user.getPassword().equals(md5Hex(userCredential.getPassword()))) {
+
+                    loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
+
+
+                    response.setStatusCode(200);
+                    response.setData(writeJSON.writeResponseAutorization(loginResponse));
+
+
+
+
+
+
+                } else {
+                    response.setStatusCode(401);
+                    response.setData(writeJSON.createErrorReply("invalid password"));
+
+
+                }
+            }
+            response.setHttpExchange(httpExchange);
+            view.view(response);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -140,12 +146,11 @@ public class Controller implements HttpHandler {
 
         Response response = new Response();
 
-        try{
+        try {
             groupService.delete(id);
 
-            response.setStatusCode(204);}
-
-        catch (noItemWithSuchIdException e) {
+            response.setStatusCode(204);
+        } catch (noItemWithSuchIdException e) {
 
             response.setStatusCode(404);
         }
@@ -286,16 +291,15 @@ public class Controller implements HttpHandler {
         int id = Integer.parseInt(parts[3]);
 
         Response response = new Response();
-try{
-        goodsService.delete(id);
+        try {
+            goodsService.delete(id);
 
 
-        response.setStatusCode(204);}
+            response.setStatusCode(204);
+        } catch (noItemWithSuchIdException e) {
 
-catch (noItemWithSuchIdException e){
-
-    response.setStatusCode(404);
-}
+            response.setStatusCode(404);
+        }
         response.setHttpExchange(httpExchange);
         response.setData(null);
 
@@ -338,13 +342,12 @@ catch (noItemWithSuchIdException e){
         Goods goods = readJSON.selectGoods(body);
 
 
-        try{
+        try {
             goodsService.update(goods);
 
 
-            response.setStatusCode(204);}
-
-        catch (noItemWithSuchIdException e){
+            response.setStatusCode(204);
+        } catch (noItemWithSuchIdException e) {
 
             response.setStatusCode(404);
         }
@@ -447,27 +450,26 @@ catch (noItemWithSuchIdException e){
                     unknownEndpoint(httpExchange, result);
                 }
             }
-            }
-        catch(MissedJsonFieldException | noItemWithSuchIdException e){
+        } catch (MissedJsonFieldException | noItemWithSuchIdException e) {
             response.setStatusCode(404);
             response.setData(writeJSON.createErrorReply("No field"));
             view.view(response);
-        }catch(IOException e){
-                e.printStackTrace();
-            } catch(WrongJsonInputData | WrongJsonException e){
-                response.setStatusCode(409);
-                response.setData(writeJSON.createErrorReply("Wrong input data"));
-                view.view(response);
-            }  catch(wrongDataBaseConnection e){
-                System.out.println("Wrong database connection");
-            } catch(noItemWithSuchNameException e){
-                System.out.println("No item with such name");
-            } catch(wrongNotUniqueValue e){
-                System.out.println("Not unique value");
-            } catch(WrongServerJsonException e){
-                e.printStackTrace();
-            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (WrongJsonInputData | WrongJsonException e) {
+            response.setStatusCode(409);
+            response.setData(writeJSON.createErrorReply("Wrong input data"));
+            view.view(response);
+        } catch (wrongDataBaseConnection e) {
+            System.out.println("Wrong database connection");
+        } catch (noItemWithSuchNameException e) {
+            System.out.println("No item with such name");
+        } catch (wrongNotUniqueValue e) {
+            System.out.println("Not unique value");
+        } catch (WrongServerJsonException e) {
+            e.printStackTrace();
         }
-
-
     }
+
+
+}
