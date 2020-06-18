@@ -43,15 +43,9 @@ public class Controller implements HttpHandler {
     public static void setView(View newView) {
         view = newView;
     }
-    public static String generateTokenn(String username) {
-        long longToken = Math.abs( random.nextLong() );
-        String random = Long.toString( longToken, 16 );
-        return ( username + ":" + random );
-    }
 
-    public static String generateJws(String email, String password){
-        return Jwts.builder().setSubject(email+password).signWith(SECRET_KEY).compact();
-    }
+
+
 
     public static String generateToken(final User user) {
 
@@ -83,17 +77,17 @@ public class Controller implements HttpHandler {
            httpExchange.getResponseHeaders()
                    .add("Content-Type", "application/json");
 
-           String token = generateJws(user.getLogin(),user.getRole());
+           String token = generateToken(user);
            System.out.println(token);
 
 try {
 
       if(user!=null){
           System.out.println("3");
-     loginResponse = new LoginResponse(generateToken(user), user.getLogin(), user.getRole());
+     loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
           System.out.println("3");}
       else {
-          writeJSON.writeResponseAutorization(httpExchange, 401,writeJSON.createErrorReply("unknown user"));
+          writeJSON.writeResponseAutorization(httpExchange, 401,writeJSON.createErrorReply("Unauthorized"));
 
       }
 }catch (UnknownClassException e){}
@@ -102,7 +96,7 @@ finally {
            if (user != null) {
                if (user.getPassword().equals(md5Hex(userCredential.getPassword()))) {
 
-                   loginResponse = new LoginResponse(generateToken(user), user.getLogin(), user.getRole());
+                   loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
 
 
                    writeJSON.writeResponseAutorization(httpExchange, 200, loginResponse);
