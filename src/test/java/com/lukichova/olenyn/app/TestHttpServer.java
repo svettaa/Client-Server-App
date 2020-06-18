@@ -1,60 +1,67 @@
 package com.lukichova.olenyn.app;
 
+import com.lukichova.olenyn.app.DB.User;
+import com.lukichova.olenyn.app.http.LoginResponse;
 import org.junit.Test;
+
+import static com.lukichova.olenyn.app.service.JwtService.generateToken;
 
 public class TestHttpServer {
 
     @Test
     public void testHTTP() throws Exception {
-        ReceivedResponse response;
-        String token;
 
+        ReceivedResponse response;
+        User userTest = new User("loginn","password","role");
+        String tokenTest = generateToken(userTest);
+        LoginResponse LoginedUser = new LoginResponse(tokenTest,userTest.getLogin(),userTest.getRole());
+        String token=LoginedUser.getToken();
 
 
         // delete all
 
         response = new ReceivedResponse("DELETE", "/api/goods",
-                null, null);
+                null, token);
         response.assertResponse(204, null);
 
 
         response = new ReceivedResponse("DELETE", "/api/group",
-                null, null);
+                null, token);
         response.assertResponse(204, null);
 
 
         // test groups
         response = new ReceivedResponse("PUT", "/api/group",
-                "{\"id\": 1, \"name\": \"Diary products\", \"description\": \"Tasty diary products\"}", null);
+                "{\"id\": 1, \"name\": \"Diary products\", \"description\": \"Tasty diary products\"}", token);
         response.assertResponse(201, "{\"id\":1}");
 
 
         response = new ReceivedResponse("PUT", "/api/group",
-                "{\"id\": 2, \"name\": \"Drinks\"}", null);
+                "{\"id\": 2, \"name\": \"Drinks\"}", token);
         response.assertResponse(201, "{\"id\":2}");
 
 
         response = new ReceivedResponse("PUT", "/api/group",
-                "{\"id\": 3, \"name\": \"Clothes\", \"description\": \"Clothes\"}", null);
+                "{\"id\": 3, \"name\": \"Clothes\", \"description\": \"Clothes\"}", token);
         response.assertResponse(201, "{\"id\":3}");
 
 
         response = new ReceivedResponse("POST", "/api/group",
-                "{\"id\": 3, \"name\": \"Jeans\", \"description\": \"Jeans\"}", null);
+                "{\"id\": 3, \"name\": \"Jeans\", \"description\": \"Jeans\"}", token);
         response.assertResponse(204, null);
 
         response = new ReceivedResponse("GET", "/api/group/3",
-                null, null);
+                null, token);
         response.assertResponse(200, "{\"id\":3,\"name\":\"Jeans\",\"description\":\"Jeans\"}");
 
         //error 409
         response = new ReceivedResponse("PUT", "/api/group",
-                "{\"name\": }", null);
+                "{\"name\": }", token);
         response.assertResponse(409, null);
 
         //error 404
         response = new ReceivedResponse("GET", "/api/group/02329",
-                null, null);
+                null, token);
         response.assertResponse(404, null);
 
 
@@ -92,12 +99,12 @@ public class TestHttpServer {
         response.assertResponse(204, null);
 
         response = new ReceivedResponse("GET", "/api/goods/10",
-                null, null);
+                null, token);
         response.assertResponse(200, "{\"id\":10,\"name\":\"cola\",\"producer\":\"Coca Cola\",\"description\":\"Tasty cola\",\"left_amount\":16,\"price\":\"10\",\"group_id\":2}");
 
         //error 404
         response = new ReceivedResponse("GET", "/api/goods/02329",
-                null, null);
+                null, token);
         response.assertResponse(404, null);
     }
 }

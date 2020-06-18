@@ -428,7 +428,6 @@ public class Controller implements HttpHandler {
                 response.setData(writeJSON.createErrorReply("Wrong input data"));
                 view.view(response);
             } catch(MissedJsonFieldException | noItemWithSuchIdException e){
-
                 response.setStatusCode(404);
                 response.setData(writeJSON.createErrorReply("No field"));
                 view.view(response);
