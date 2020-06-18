@@ -373,7 +373,7 @@ public class Controller implements HttpHandler {
             if (method.equals("get")) {
                 if (Pattern.matches("/login", requestUriPath)) {
                     loginHandler(httpExchange, requestParameters);
-                }else if (Pattern.matches("^/api/goods/$", requestUriPath)) {
+                } else if (Pattern.matches("^/api/goods/$", requestUriPath)) {
                     getGoods(httpExchange, result);
                 } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
                     getGoodsById(httpExchange, result);
@@ -405,7 +405,7 @@ public class Controller implements HttpHandler {
                     unknownEndpoint(httpExchange, result);
                 }
             } else if (method.equals("post")) {
-                if (requestUriPath.equals("^/api/goods$")) {
+                if (Pattern.matches("^/api/goods$", requestUriPath)) {
                     postGoods(httpExchange, result);
                 } else if (Pattern.matches("^/api/group$", requestUriPath)) {
                     postGroup(httpExchange, result);
