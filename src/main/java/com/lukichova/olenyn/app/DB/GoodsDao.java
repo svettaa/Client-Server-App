@@ -187,11 +187,20 @@ public class GoodsDao {
         }
     }
 
-    public boolean update(Goods goods) throws wrongDataBaseConnection, wrongNotUniqueValue {
+    public boolean update(Goods goods) throws wrongDataBaseConnection, wrongNotUniqueValue, noItemWithSuchIdException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
+
+
+
+
+
+
+
+
         try {
             connection = DriverManager.getConnection(DataBase.url);
+
             String sqlQuery = "UPDATE " + GOODS_TABLE + " " +
                     "SET name = ?, " +
                     "price = ?, " +
