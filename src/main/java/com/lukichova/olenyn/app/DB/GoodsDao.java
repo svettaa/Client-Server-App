@@ -187,9 +187,12 @@ public class GoodsDao {
         }
     }
 
-    public boolean update(Goods goods) throws wrongDataBaseConnection, wrongNotUniqueValue {
+    public boolean update(Goods goods) throws wrongDataBaseConnection, noItemWithSuchIdException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
+        //Goods g = new Goods();
+        //g=getById(goods.getId());
+
         try {
             connection = DriverManager.getConnection(DataBase.url);
             String sqlQuery = "UPDATE " + GOODS_TABLE + " " +
@@ -219,7 +222,7 @@ public class GoodsDao {
             return true;
         } catch (SQLiteException e) {
 
-            throw new wrongNotUniqueValue();
+            throw new noItemWithSuchIdException();
 
         } catch (SQLException sqlException) {
             throw new wrongDataBaseConnection();

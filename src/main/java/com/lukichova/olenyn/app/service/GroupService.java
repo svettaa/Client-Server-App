@@ -32,7 +32,7 @@ public class GroupService {
     }
 
     public boolean update(Group group) throws wrongNotUniqueValue, wrongDataBaseConnection, WrongJsonInputData {
-        if (group.getName() == null)
+        if (group.getId() == null || group.getName() == null)
             throw new WrongJsonInputData();
         return groupDao.update(group);
     }

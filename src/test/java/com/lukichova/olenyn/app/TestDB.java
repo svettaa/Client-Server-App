@@ -69,6 +69,7 @@ public class TestDB {
         Assert.assertEquals(newGroup, groupService.listByCriteria(18));
 
         Assert.assertTrue(groupService.delete(18));
+
         try {
             groupService.listByCriteria(18);
             Assert.assertTrue(false);
