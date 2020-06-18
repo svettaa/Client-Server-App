@@ -20,22 +20,6 @@ public class TestHttpServer {
         String token=LoginedUser.getToken();
 
         // delete
-        GoodsDao gd= new GoodsDao();
-        GroupDao groupDao= new GroupDao();
-
-        Group group = new Group(2, "dairy products", "so many dairy products");
-        Goods goods = new Goods(2, "milk", new BigDecimal("20"), 35, "Yagotinske", "best milk", 2);
-              //  gd.create(goods);
-       // groupDao.create(group);
-
-
-        response = new ReceivedResponse("DELETE", "/api/goods/2",
-                null, token);
-        response.assertResponse(204, null);
-
-        response = new ReceivedResponse("DELETE", "/api/group/2",
-                null, token);
-        response.assertResponse(204, null);
         response = new ReceivedResponse("DELETE", "/api/goods/100",
                 null, token);
         response.assertResponse(404, null);
@@ -148,6 +132,12 @@ public class TestHttpServer {
        response.assertResponse(404, null);
 
 
+        response = new ReceivedResponse("DELETE", "/api/goods/2",
+                null, token);
+        response.assertResponse(204, null);
 
+        response = new ReceivedResponse("DELETE", "/api/group/2",
+                null, token);
+        response.assertResponse(204, null);
     }
 }
