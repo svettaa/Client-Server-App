@@ -19,6 +19,8 @@ public class TestHttpServer {
         LoginResponse LoginedUser = new LoginResponse(tokenTest,userTest.getLogin(),userTest.getRole());
         String token=LoginedUser.getToken();
 
+        response = new ReceivedResponse("GET", "/api/goods/100",
+                null, token);
         // delete
         response = new ReceivedResponse("DELETE", "/api/goods/100",
                 null, token);

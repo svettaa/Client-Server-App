@@ -22,6 +22,7 @@ public class JwtService {
 
     public static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
+    public String token="";
 
     public static String generateToken(final User user) {
 

@@ -7,6 +7,7 @@ import com.lukichova.olenyn.app.JSON.WriteJSON;
 import com.lukichova.olenyn.app.dto.Response;
 import com.lukichova.olenyn.app.service.GoodsService;
 import com.lukichova.olenyn.app.service.GroupService;
+import com.lukichova.olenyn.app.service.JwtService;
 import com.lukichova.olenyn.app.views.View;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -34,17 +35,17 @@ public class Controller implements HttpHandler {
     private final WriteJSON writeJSON = new WriteJSON();
     private final GoodsService goodsService = new GoodsService();
     private final GroupService groupService = new GroupService();
-
+    JwtService jwtService = new JwtService();
     public static void setView(View newView) {
         view = newView;
     }
 
-    private void loginHandler(final HttpExchange httpExchange, Map<String, Object> pathParams) {
+    private void loginHandler(final HttpExchange httpExchange, Map<String, Object> pathParams) throws noItemWithSuchIdException, wrongDataBaseConnection, IOException, WrongAuthorizationException {
 
         LoginResponse loginResponse = null;
 
 
-        try {
+
             UserDao userDao = new UserDao();
 
             String password = (String) pathParams.get("password");
@@ -80,6 +81,7 @@ public class Controller implements HttpHandler {
                     loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
 
 
+                    jwtService.token=token;
                     response.setStatusCode(200);
                     response.setData(writeJSON.writeResponseAutorization(loginResponse));
 
@@ -97,9 +99,8 @@ public class Controller implements HttpHandler {
             }
             response.setHttpExchange(httpExchange);
             view.view(response);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+
 
     }
     //group
@@ -404,13 +405,19 @@ public class Controller implements HttpHandler {
 
             Map<String, Object> requestParameters = HttpUtil.parseQuery(paramsStr);
             result.put("requestParameters", requestParameters);
+            if (method.equals("get") && Pattern.matches("/login", requestUriPath)) {
+                loginHandler(httpExchange, requestParameters);
+
+            }
+            else{
+
+
+                if(jwtService.token!=""){
 
 
             if (method.equals("get")) {
-
-                if (Pattern.matches("/login", requestUriPath)) {
-                    loginHandler(httpExchange, requestParameters);
-                } else if (Pattern.matches("^/api/goods/$", requestUriPath)) {
+              //  JwtService.getUsernameFromToken()
+                 if (Pattern.matches("^/api/goods/$", requestUriPath)) {
                     getGoods(httpExchange, result);
                 } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
                     getGoodsById(httpExchange, result);
@@ -450,6 +457,15 @@ public class Controller implements HttpHandler {
                     unknownEndpoint(httpExchange, result);
                 }
             }
+
+
+                }else throw new WrongAuthorizationException();
+
+
+
+
+            }
+
         } catch (MissedJsonFieldException | noItemWithSuchIdException e) {
             response.setStatusCode(404);
             response.setData(writeJSON.createErrorReply("No field"));
@@ -468,6 +484,11 @@ public class Controller implements HttpHandler {
             System.out.println("Not unique value");
         } catch (WrongServerJsonException e) {
             e.printStackTrace();
+        } catch (WrongAuthorizationException e) {
+            response.setStatusCode(401);
+            response.setData(writeJSON.createErrorReply("Unauthorize"));
+            view.view(response);
+            System.out.println("Unauthorize");
         }
     }
 
