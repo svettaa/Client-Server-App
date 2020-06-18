@@ -163,7 +163,7 @@ finally {
 
     }
 
-    public void putGroup(HttpExchange httpExchange, Map result) throws noItemWithSuchNameException, wrongDataBaseConnection, wrongNotUniqueValue, IOException, WrongJsonException, MissedJsonFieldException {
+    public void putGroup(HttpExchange httpExchange, Map result) throws noItemWithSuchNameException, wrongDataBaseConnection, wrongNotUniqueValue, IOException, WrongJsonException, MissedJsonFieldException, WrongJsonInputData {
         Response response = new Response();
         response.setHttpExchange(httpExchange);
 
@@ -182,7 +182,7 @@ finally {
         view.view(response);
     }
 
-    public void postGroup(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException {
+    public void postGroup(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
         Response response = new Response();
         response.setHttpExchange(httpExchange);
 
@@ -290,7 +290,7 @@ finally {
         view.view(response);
     }
 
-    public void putGoods(HttpExchange httpExchange, Map result) throws noItemWithSuchNameException, wrongDataBaseConnection, wrongNotUniqueValue, IOException, WrongJsonException, MissedJsonFieldException {
+    public void putGoods(HttpExchange httpExchange, Map result) throws noItemWithSuchNameException, wrongDataBaseConnection, wrongNotUniqueValue, IOException, WrongJsonException, MissedJsonFieldException, WrongJsonInputData {
         Response response = new Response();
         response.setHttpExchange(httpExchange);
 
@@ -317,7 +317,7 @@ finally {
         return bufferedReader.readLine();
     }
 
-    public void postGoods(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException {
+    public void postGoods(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
         Response response = new Response();
         response.setHttpExchange(httpExchange);
 
@@ -409,15 +409,31 @@ System.out.println(result);
                 }
             } else if (method.equals("put")) {
                 if (Pattern.matches("/api/goods", requestUriPath)) {
-                    putGoods(httpExchange, result);
+                    try {
+                        putGoods(httpExchange, result);
+                    } catch (WrongJsonInputData wrongJsonInputData) {
+                        wrongJsonInputData.printStackTrace();
+                    }
                 } else if(Pattern.matches("/api/group", requestUriPath)){
-                    putGroup(httpExchange, result);
+                    try {
+                        putGroup(httpExchange, result);
+                    } catch (WrongJsonInputData wrongJsonInputData) {
+                        wrongJsonInputData.printStackTrace();
+                    }
                 }
             } else if (method.equals("post")) {
                 if (requestUriPath.equals("/api/goods")) {
-                    postGoods(httpExchange, result);
+                    try {
+                        postGoods(httpExchange, result);
+                    } catch (WrongJsonInputData wrongJsonInputData) {
+                        wrongJsonInputData.printStackTrace();
+                    }
                 } else if(Pattern.matches("/api/group", requestUriPath)){
-                    postGroup(httpExchange, result);
+                    try {
+                        postGroup(httpExchange, result);
+                    } catch (WrongJsonInputData wrongJsonInputData) {
+                        wrongJsonInputData.printStackTrace();
+                    }
                 }
             } else if (methodToCallName == null) {
                 unknownEndpoint(httpExchange, result);
