@@ -261,6 +261,7 @@ public class GoodsDao {
             System.out.println("deleteAllByGroupId() invoked");
 
             preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, group_id);
             preparedStatement.executeUpdate();
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();

@@ -8,9 +8,11 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
+import static com.lukichova.olenyn.app.resoures.Resoures.HTTP_SERVER_PORT;
+
 public class HttpServerReflection {
 
-    final static int HTTP_SERVER_PORT = 8888;
+
 
     final static View VIEW = new JsonView();
 
@@ -22,8 +24,8 @@ public class HttpServerReflection {
 
             server.bind(new InetSocketAddress(HTTP_SERVER_PORT), 0);
 
-            Controller exampleMultiactionController = new Controller();
-            server.createContext("/", exampleMultiactionController);
+            Controller controller = new Controller();
+            server.createContext("/", controller);
 
             server.start();
         } catch (IOException e) {

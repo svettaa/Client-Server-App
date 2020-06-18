@@ -1,11 +1,9 @@
 package com.lukichova.olenyn.app.service;
 
 import com.lukichova.olenyn.app.DB.*;
-import com.lukichova.olenyn.app.Exceptions.noItemWithSuchIdException;
-import com.lukichova.olenyn.app.Exceptions.noItemWithSuchNameException;
-import com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection;
-import com.lukichova.olenyn.app.Exceptions.wrongNotUniqueValue;
+import com.lukichova.olenyn.app.Exceptions.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class GoodsService {
@@ -28,11 +26,24 @@ public class GoodsService {
         return goodsDao.readAll();
     }
 
-    public boolean create(Goods goods) throws wrongNotUniqueValue, wrongDataBaseConnection {
+    public boolean create(Goods goods) throws wrongNotUniqueValue, wrongDataBaseConnection, WrongJsonInputData {
+        if (goods.getId() < 1 || goods.getName() == null || goods.getProducer() == null ||
+                goods.getLeft_amount() < 0 || goods.getLeft_amount() == null || goods.getPrice() == null ||
+                (goods.getPrice().compareTo(new BigDecimal("0.00")) < 0) || goods.getGroup_id() == null ||
+                goods.getGroup_id() < 1){
+            throw new WrongJsonInputData();
+        }
         return goodsDao.create(goods);
     }
 
-    public boolean update(Goods goods) throws wrongNotUniqueValue, wrongDataBaseConnection {
+    public boolean update(Goods goods) throws wrongNotUniqueValue, wrongDataBaseConnection, WrongJsonInputData {
+        if (goods.getName() == null || goods.getProducer() == null ||
+                goods.getLeft_amount() < 0 || goods.getLeft_amount() == null || goods.getPrice() == null ||
+                (goods.getPrice().compareTo(new BigDecimal("0.00")) < 0) || goods.getGroup_id() == null ||
+                goods.getGroup_id() < 1){
+            throw new WrongJsonInputData();
+        }
+
         return goodsDao.update(goods);
     }
 

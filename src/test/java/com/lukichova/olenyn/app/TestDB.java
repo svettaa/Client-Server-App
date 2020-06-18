@@ -103,9 +103,5 @@ public class TestDB {
         } catch (noItemWithSuchNameException e) {
             Assert.assertTrue(true);
         }
-
-
     }
-
-
 }
