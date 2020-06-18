@@ -63,20 +63,22 @@ public class Controller implements HttpHandler {
            httpExchange.getResponseHeaders()
                    .add("Content-Type", "application/json");
 
-           String token = generateToken(user);
-           System.out.println(token);
+           String token=null;
+
 
 try {
 
       if(user!=null){
-
+          token = generateToken(user);
      loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
           }
       else {
           writeJSON.writeResponseAutorization(httpExchange, 401,writeJSON.createErrorReply("Unauthorized"));
 
       }
-}catch (UnknownClassException e){}
+}catch (UnknownClassException e){
+
+}
 finally {
 
            if (user != null) {
