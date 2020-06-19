@@ -10,12 +10,18 @@ public class TestHttpServer {
 
     @Test
     public void testHTTP() throws Exception {
+
         ReceivedResponse response;
 
         User userTest = new User("lll","ppp","role");
         String tokenTest = generateToken(userTest);
         LoginResponse LoginedUser = new LoginResponse(tokenTest,userTest.getLogin(),userTest.getRole());
         String token=LoginedUser.getToken();
+
+//chek if it works without login (without token)
+        response = new ReceivedResponse("GET", "/api/goods/100",
+                null, "");
+        response.assertResponse(401, null);
 
 
         //check login
@@ -26,6 +32,14 @@ public class TestHttpServer {
         response = new ReceivedResponse("GET", "/login?login=1lll&password=ppp",
                 null, "");
         response.assertResponse(401, null);
+
+
+
+//checkn token
+        response = new ReceivedResponse("GET", "/api/group/3",
+                null, "gggggg");
+   //     response.assertResponse(403, "{\"id\":3,\"name\":\"Jeans\",\"description\":\"Jeans\"}");
+
 
         // delete
         response = new ReceivedResponse("DELETE", "/api/goods/100",

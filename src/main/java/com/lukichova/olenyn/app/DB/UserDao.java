@@ -29,8 +29,17 @@ public class UserDao {
             rs = preparedStatement.executeQuery();
 
             if (rs.next()) {
-                return createUser(rs);
+
+
+                User user= createUser(rs);
+                if(user.getId()!=null){
+
+                return user;
+                }
+                else return null;
+
             } else {
+
                 return null;
 
             }
@@ -39,7 +48,9 @@ public class UserDao {
             sqlException.printStackTrace();
             throw new wrongDataBaseConnection();
         } finally {
+
             close(connection, preparedStatement, rs);
+
         }
     }
     private User createUser(ResultSet rs) throws SQLException {

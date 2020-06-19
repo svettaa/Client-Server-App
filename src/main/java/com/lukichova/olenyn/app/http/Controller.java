@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import static com.lukichova.olenyn.app.service.JwtService.generateToken;
+import static com.lukichova.olenyn.app.service.JwtService.getUsernameFromToken;
 import static org.apache.commons.codec.digest.DigestUtils.*;
 
 public class Controller implements HttpHandler {
@@ -37,6 +38,27 @@ public class Controller implements HttpHandler {
         view = newView;
     }
 
+
+
+    private boolean varification() throws wrongTokenException {
+       UserDao userDao = new UserDao();
+        String login = getUsernameFromToken(jwtService.getToken());
+
+        try {
+            if(userDao.getByLogin(login)!=null)
+
+            return true;
+        } catch (com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection wrongDataBaseConnection) {
+
+            throw new wrongTokenException();
+
+        } catch (noItemWithSuchIdException e) {
+
+            throw new wrongTokenException();
+
+        }
+        return false;
+    }
     private void loginHandler(final HttpExchange httpExchange, Map<String, Object> pathParams) throws noItemWithSuchIdException, wrongDataBaseConnection, IOException, WrongAuthorizationException {
 
         LoginResponse loginResponse = null;
@@ -387,56 +409,73 @@ public class Controller implements HttpHandler {
                 if (jwtService.token != "") {
 
 
-                    if (method.equals("get")) {
-                        //  JwtService.getUsernameFromToken()
-                        if (Pattern.matches("^/api/goods/$", requestUriPath)) {
-                            getGoods(httpExchange, result);
-                        } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
-                            getGoodsById(httpExchange, result);
-                        } else if (Pattern.matches("^/api/group$", requestUriPath)) {
-                            getGroup(httpExchange, result);
-                        } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {
-                            getGroupById(httpExchange, result);
-                        } else {
-                            unknownEndpoint(httpExchange, result);
+                    if (varification()) {
+
+
+                        if (method.equals("get")) {
+
+                            if (Pattern.matches("^/api/goods/$", requestUriPath)) {
+                                getGoods(httpExchange, result);
+                            } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
+                                getGoodsById(httpExchange, result);
+                            } else if (Pattern.matches("^/api/group$", requestUriPath)) {
+                                getGroup(httpExchange, result);
+                            } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {
+                                getGroupById(httpExchange, result);
+                            } else {
+                                unknownEndpoint(httpExchange, result);
+                            }
+                        } else if (method.equals("delete")) {
+                            if (Pattern.matches("^/api/goods$", requestUriPath)) {
+                                deleteAllGoods(httpExchange, result);
+                            } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
+                                deleteGoodsById(httpExchange, result);
+                            } else if (Pattern.matches("^/api/group$", requestUriPath)) {
+                                deleteAllGroups(httpExchange, result);
+                            } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {
+                                deleteGroupById(httpExchange, result);
+                            } else {
+                                unknownEndpoint(httpExchange, result);
+                            }
+                        } else if (method.equals("put")) {
+                            if (Pattern.matches("^/api/goods$", requestUriPath)) {
+                                putGoods(httpExchange, result);
+                            } else if (Pattern.matches("^/api/group$", requestUriPath)) {
+                                putGroup(httpExchange, result);
+                            } else {
+                                unknownEndpoint(httpExchange, result);
+                            }
+                        } else if (method.equals("post")) {
+                            if (Pattern.matches("^/api/goods$", requestUriPath)) {
+                                postGoods(httpExchange, result);
+                            } else if (Pattern.matches("^/api/group$", requestUriPath)) {
+                                postGroup(httpExchange, result);
+                            } else {
+                                unknownEndpoint(httpExchange, result);
+                            }
                         }
-                    } else if (method.equals("delete")) {
-                        if (Pattern.matches("^/api/goods$", requestUriPath)) {
-                            deleteAllGoods(httpExchange, result);
-                        } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
-                            deleteGoodsById(httpExchange, result);
-                        } else if (Pattern.matches("^/api/group$", requestUriPath)) {
-                            deleteAllGroups(httpExchange, result);
-                        } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {
-                            deleteGroupById(httpExchange, result);
-                        } else {
-                            unknownEndpoint(httpExchange, result);
-                        }
-                    } else if (method.equals("put")) {
-                        if (Pattern.matches("^/api/goods$", requestUriPath)) {
-                            putGoods(httpExchange, result);
-                        } else if (Pattern.matches("^/api/group$", requestUriPath)) {
-                            putGroup(httpExchange, result);
-                        } else {
-                            unknownEndpoint(httpExchange, result);
-                        }
-                    } else if (method.equals("post")) {
-                        if (Pattern.matches("^/api/goods$", requestUriPath)) {
-                            postGoods(httpExchange, result);
-                        } else if (Pattern.matches("^/api/group$", requestUriPath)) {
-                            postGroup(httpExchange, result);
-                        } else {
-                            unknownEndpoint(httpExchange, result);
-                        }
+
+
+                    } else {
+
+                        response.setStatusCode(403);
+                        response.setData(writeJSON.createErrorReply("Invalid token"));
+                        view.view(response);
+
                     }
+                }
 
-
-                } else throw new WrongAuthorizationException();
+                else throw new WrongAuthorizationException();
 
 
             }
 
-        } catch (MissedJsonFieldException | noItemWithSuchIdException e) {
+        } catch (wrongTokenException e) {
+            response.setStatusCode(403);
+            response.setData(writeJSON.createErrorReply("Invalid token"));
+            view.view(response);
+            e.printStackTrace();
+        }catch (MissedJsonFieldException | noItemWithSuchIdException e) {
             response.setStatusCode(404);
             response.setData(writeJSON.createErrorReply("No field"));
             view.view(response);

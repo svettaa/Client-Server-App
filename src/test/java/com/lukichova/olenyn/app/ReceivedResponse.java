@@ -23,9 +23,10 @@ public class ReceivedResponse {
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
         con.setRequestMethod(method);
-        /*if (token != null) {
+
+        if (token != null) {
             con.setRequestProperty("x-auth", token);
-        }*/
+        }
 
         if (body != null) {
             con.setDoOutput(true);
