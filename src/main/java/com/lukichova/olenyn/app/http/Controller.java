@@ -15,12 +15,15 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static com.lukichova.olenyn.app.resoures.Resoures.HTTP_SERVER_PORT;
 import static com.lukichova.olenyn.app.service.JwtService.generateToken;
 import static com.lukichova.olenyn.app.service.JwtService.getUsernameFromToken;
 import static org.apache.commons.codec.digest.DigestUtils.*;
@@ -60,6 +63,7 @@ public class Controller implements HttpHandler {
         return false;
     }
     private void loginHandler(final HttpExchange httpExchange, Map<String, Object> pathParams) throws noItemWithSuchIdException, wrongDataBaseConnection, IOException, WrongAuthorizationException {
+
 
         LoginResponse loginResponse = null;
         UserDao userDao = new UserDao();
@@ -390,6 +394,7 @@ public class Controller implements HttpHandler {
             String query = requestUri.getRawQuery();
             result.put("query", query);
 
+            ;
             int start = requestUri.toString().indexOf('?');
             String paramsStr;
             if (start == -1) {

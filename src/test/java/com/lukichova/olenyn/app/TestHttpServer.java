@@ -35,12 +35,6 @@ public class TestHttpServer {
 
 
 
-//checkn token
-        response = new ReceivedResponse("GET", "/api/group/3",
-                null, "gggggg");
-   //     response.assertResponse(403, "{\"id\":3,\"name\":\"Jeans\",\"description\":\"Jeans\"}");
-
-
         // delete
         response = new ReceivedResponse("DELETE", "/api/goods/100",
                 null, token);
