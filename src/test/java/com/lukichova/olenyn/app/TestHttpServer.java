@@ -10,10 +10,13 @@ public class TestHttpServer {
 
     @Test
     public void testHTTP() throws Exception {
-
+        UserDao userdao = new UserDao();
+        userdao.deleteAll();
         ReceivedResponse response;
 
-        User userTest = new User("lll","ppp","role");
+        User userTest = new User("sveta","luk","ff");
+
+        userdao.create(userTest);
         String tokenTest = generateToken(userTest);
         LoginResponse LoginedUser = new LoginResponse(tokenTest,userTest.getLogin(),userTest.getRole());
         String token=LoginedUser.getToken();
@@ -25,11 +28,11 @@ public class TestHttpServer {
 
 
         //check login
-        response = new ReceivedResponse("GET", "/login?login=lll&password=ppp",
+        response = new ReceivedResponse("GET", "/login?login=sveta&password=luk",
                 null, "");
         response.assertResponse(200, null);
 
-        response = new ReceivedResponse("GET", "/login?login=1lll&password=ppp",
+        response = new ReceivedResponse("GET", "/login?login=sveta&password=ppp",
                 null, "");
         response.assertResponse(401, null);
 

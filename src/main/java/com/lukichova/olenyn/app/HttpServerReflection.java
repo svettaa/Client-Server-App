@@ -30,6 +30,9 @@ public class HttpServerReflection {
 
             server.bind(new InetSocketAddress(HTTP_SERVER_PORT), 0);
 
+
+
+
             Controller controller = new Controller();
             server.createContext("/", controller).setAuthenticator(new MyAuthenticator());
 
