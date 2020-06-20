@@ -1,6 +1,7 @@
 package com.lukichova.olenyn.app;
 
 import com.lukichova.olenyn.app.http.Controller;
+import com.lukichova.olenyn.app.service.GoodsService;
 import com.lukichova.olenyn.app.views.JsonView;
 import com.lukichova.olenyn.app.views.View;
 import com.sun.net.httpserver.HttpServer;
@@ -28,6 +29,8 @@ public class HttpServerReflection {
 
 
             server.bind(new InetSocketAddress(HTTP_SERVER_PORT), 0);
+            GoodsService h = new GoodsService();
+            System.out.println(h.gettotalPrice());
 
             Controller controller = new Controller();
             server.createContext("/", controller);
@@ -36,6 +39,8 @@ public class HttpServerReflection {
 
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection wrongDataBaseConnection) {
+            wrongDataBaseConnection.printStackTrace();
         }
     }
 }

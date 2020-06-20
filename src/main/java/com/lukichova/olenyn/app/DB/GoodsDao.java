@@ -55,6 +55,33 @@ public class GoodsDao {
 
         return list;
     }
+    //загальна вартість товару на складі (кількість * на ціну),
+
+
+    public int totalPrice() throws wrongDataBaseConnection {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = null;
+        try {
+            connection = DriverManager.getConnection(DataBase.url);
+            String sqlQuery = "SELECT SUM(price*left_amount) FROM " + GOODS_TABLE ;
+            System.out.println("getByName() invoked");
+            List<Goods> list = new ArrayList<Goods>();
+
+            preparedStatement = connection.prepareStatement(sqlQuery);
+         //   preparedStatement.setString(1, name);
+            rs = preparedStatement.executeQuery();
+            int amount = rs.getInt(1);
+           return amount;
+        } catch (SQLException sqlException) {
+            throw new wrongDataBaseConnection();
+        } finally {
+            close(connection, preparedStatement, rs);
+        }
+    }
+
+
+
 
     private Goods createGoods(ResultSet rs) throws SQLException {
         Goods g = new Goods();

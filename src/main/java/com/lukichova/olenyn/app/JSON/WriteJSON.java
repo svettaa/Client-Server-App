@@ -19,6 +19,17 @@ public class WriteJSON {
 
 
 
+    public String createCreatedPriceReply(int total_price){
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectNode rootNode = mapper.createObjectNode();
+            rootNode.put("total_price", total_price);
+            return mapper.writeValueAsString(rootNode);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     public String createCreatedIdReply(int id){
         try {

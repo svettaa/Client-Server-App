@@ -53,6 +53,7 @@ public class Controller implements HttpHandler {
         }
     }
 
+
     public void getGroupById(HttpExchange httpExchange, Map result) throws noItemWithSuchIdException, wrongDataBaseConnection, WrongServerJsonException {
 
         String[] parts = (String[]) result.get("requestUriPathParts");
@@ -241,7 +242,16 @@ public class Controller implements HttpHandler {
             e.printStackTrace();
         }
     }
+    public void getTotalPrice(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection {
+        Response response = new Response();
+        Integer price = goodsService.gettotalPrice();
+        response.setStatusCode(200);
 
+        response.setData(writeJSON.createCreatedPriceReply(price));
+        response.setHttpExchange(httpExchange);
+
+        view.view(response);
+    }
     public void getGoodsById(HttpExchange httpExchange, Map result) throws noItemWithSuchIdException, wrongDataBaseConnection, WrongServerJsonException {
 
         String[] parts = (String[]) result.get("requestUriPathParts");
@@ -438,6 +448,8 @@ public class Controller implements HttpHandler {
                     getGoods(httpExchange, result);
                 } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
                     getGoodsById(httpExchange, result);
+                }else if (Pattern.matches("^/api/goods/totalprice", requestUriPath)) {
+                    getTotalPrice(httpExchange, result);
                 }else if (Pattern.matches("^/api/goods/search$", requestUriPath)) {
                     searchGoods(httpExchange, requestParameters);
                 } else if (Pattern.matches("^/api/group$", requestUriPath)) {
