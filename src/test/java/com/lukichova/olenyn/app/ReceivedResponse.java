@@ -18,15 +18,13 @@ public class ReceivedResponse {
     private int status;
     private String Rbody;
 
-    public ReceivedResponse(String method, String endpoint, String body, String token) throws IOException {
+    public ReceivedResponse(String method, String endpoint, String body) throws IOException {
         URL url = new URL("http://localhost:" + HTTP_SERVER_PORT + endpoint);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
         con.setRequestMethod(method);
 
-        if (token != null) {
-            con.setRequestProperty("x-auth", token);
-        }
+
 
         if (body != null) {
             con.setDoOutput(true);
