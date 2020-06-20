@@ -18,6 +18,9 @@ public class GoodsService {
         return goodsDao.getByName(name);
     }
 
+    public List<Goods> searchByName(String name) throws noItemWithSuchIdException, wrongDataBaseConnection {
+        return goodsDao.searchByName(name);
+    }
     public List<Goods> getByGroupId(Integer group_id) throws noItemWithSuchIdException, wrongDataBaseConnection {
         return goodsDao.getByGroupId(group_id);
     }
@@ -37,15 +40,26 @@ public class GoodsService {
     }
 
     public boolean update(Goods goods) throws wrongDataBaseConnection, WrongJsonInputData, noItemWithSuchIdException, wrongNotUniqueValue {
-        if (goods.getId() == null || goods.getName() == null || goods.getProducer() == null ||
-                goods.getLeft_amount() < 0 || goods.getLeft_amount() == null || goods.getPrice() == null ||
-                (goods.getPrice().compareTo(new BigDecimal("0.00")) < 0) || goods.getGroup_id() == null ||
-                goods.getGroup_id() < 1){
-            throw new WrongJsonInputData();
-        }
+//        if (goods.getId() == null || goods.getName() == null || goods.getProducer() == null ||
+//                goods.getLeft_amount() < 0 || goods.getLeft_amount() == null || goods.getPrice() == null ||
+//                (goods.getPrice().compareTo(new BigDecimal("0.00")) < 0) || goods.getGroup_id() == null ||
+//                goods.getGroup_id() < 1){
+//            throw new WrongJsonInputData();
+//        }
 
 
         return goodsDao.update(goods);
+    }
+    public boolean updateLeftAmount(Goods goods) throws wrongDataBaseConnection, WrongJsonInputData, noItemWithSuchIdException, wrongNotUniqueValue {
+//        if (goods.getId() == null || goods.getName() == null || goods.getProducer() == null ||
+//                goods.getLeft_amount() < 0 || goods.getLeft_amount() == null || goods.getPrice() == null ||
+//                (goods.getPrice().compareTo(new BigDecimal("0.00")) < 0) || goods.getGroup_id() == null ||
+//                goods.getGroup_id() < 1){
+//            throw new WrongJsonInputData();
+//        }
+
+
+        return goodsDao.updateLeftAmount(goods);
     }
 
     public boolean delete(int id) throws wrongDataBaseConnection, noItemWithSuchIdException {
