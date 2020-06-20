@@ -8,6 +8,7 @@ import org.sqlite.SQLiteException;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.lukichova.olenyn.app.resoures.Resoures.GROUP_TABLE;
@@ -77,7 +78,16 @@ public class GroupDao {
         }
 
     }
+    public List<Group> searchByName(String name) throws wrongDataBaseConnection, noItemWithSuchIdException {
+        List<Group> all =  readAll();
+        List<Group> list = new ArrayList<Group>();
+        Object dd[] = all.stream()
+                .filter(item -> item.getName().toLowerCase().contains(name.toLowerCase())).toArray();
+        ArrayList<Group> list1 = new ArrayList(Arrays.asList(dd));
+        list=list1;
 
+        return list;
+    }
     public List<Group> readAll() throws wrongDataBaseConnection {
         List<Group> list = new ArrayList<Group>();
         Connection connection = null;

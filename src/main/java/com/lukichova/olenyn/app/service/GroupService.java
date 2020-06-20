@@ -24,7 +24,9 @@ public class GroupService {
     public List<Group> getAll() throws wrongDataBaseConnection {
         return groupDao.readAll();
     }
-
+    public List<Group> searchByName(String name) throws noItemWithSuchIdException, wrongDataBaseConnection {
+        return groupDao.searchByName(name);
+    }
     public boolean create(Group group) throws wrongNotUniqueValue, wrongDataBaseConnection, WrongJsonInputData {
         if(group.getName() == null)
             throw new WrongJsonInputData();

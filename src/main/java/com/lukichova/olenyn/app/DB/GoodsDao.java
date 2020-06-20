@@ -8,7 +8,9 @@ import org.sqlite.SQLiteException;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.lukichova.olenyn.app.resoures.Resoures.GOODS_TABLE;
 
@@ -44,33 +46,14 @@ public class GoodsDao {
         }
     }
     public List<Goods> searchByName(String name) throws wrongDataBaseConnection, noItemWithSuchIdException {
+        List<Goods> all =  readAll();
         List<Goods> list = new ArrayList<Goods>();
-        Connection connection = null;
-        PreparedStatement preparedStatement = null;
-        ResultSet rs = null;
-        try {
-            connection = DriverManager.getConnection(DataBase.url);
-            String sqlQuery = "SELECT * FROM " + GOODS_TABLE + " WHERE " +
-                    "name LIKE ?";
-            System.out.println("searchByName() invoked");
+        Object dd[] = all.stream()
+                .filter(item -> item.getName().toLowerCase().contains(name.toLowerCase())).toArray();
+        ArrayList<Goods> list1 = new ArrayList(Arrays.asList(dd));
+        list=list1;
 
-            preparedStatement = connection.prepareStatement(sqlQuery);
-            preparedStatement.setString(1, name);
-            rs = preparedStatement.executeQuery();
-
-            if (rs.next()) {
-                list.add(createGoods(rs));
-            } else {
-                throw new noItemWithSuchIdException();
-            }
-            rs.close();
-            return list;
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-            throw new wrongDataBaseConnection();
-        } finally {
-            close(connection, preparedStatement, rs);
-        }
+        return list;
     }
 
     private Goods createGoods(ResultSet rs) throws SQLException {

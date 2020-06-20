@@ -70,7 +70,40 @@ public class Controller implements HttpHandler {
 
         view.view(response);
     }
+    public void searchGroups (HttpExchange httpExchange, Map<String, Object> result) {
+        try {
 
+            Map<String, Object> params = (Map<String, Object>) (result.get("requestParameters"));
+            String nameStr = (String) result.get("name");
+
+            if (nameStr != null) {
+                Response response = new Response();
+
+
+                List<Group> goodsList = groupService.searchByName(nameStr);
+
+                response.setTemplate("list");
+                response.setStatusCode(200);
+                response.setData(writeJSON.createGroupListReply(goodsList));
+                response.setHttpExchange(httpExchange);
+
+                view.view(response);
+            } else {
+                Response response = new Response();
+
+                List<Group> goodsList = groupService.getAll();
+
+                response.setTemplate("list");
+                response.setStatusCode(200);
+                response.setData(writeJSON.createGroupListReply(goodsList));
+                response.setHttpExchange(httpExchange);
+
+                view.view(response);
+            }
+        } catch (wrongDataBaseConnection | WrongServerJsonException | noItemWithSuchIdException e) {
+            e.printStackTrace();
+        }
+    }
     public void deleteGroupById(HttpExchange httpExchange, Map result) throws WrongServerJsonException, wrongDataBaseConnection {
 
         String[] parts = (String[]) result.get("requestUriPathParts");
@@ -142,10 +175,12 @@ public class Controller implements HttpHandler {
 
 
     //goods
-    public void searchGoods(HttpExchange httpExchange, Map result) {
+    public void searchGoods(HttpExchange httpExchange, Map<String, Object> result) {
         try {
+
             Map<String, Object> params = (Map<String, Object>) (result.get("requestParameters"));
-            String nameStr = (String) params.get("name");
+            String nameStr = (String) result.get("name");
+
             if (nameStr != null) {
                 Response response = new Response();
 
@@ -395,19 +430,23 @@ public class Controller implements HttpHandler {
             result.put("requestParameters", requestParameters);
 
 
-            if (method.equals("get")) {
+
+
+                if (method.equals("get")) {
 
                 if (Pattern.matches("^/api/goods/$", requestUriPath)) {
                     getGoods(httpExchange, result);
                 } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
                     getGoodsById(httpExchange, result);
-                }else if (Pattern.matches("^/api/goods/search/\\t+$", requestUriPath)) {
-                    searchGoods(httpExchange, result);
+                }else if (Pattern.matches("^/api/goods/search$", requestUriPath)) {
+                    searchGoods(httpExchange, requestParameters);
                 } else if (Pattern.matches("^/api/group$", requestUriPath)) {
                     getGroup(httpExchange, result);
                 } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {
                     getGroupById(httpExchange, result);
-                } else {
+                } else if (Pattern.matches("^/api/group/search$", requestUriPath)) {
+                    searchGroups(httpExchange, requestParameters);
+                }else {
                     unknownEndpoint(httpExchange, result);
                 }
             } else if (method.equals("delete")) {
