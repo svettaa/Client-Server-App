@@ -58,15 +58,14 @@ public class GoodsDao {
     //загальна вартість товару на складі (кількість * на ціну),
 
 
-    public int totalPrice() throws wrongDataBaseConnection {
+    public Integer totalPrice() throws wrongDataBaseConnection {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet rs = null;
         try {
             connection = DriverManager.getConnection(DataBase.url);
             String sqlQuery = "SELECT SUM(price*left_amount) FROM " + GOODS_TABLE ;
-            System.out.println("getByName() invoked");
-            List<Goods> list = new ArrayList<Goods>();
+            System.out.println("totalPrice() invoked");
 
             preparedStatement = connection.prepareStatement(sqlQuery);
          //   preparedStatement.setString(1, name);
@@ -79,6 +78,31 @@ public class GoodsDao {
             close(connection, preparedStatement, rs);
         }
     }
+    public Integer totalGroupPrice(int id) throws wrongDataBaseConnection {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = null;
+        try {
+
+            connection = DriverManager.getConnection(DataBase.url);
+
+            String sqlQuery = "SELECT SUM(price*left_amount) FROM " + GOODS_TABLE +" WHERE group_id = ?";
+
+
+            System.out.println("totalGroupPrice() invoked");
+            preparedStatement = connection.prepareStatement(sqlQuery);
+            preparedStatement.setInt(1, id);
+            rs = preparedStatement.executeQuery();
+            int amount = rs.getInt(1);
+            return amount;
+        } catch (SQLException sqlException) {
+            throw new wrongDataBaseConnection();
+        } finally {
+            close(connection, preparedStatement, rs);
+        }
+    }
+
+
 
 
 

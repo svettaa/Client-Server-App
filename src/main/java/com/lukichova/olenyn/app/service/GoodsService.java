@@ -24,9 +24,13 @@ public class GoodsService {
     public List<Goods> getByGroupId(Integer group_id) throws noItemWithSuchIdException, wrongDataBaseConnection {
         return goodsDao.getByGroupId(group_id);
     }
- public int gettotalPrice() throws wrongDataBaseConnection {
+ public Integer gettotalPrice() throws wrongDataBaseConnection {
         return goodsDao.totalPrice();
  }
+    public Integer getGroupTotalPrice(int id) throws wrongDataBaseConnection {
+
+        return goodsDao.totalGroupPrice(id);
+    }
     public List<Goods> getAll() throws wrongDataBaseConnection {
         return goodsDao.readAll();
     }

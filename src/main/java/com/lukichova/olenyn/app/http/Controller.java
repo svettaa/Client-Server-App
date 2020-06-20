@@ -294,24 +294,39 @@ public class Controller implements HttpHandler {
         }
     }
 
-    public void deleteGoodsById(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection, noItemWithSuchIdException {
+    public void deleteGoodsById(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection, noItemWithSuchIdException, WrongServerJsonException {
+
 
         String[] parts = (String[]) result.get("requestUriPathParts");
+
         int id = Integer.parseInt(parts[3]);
 
         Response response = new Response();
-        try {
-            goodsService.delete(id);
 
+        Group group = groupService.listByCriteria(id);
 
-            response.setStatusCode(204);
-        } catch (noItemWithSuchIdException e) {
+        response.setStatusCode(200);
 
-            response.setStatusCode(404);
-        }
+        response.setData(writeJSON.createGroupReply(group));
         response.setHttpExchange(httpExchange);
-        response.setData(null);
 
+        view.view(response);
+
+    }
+    public void getGroupTotalAmount (HttpExchange httpExchange, Map result) throws wrongDataBaseConnection, noItemWithSuchIdException {
+
+        String[] parts = (String[]) result.get("requestUriPathParts");
+
+        int id = Integer.parseInt(parts[4]);
+
+        Response response = new Response();
+        Integer goods = goodsService.getGroupTotalPrice(id);
+
+        response.setStatusCode(200);
+
+        response.setData(writeJSON.createGroupCreatedPriceReply(id,goods));
+
+        response.setHttpExchange(httpExchange);
 
         view.view(response);
     }
@@ -452,6 +467,8 @@ public class Controller implements HttpHandler {
                     getTotalPrice(httpExchange, result);
                 }else if (Pattern.matches("^/api/goods/search$", requestUriPath)) {
                     searchGoods(httpExchange, requestParameters);
+                }else if (Pattern.matches("^/api/goods/totalprice/\\d+$", requestUriPath)) {
+                    getGroupTotalAmount(httpExchange, result);
                 } else if (Pattern.matches("^/api/group$", requestUriPath)) {
                     getGroup(httpExchange, result);
                 } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {

@@ -29,8 +29,8 @@ public class HttpServerReflection {
 
 
             server.bind(new InetSocketAddress(HTTP_SERVER_PORT), 0);
-            GoodsService h = new GoodsService();
-            System.out.println(h.gettotalPrice());
+//            GoodsService h = new GoodsService();
+//            System.out.println(h.gettotalPrice());
 
             Controller controller = new Controller();
             server.createContext("/", controller);
@@ -39,8 +39,6 @@ public class HttpServerReflection {
 
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection wrongDataBaseConnection) {
-            wrongDataBaseConnection.printStackTrace();
         }
     }
 }

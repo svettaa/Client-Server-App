@@ -18,7 +18,18 @@ import java.util.List;
 public class WriteJSON {
 
 
-
+    public String createGroupCreatedPriceReply(int group_id,int total_price){
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectNode rootNode = mapper.createObjectNode();
+            rootNode.put("group_id", group_id);
+            rootNode.put("total_price", total_price);
+            return mapper.writeValueAsString(rootNode);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     public String createCreatedPriceReply(int total_price){
         try {
             ObjectMapper mapper = new ObjectMapper();
