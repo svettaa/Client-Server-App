@@ -7,7 +7,8 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses(
         {
                 TestDB.class,
-                TestDBExceptions.class
+                TestDBExceptions.class,
+                TestHttpServer.class
 
         }
 )

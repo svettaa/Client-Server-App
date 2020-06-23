@@ -32,6 +32,9 @@ public class HttpServerReflection {
 //            GoodsService h = new GoodsService();
 //            System.out.println(h.gettotalPrice());
 
+
+
+
             Controller controller = new Controller();
             server.createContext("/", controller);
 

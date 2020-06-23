@@ -22,6 +22,6 @@ CREATE TABLE users
     id          integer PRIMARY KEY autoincrement,
     login          varchar(15) ,
     password        varchar(15) NOT NULL,
-    price       varchar(15) NOT NULL
+    role       varchar(15) NOT NULL
 
 );

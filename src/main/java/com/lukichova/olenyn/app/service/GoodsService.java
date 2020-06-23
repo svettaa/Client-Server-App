@@ -39,7 +39,7 @@ public class GoodsService {
     }
 
     public boolean create(Goods goods) throws wrongNotUniqueValue, wrongDataBaseConnection, WrongJsonInputData {
-        if (goods.getId() < 1 || goods.getName() == null || goods.getProducer() == null ||
+        if (goods.getName() == null || goods.getProducer() == null ||
                 goods.getLeft_amount() < 0 || goods.getLeft_amount() == null || goods.getPrice() == null ||
                 (goods.getPrice().compareTo(new BigDecimal("0.00")) < 0) || goods.getGroup_id() == null ||
                 goods.getGroup_id() < 1){
