@@ -339,9 +339,19 @@ public class Controller implements HttpHandler {
             result.put("requestParameters", requestParameters);
 
 
+            httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+
+            if (httpExchange.getRequestMethod().equalsIgnoreCase("OPTIONS")) {
+                httpExchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, PUT, OPTIONS");
+                httpExchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type,Authorization");
+                httpExchange.sendResponseHeaders(204, -1);
+                return;
+            }
+
+
             if (method.equals("get")) {
 
-                if (Pattern.matches("^/api/goods/$", requestUriPath)) {
+                if (Pattern.matches("^/api/goods$", requestUriPath)) {
                     getGoods(httpExchange, result);
                 } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
                     getGoodsById(httpExchange, result);
