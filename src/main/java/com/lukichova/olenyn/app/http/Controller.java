@@ -146,12 +146,12 @@ public class Controller implements HttpHandler {
 
 
         String body = getBodyString(httpExchange);
-        String vaalue = readJSON.selectStringSearch(body);
-        if (vaalue != null) {
+        String value = (String) result.get("value");
+        if (value != null) {
             Response response = new Response();
 
 
-            List<Group> goodsList = groupService.searchByName(vaalue);
+            List<Group> goodsList = groupService.searchByName(value);
 
             response.setTemplate("list");
             response.setStatusCode(200);
@@ -176,11 +176,12 @@ public class Controller implements HttpHandler {
 
     //goods
 
-    public void searchGoods(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
+    public void searchGoods(HttpExchange httpExchange, Map<String, Object> result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
 
 
-        String body = getBodyString(httpExchange);
-        String value = readJSON.selectStringSearch(body);
+        String value = (String) result.get("value");
+
+
         if (value != null) {
             Response response = new Response();
 
@@ -206,11 +207,10 @@ public class Controller implements HttpHandler {
             view.view(response);
         }
     }
-    public void sarchGoodsByGroup(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
+    public void sarchGoodsByGroup(HttpExchange httpExchange, Map<String, Object> result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
 
 
-        String body = getBodyString(httpExchange);
-        String value = readJSON.selectStringSearch(body);
+        String value = (String) result.get("value");
         if (value != null) {
             Response response = new Response();
 
@@ -497,8 +497,9 @@ public class Controller implements HttpHandler {
                 }else if (Pattern.matches("^/api/goods/totalprice", requestUriPath)) {
                     getTotalPrice(httpExchange, result);
                 }else if (Pattern.matches("^/api/goods/search$", requestUriPath)) {
-                    searchGoods(httpExchange, result);
-//                    sarchGoodsByGroup(httpExchange, result);
+                   searchGoods(httpExchange, requestParameters);
+               }else if (Pattern.matches("^/api/goods/searchbygroup$", requestUriPath)) {
+                    sarchGoodsByGroup(httpExchange, requestParameters);
                 }else if (Pattern.matches("^/api/goods/totalprice/\\d+$", requestUriPath)) {
                     getGroupTotalAmount(httpExchange, result);
                 } else if (Pattern.matches("^/api/group$", requestUriPath)) {
@@ -506,7 +507,7 @@ public class Controller implements HttpHandler {
                 } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {
                     getGroupById(httpExchange, result);
                 } else if (Pattern.matches("^/api/group/search$", requestUriPath)) {
-                    searchGroup(httpExchange, result);
+                    searchGroup(httpExchange, requestParameters);
                 }else {
                     unknownEndpoint(httpExchange, result);
                 }

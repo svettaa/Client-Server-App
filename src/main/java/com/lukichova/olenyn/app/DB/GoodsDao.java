@@ -77,14 +77,30 @@ public class GoodsDao {
         }
     }
     public List<Goods> searchByName(String name) throws wrongDataBaseConnection, noItemWithSuchIdException {
-        List<Goods> all =  readAll();
         List<Goods> list = new ArrayList<Goods>();
-        Object dd[] = all.stream()
-                .filter(item -> item.getName().toLowerCase().contains(name.toLowerCase())).toArray();
-        ArrayList<Goods> list1 = new ArrayList(Arrays.asList(dd));
-        list=list1;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            connection = DriverManager.getConnection(DataBase.url);
+            String sql = "SELECT * FROM " + GOODS_TABLE+
+                    " WHERE name LIKE ? " ;
+            System.out.println("searchByName() invoked");
 
-        return list;
+
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, '%' + name + '%');
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                list.add(createGoods(rs));
+                System.out.println(createGoods(rs));
+            }
+            rs.close();
+            return list;
+        } catch (SQLException sqlException) {
+            throw new wrongDataBaseConnection();
+        } finally {
+            close(connection, preparedStatement);
+        }
     }
     //загальна вартість товару на складі (кількість * на ціну),
 
@@ -152,41 +168,33 @@ public class GoodsDao {
     }
     public List<Goods> searchGoodsByGroup(String name) throws wrongDataBaseConnection, noItemWithSuchIdException {
         List<Goods> list = new ArrayList<Goods>();
-
         Connection connection = null;
         PreparedStatement preparedStatement = null;
-        ResultSet rs = null;
         try {
             connection = DriverManager.getConnection(DataBase.url);
-            String sqlQuery = "SELECT * FROM " + GOODS_TABLE+" WHERE group_id IN" +
-                    " (SELECT id FROM " +GROUP_TABLE+" WHERE name like 'je%' " ;
-
-            System.out.println("searchGoodsByGroup() invoked");
-
-            preparedStatement = connection.prepareStatement(sqlQuery);
-           // preparedStatement.setString(1, name);
-            rs = preparedStatement.executeQuery();
+            String sql = "SELECT * FROM " + GOODS_TABLE+
+                                " WHERE group_id IN" +
+              " (SELECT id FROM " +GROUP_TABLE+" WHERE name LIKE ? )" ;
+            System.out.println("readAll() invoked");
 
 
-
-            if (rs.next()) {
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, '%' + name + '%');
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
                 list.add(createGoods(rs));
-            } else {
-                throw new noItemWithSuchIdException();
+                System.out.println(createGoods(rs));
             }
-
-
-
-
             rs.close();
             return list;
         } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
             throw new wrongDataBaseConnection();
         } finally {
-            close(connection, preparedStatement, rs);
+            close(connection, preparedStatement);
         }
     }
+
+
     public List<Goods> getByGroupId(int group_id) throws wrongDataBaseConnection, noItemWithSuchIdException {
         List<Goods> list = new ArrayList<Goods>();
         Connection connection = null;
