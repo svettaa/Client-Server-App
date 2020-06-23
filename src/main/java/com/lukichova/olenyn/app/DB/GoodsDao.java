@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.lukichova.olenyn.app.resoures.Resoures.GOODS_TABLE;
+import static com.lukichova.olenyn.app.resoures.Resoures.GROUP_TABLE;
 
 public class GoodsDao {
     public Goods getById(int id) throws wrongDataBaseConnection, noItemWithSuchIdException {
@@ -33,6 +34,36 @@ public class GoodsDao {
             if (rs.next()) {
 
                 return createGoods(rs);
+            } else {
+
+                throw new noItemWithSuchIdException();
+            }
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+
+            throw new wrongDataBaseConnection();
+        } finally {
+            close(connection, preparedStatement, rs);
+        }
+    }
+    public int getLeftAmountById(int id) throws wrongDataBaseConnection, noItemWithSuchIdException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = null;
+        try {
+            connection = DriverManager.getConnection(DataBase.url);
+            String sqlQuery = "SELECT * FROM " + GOODS_TABLE + " WHERE id = ?";
+            System.out.println("getLeftAmountById() invoked");
+
+            preparedStatement = connection.prepareStatement(sqlQuery);
+            preparedStatement.setInt(1, id);
+            rs = preparedStatement.executeQuery();
+
+
+
+            if (rs.next()) {
+                 Goods goods =createGoods(rs);
+                return goods.getLeft_amount();
             } else {
 
                 throw new noItemWithSuchIdException();
@@ -119,7 +150,43 @@ public class GoodsDao {
 
         return g;
     }
+    public List<Goods> searchGoodsByGroup(String name) throws wrongDataBaseConnection, noItemWithSuchIdException {
+        List<Goods> list = new ArrayList<Goods>();
 
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = null;
+        try {
+            connection = DriverManager.getConnection(DataBase.url);
+            String sqlQuery = "SELECT * FROM " + GOODS_TABLE+" WHERE group_id IN" +
+                    " (SELECT id FROM " +GROUP_TABLE+" WHERE name like 'je%' " ;
+
+            System.out.println("searchGoodsByGroup() invoked");
+
+            preparedStatement = connection.prepareStatement(sqlQuery);
+           // preparedStatement.setString(1, name);
+            rs = preparedStatement.executeQuery();
+
+
+
+            if (rs.next()) {
+                list.add(createGoods(rs));
+            } else {
+                throw new noItemWithSuchIdException();
+            }
+
+
+
+
+            rs.close();
+            return list;
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+            throw new wrongDataBaseConnection();
+        } finally {
+            close(connection, preparedStatement, rs);
+        }
+    }
     public List<Goods> getByGroupId(int group_id) throws wrongDataBaseConnection, noItemWithSuchIdException {
         List<Goods> list = new ArrayList<Goods>();
         Connection connection = null;
@@ -298,21 +365,53 @@ public class GoodsDao {
             close(connection, preparedStatement);
         }
     }
-    public boolean updateLeftAmount(Goods goods) throws wrongDataBaseConnection, noItemWithSuchIdException {
+    public boolean writeOffAmount(Goods goods) throws wrongDataBaseConnection, noItemWithSuchIdException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         Goods g = new Goods();
         g=getById(goods.getId());
-
+        int amount =  getLeftAmountById(goods.getId())- goods.getLeft_amount();
         try {
             connection = DriverManager.getConnection(DataBase.url);
             String sqlQuery = "UPDATE " + GOODS_TABLE + " " +
-                    "SET left_amount = ? WHERE id = ?";
+                    "SET left_amount = "+ amount+" WHERE id = ?";
             System.out.println("update() invoked");
 
             preparedStatement = connection.prepareStatement(sqlQuery);
-            preparedStatement.setInt(1, goods.getLeft_amount());
-            preparedStatement.setInt(2, goods.getId());
+
+            preparedStatement.setInt(1, goods.getId());
+
+            preparedStatement.executeUpdate();
+
+            System.out.println("Updated " + goods.getName() + " " + goods.getPrice() + " "
+                    + goods.getLeft_amount() + " " + goods.getProducer() + " " + goods.getDescription());
+            System.out.println();
+            return true;
+        } catch (SQLiteException e) {
+
+            throw new noItemWithSuchIdException();
+
+        } catch (SQLException sqlException) {
+            throw new wrongDataBaseConnection();
+        } finally {
+            close(connection, preparedStatement);
+        }
+    }
+    public boolean addAmount(Goods goods) throws wrongDataBaseConnection, noItemWithSuchIdException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        Goods g = new Goods();
+        g=getById(goods.getId());
+        int amount =  getLeftAmountById(goods.getId())+ goods.getLeft_amount();
+        try {
+            connection = DriverManager.getConnection(DataBase.url);
+            String sqlQuery = "UPDATE " + GOODS_TABLE + " " +
+                    "SET left_amount = "+ amount+" WHERE id = ?";
+            System.out.println("update() invoked");
+
+            preparedStatement = connection.prepareStatement(sqlQuery);
+
+            preparedStatement.setInt(1, goods.getId());
 
             preparedStatement.executeUpdate();
 

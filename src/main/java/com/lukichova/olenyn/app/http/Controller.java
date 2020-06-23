@@ -70,41 +70,9 @@ public class Controller implements HttpHandler {
         response.setHttpExchange(httpExchange);
 
         view.view(response);
-    }
-    public void searchGroups (HttpExchange httpExchange, Map<String, Object> result) {
-        try {
-
-            Map<String, Object> params = (Map<String, Object>) (result.get("requestParameters"));
-            String nameStr = (String) result.get("name");
-
-            if (nameStr != null) {
-                Response response = new Response();
+    };
 
 
-                List<Group> goodsList = groupService.searchByName(nameStr);
-
-                response.setTemplate("list");
-                response.setStatusCode(200);
-                response.setData(writeJSON.createGroupListReply(goodsList));
-                response.setHttpExchange(httpExchange);
-
-                view.view(response);
-            } else {
-                Response response = new Response();
-
-                List<Group> goodsList = groupService.getAll();
-
-                response.setTemplate("list");
-                response.setStatusCode(200);
-                response.setData(writeJSON.createGroupListReply(goodsList));
-                response.setHttpExchange(httpExchange);
-
-                view.view(response);
-            }
-        } catch (wrongDataBaseConnection | WrongServerJsonException | noItemWithSuchIdException e) {
-            e.printStackTrace();
-        }
-    }
     public void deleteGroupById(HttpExchange httpExchange, Map result) throws WrongServerJsonException, wrongDataBaseConnection {
 
         String[] parts = (String[]) result.get("requestUriPathParts");
@@ -158,7 +126,7 @@ public class Controller implements HttpHandler {
         view.view(response);
     }
 
-    public void postGroup(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
+       public void postGroup(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
         Response response = new Response();
         response.setHttpExchange(httpExchange);
 
@@ -174,40 +142,98 @@ public class Controller implements HttpHandler {
         view.view(response);
     }
 
+    public void searchGroup(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
+
+
+        String body = getBodyString(httpExchange);
+        String vaalue = readJSON.selectStringSearch(body);
+        if (vaalue != null) {
+            Response response = new Response();
+
+
+            List<Group> goodsList = groupService.searchByName(vaalue);
+
+            response.setTemplate("list");
+            response.setStatusCode(200);
+            response.setData(writeJSON.createGroupListReply(goodsList));
+            response.setHttpExchange(httpExchange);
+
+            view.view(response);
+        } else {
+            Response response = new Response();
+
+            List<Group> goodsList = groupService.getAll();
+
+            response.setTemplate("list");
+            response.setStatusCode(200);
+            response.setData(writeJSON.createGroupListReply(goodsList));
+            response.setHttpExchange(httpExchange);
+
+            view.view(response);
+        }
+    }
+
 
     //goods
-    public void searchGoods(HttpExchange httpExchange, Map<String, Object> result) {
-        try {
 
-            Map<String, Object> params = (Map<String, Object>) (result.get("requestParameters"));
-            String nameStr = (String) result.get("name");
-
-            if (nameStr != null) {
-                Response response = new Response();
+    public void searchGoods(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
 
 
-                List<Goods> goodsList = goodsService.searchByName(nameStr);
+        String body = getBodyString(httpExchange);
+        String value = readJSON.selectStringSearch(body);
+        if (value != null) {
+            Response response = new Response();
 
-                response.setTemplate("list");
-                response.setStatusCode(200);
-                response.setData(writeJSON.createGoodsListReply(goodsList));
-                response.setHttpExchange(httpExchange);
 
-                view.view(response);
-            } else {
-                Response response = new Response();
+            List<Goods> goodsList = goodsService.searchByName(value);
 
-                List<Goods> goodsList = goodsService.getAll();
+            response.setTemplate("list");
+            response.setStatusCode(200);
+            response.setData(writeJSON.createGoodsListReply(goodsList));
+            response.setHttpExchange(httpExchange);
 
-                response.setTemplate("list");
-                response.setStatusCode(200);
-                response.setData(writeJSON.createGoodsListReply(goodsList));
-                response.setHttpExchange(httpExchange);
+            view.view(response);
+        } else {
+            Response response = new Response();
 
-                view.view(response);
-            }
-        } catch (wrongDataBaseConnection | WrongServerJsonException | noItemWithSuchIdException e) {
-            e.printStackTrace();
+            List<Goods> goodsList = goodsService.getAll();
+
+            response.setTemplate("list");
+            response.setStatusCode(200);
+            response.setData(writeJSON.createGoodsListReply(goodsList));
+            response.setHttpExchange(httpExchange);
+
+            view.view(response);
+        }
+    }
+    public void sarchGoodsByGroup(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
+
+
+        String body = getBodyString(httpExchange);
+        String value = readJSON.selectStringSearch(body);
+        if (value != null) {
+            Response response = new Response();
+
+
+            List<Goods> goodsList = goodsService.searchGoodsByGroup(value);
+
+            response.setTemplate("list");
+            response.setStatusCode(200);
+            response.setData(writeJSON.createGoodsListReply(goodsList));
+            response.setHttpExchange(httpExchange);
+
+            view.view(response);
+        } else {
+            Response response = new Response();
+
+            List<Goods> goodsList = goodsService.getAll();
+
+            response.setTemplate("list");
+            response.setStatusCode(200);
+            response.setData(writeJSON.createGoodsListReply(goodsList));
+            response.setHttpExchange(httpExchange);
+
+            view.view(response);
         }
     }
     public void getGoods(HttpExchange httpExchange, Map result) {
@@ -382,16 +408,20 @@ public class Controller implements HttpHandler {
 
         view.view(response);
     }
-    public synchronized void postGoodsLeftAmount(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
+    public synchronized void postGoodsChangeAmount(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
         Response response = new Response();
         response.setHttpExchange(httpExchange);
 
         String body = getBodyString(httpExchange);
-        Goods goods = readJSON.selectGoods(body);
+        Goods goods = readJSON.selectUpdateAmount(body);
 
 
         try {
-            goodsService.updateLeftAmount(goods);
+
+            if(goods.getName()=="add"){
+                goodsService.addAmount(goods);
+            } else {
+            goodsService.writeOffAmount(goods);}
 
 
             response.setStatusCode(204);
@@ -405,6 +435,7 @@ public class Controller implements HttpHandler {
 
         view.view(response);
     }
+
 
 
     public void unknownEndpoint(HttpExchange httpExchange, Map result) {
@@ -466,7 +497,8 @@ public class Controller implements HttpHandler {
                 }else if (Pattern.matches("^/api/goods/totalprice", requestUriPath)) {
                     getTotalPrice(httpExchange, result);
                 }else if (Pattern.matches("^/api/goods/search$", requestUriPath)) {
-                    searchGoods(httpExchange, requestParameters);
+                    searchGoods(httpExchange, result);
+//                    sarchGoodsByGroup(httpExchange, result);
                 }else if (Pattern.matches("^/api/goods/totalprice/\\d+$", requestUriPath)) {
                     getGroupTotalAmount(httpExchange, result);
                 } else if (Pattern.matches("^/api/group$", requestUriPath)) {
@@ -474,7 +506,7 @@ public class Controller implements HttpHandler {
                 } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {
                     getGroupById(httpExchange, result);
                 } else if (Pattern.matches("^/api/group/search$", requestUriPath)) {
-                    searchGroups(httpExchange, requestParameters);
+                    searchGroup(httpExchange, result);
                 }else {
                     unknownEndpoint(httpExchange, result);
                 }
@@ -502,8 +534,8 @@ public class Controller implements HttpHandler {
 
                 if (Pattern.matches("^/api/goods$", requestUriPath)) {
                     postGoods(httpExchange, result);
-                }else if (Pattern.matches("^/api/goods/changeAmount$", requestUriPath)) {
-                     postGoodsLeftAmount(httpExchange, result);
+                }else if (Pattern.matches("^/api/goods/changeamount$", requestUriPath)) {
+                    postGoodsChangeAmount(httpExchange, result);
                 } else if (Pattern.matches("^/api/group$", requestUriPath)) {
                     postGroup(httpExchange, result);
                 } else {

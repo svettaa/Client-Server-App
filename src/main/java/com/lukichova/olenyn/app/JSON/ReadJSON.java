@@ -13,6 +13,44 @@ import java.math.BigDecimal;
 
 public class ReadJSON {
 
+    public String selectStringSearch(String json) throws WrongJsonException, MissedJsonFieldException {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readValue(json, JsonNode.class);
+
+
+            String name = root.get("value").asText();
+
+
+            return name;
+        } catch (JsonProcessingException e) {
+            throw new WrongJsonException();
+        } catch (NullPointerException e) {
+            throw new MissedJsonFieldException();
+        }
+    }
+    public Goods selectUpdateAmount(String json) throws WrongJsonException, MissedJsonFieldException {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readValue(json, JsonNode.class);
+
+            Integer id = getIntFieldIfExists(root, "id");
+
+            Integer leftAmount = getIntFieldIfExists(root, "amount");
+
+            Integer action = getIntFieldIfExists(root, "action");
+
+          if(action==1)
+              return new Goods(id, "add", null, leftAmount, null, null,null);
+          if(action==0)
+            return new Goods(id, null, null, leftAmount, null, null,null);
+          else throw new WrongJsonException();
+        } catch (JsonProcessingException | NumberFormatException e) {
+            throw new WrongJsonException();
+        } catch (NullPointerException e) {
+            throw new MissedJsonFieldException();
+        }
+    }
 
 
     public Group selectGroup(String json) throws WrongJsonException, MissedJsonFieldException {
