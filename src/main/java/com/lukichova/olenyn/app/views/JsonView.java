@@ -25,9 +25,11 @@ public class JsonView implements View {
         try {
             if (responseBody != null) {
 
-                httpExchange.sendResponseHeaders(statusCode, responseBody.length());
+                byte[] bs = responseBody.getBytes("UTF-8");
+
+                httpExchange.sendResponseHeaders(statusCode, bs.length);
                 OutputStream outputStream = httpExchange.getResponseBody();
-                outputStream.write(responseBody.getBytes());
+                outputStream.write(bs);
                 System.out.println(responseBody);
                 outputStream.close();
 
