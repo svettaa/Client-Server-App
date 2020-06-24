@@ -654,7 +654,7 @@ public class Controller implements HttpHandler {
             view.view(response);
             e.printStackTrace();
         } catch (notEnoughAmountException e) {
-            response.setStatusCode(404);
+            response.setStatusCode(409);
             response.setData(writeJSON.createErrorReply("notEnoughAmountException"));
             view.view(response);
             e.printStackTrace();
