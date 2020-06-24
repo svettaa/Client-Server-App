@@ -209,6 +209,7 @@ public class GroupDao {
             preparedStatement.executeUpdate();
 
             System.out.println("Deleted " + id);
+
             return true;
         } catch (SQLException e) {
             throw new wrongDataBaseConnection();

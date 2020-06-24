@@ -141,7 +141,7 @@ public class Controller implements HttpHandler {
 
         try {
             groupService.delete(id);
-
+            goodsService.deleteByGroupId(id);
             response.setStatusCode(204);
         } catch (noItemWithSuchIdException e) {
 
@@ -158,6 +158,7 @@ public class Controller implements HttpHandler {
         Response response = new Response();
 
         groupService.deleteAll();
+        goodsService.deleteAll();
         response.setStatusCode(204);
         response.setHttpExchange(httpExchange);
         response.setData(null);
