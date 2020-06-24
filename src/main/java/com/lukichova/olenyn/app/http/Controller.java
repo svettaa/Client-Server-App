@@ -640,6 +640,9 @@ public class Controller implements HttpHandler {
         } catch (noItemWithSuchNameException e) {
             System.out.println("No item with such name");
         } catch (wrongNotUniqueValue e) {
+            response.setStatusCode(409);
+            response.setData(writeJSON.createErrorReply("Not unique value"));
+            view.view(response);
             System.out.println("Not unique value");
         } catch (WrongServerJsonException e) {
             e.printStackTrace();
