@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import static com.lukichova.olenyn.app.service.JwtService.generateToken;
-import static com.lukichova.olenyn.app.service.JwtService.getUsernameFromToken;
 import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
 
 
@@ -41,25 +40,12 @@ public class Controller implements HttpHandler {
     }
 
     private boolean varification(String token) throws wrongTokenException {
-//        UserDao userDao = new UserDao();
-//        System.out.println("login  ");
-//        String login = getUsernameFromToken(token);
-//        System.out.println("login    "+login);
-//
-//        try {
-//            System.out.println("try    "+login);
-//            if(userDao.getByLogin(login)!=null)
-//                return true;
-//        } catch (com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection wrongDataBaseConnection) {
-//
-//            throw new wrongTokenException();
-//
-//        } catch (noItemWithSuchIdException e) {
-//
-//            throw new wrongTokenException();
-//
-//        }
-//        return false;
+
+     {       if(token==null)throw new wrongTokenException();
+            if(jwtService.tokenValidation(token)) throw new wrongTokenException();
+            return true;
+        }
+
     }
     private void loginHandler(final HttpExchange httpExchange, Map<String, Object> pathParams) throws noItemWithSuchIdException, wrongDataBaseConnection, IOException, WrongAuthorizationException {
 
@@ -93,9 +79,9 @@ public class Controller implements HttpHandler {
         if (user != null) {
             if (user.getPassword().equals(md5Hex(userCredential.getPassword()))) {
 
-                loginResponse = new LoginResponse( user.getLogin(), user.getRole());
+                loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
 
-               response.setToken( token);
+
                 response.setStatusCode(200);
                 response.setData(writeJSON.writeResponseAutorization(loginResponse));
 
@@ -117,6 +103,7 @@ public class Controller implements HttpHandler {
             response.setStatusCode(200);
             response.setData(writeJSON.createGroupListReply(groupList));
             response.setHttpExchange(httpExchange);
+
 
             view.view(response);
 
@@ -558,11 +545,8 @@ public class Controller implements HttpHandler {
                 paramsStr = requestUri.toString().substring(start + 1);
             }
             Map<String, List<String>> map = httpExchange.getRequestHeaders();
-            System.out.println( map.get("X-auth"));
+            System.out.println("token===="+ map.get("X-auth"));
 
-//            for (Map.Entry<String, List<String>> entry : map.entrySet()) {
-//                System.out.println(entry.getKey() + " : " + entry.getValue());
-//            }
 
             Map<String, Object> requestParameters = HttpUtil.parseQuery(paramsStr);
             result.put("requestParameters", requestParameters);
@@ -572,20 +556,17 @@ public class Controller implements HttpHandler {
 
             } else {
 
-                if(map.get("X-auth")==null)throw new wrongTokenException();
-
+                if(map.get("X-auth")==null)throw new WrongAuthorizationException();
 
                 String token = String.valueOf(map.get("X-auth"));
                 token = token.substring(1, token.length()-1);
-                if(token==null)throw new wrongTokenException();
-                System.out.println(token);
+
 
                 if(varification(token)){
 
-                    System.out.println("proishlo varification");
 
                 if (method.equals("get")) {
-                    System.out.println(1);
+
                 if (Pattern.matches("^/api/goods/$", requestUriPath)) {
                     getGoods(httpExchange, result);
                 } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {

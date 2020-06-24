@@ -1,6 +1,7 @@
 package com.lukichova.olenyn.app.service;
 
 import com.lukichova.olenyn.app.DB.User;
+import com.sun.net.httpserver.HttpExchange;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -8,6 +9,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
 import java.security.Key;
+import java.util.List;
+import java.util.Map;
 
 public class JwtService {
 
@@ -20,9 +23,9 @@ public class JwtService {
         return this.token;
 
     }
-    public boolean isJwsValid(String jws) throws ExpiredJwtException {
+    public boolean tokenValidation(String token) throws ExpiredJwtException {
         try{
-            Jwts.parserBuilder().setSigningKey(SECRET_KEY).build().parseClaimsJws(jws);
+            Jwts.parserBuilder().setSigningKey(SECRET_KEY).build().parseClaimsJws(token);
         }catch(JwtException e){
             return false;
         }
@@ -37,6 +40,7 @@ public class JwtService {
                 .compact();
 
     }
+
 
 
     public static String getUsernameFromToken(String jwt) {

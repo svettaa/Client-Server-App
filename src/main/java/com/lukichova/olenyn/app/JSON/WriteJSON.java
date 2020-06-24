@@ -35,7 +35,7 @@ public class WriteJSON {
         }
     }
     private void populateWithLoginUser(ObjectNode node, LoginResponse user){
-
+        node.put("token", user.getToken());
         node.put("login",  user.getLogin());
         node.put("role",  user.getRole());
     }

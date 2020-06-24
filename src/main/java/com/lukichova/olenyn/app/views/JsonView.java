@@ -13,7 +13,7 @@ public class JsonView implements View {
         String responseBody = "{\"error\": \"response encoding error\"}";
         Integer statusCode = 500;
 
-        String token = response.getToken();
+
 
         responseBody = response.getData();
 
@@ -23,7 +23,7 @@ public class JsonView implements View {
 
         Headers responseHeaders = httpExchange.getResponseHeaders();
         responseHeaders.set("Content-Type", "application/json");
-        responseHeaders.set("x-auth", token);
+
 
         try {
             if (responseBody != null) {
