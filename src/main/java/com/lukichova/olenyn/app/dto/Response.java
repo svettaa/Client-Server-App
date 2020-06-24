@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 public class Response {
     String template = "";
+
     String data;
     Integer statusCode;
     HttpExchange httpExchange;

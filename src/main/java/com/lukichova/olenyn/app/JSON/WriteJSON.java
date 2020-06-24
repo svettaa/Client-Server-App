@@ -9,6 +9,7 @@ import com.lukichova.olenyn.app.DB.Goods;
 import com.lukichova.olenyn.app.DB.Group;
 import com.lukichova.olenyn.app.Exceptions.WrongAuthorizationException;
 import com.lukichova.olenyn.app.Exceptions.WrongServerJsonException;
+import com.lukichova.olenyn.app.http.LoginResponse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,6 +18,27 @@ import java.util.List;
 
 public class WriteJSON {
 
+    public String writeResponseAutorization( LoginResponse response) throws IOException, WrongAuthorizationException {
+
+
+        try {
+            OutputStream outputStream = new ByteArrayOutputStream();
+            ObjectMapper mapper = new ObjectMapper();
+
+            ObjectNode root = mapper.createObjectNode();
+            populateWithLoginUser(root, response);
+
+            mapper.writeValue(outputStream, root);
+            return outputStream.toString();
+        } catch (Exception e) {
+            throw new WrongAuthorizationException();
+        }
+    }
+    private void populateWithLoginUser(ObjectNode node, LoginResponse user){
+        node.put("token", user.getToken());
+        node.put("login",  user.getLogin());
+        node.put("role",  user.getRole());
+    }
 
     public String createGroupCreatedPriceReply(int group_id,int total_price){
         try {

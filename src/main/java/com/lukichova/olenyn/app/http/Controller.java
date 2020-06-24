@@ -7,7 +7,9 @@ import com.lukichova.olenyn.app.JSON.WriteJSON;
 import com.lukichova.olenyn.app.dto.Response;
 import com.lukichova.olenyn.app.service.GoodsService;
 import com.lukichova.olenyn.app.service.GroupService;
+import com.lukichova.olenyn.app.service.JwtService;
 import com.lukichova.olenyn.app.views.View;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -20,6 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static com.lukichova.olenyn.app.service.JwtService.generateToken;
+import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
+
 
 public class Controller implements HttpHandler {
 
@@ -28,12 +33,66 @@ public class Controller implements HttpHandler {
     private final WriteJSON writeJSON = new WriteJSON();
     private final GoodsService goodsService = new GoodsService();
     private final GroupService groupService = new GroupService();
-
+    JwtService jwtService = new JwtService();
 
     public static void setView(View newView) {
         view = newView;
     }
 
+    private boolean varification(String token) throws wrongTokenException {
+
+     {       if(token==null)throw new wrongTokenException();
+            if(jwtService.tokenValidation(token)) throw new wrongTokenException();
+            return true;
+        }
+
+    }
+    private void loginHandler(final HttpExchange httpExchange, Map<String, Object> pathParams) throws noItemWithSuchIdException, wrongDataBaseConnection, IOException, WrongAuthorizationException {
+
+
+        LoginResponse loginResponse = null;
+        UserDao userDao = new UserDao();
+        String password = (String) pathParams.get("password");
+        String login = (String) pathParams.get("login");
+        UserCredential userCredential = new UserCredential(login, password);
+        User user = userDao.getByLogin(userCredential.getLogin());
+        httpExchange.getResponseHeaders()
+                .add("Content-Type", "application/json");
+
+
+        Response response = new Response();
+        String token = null;
+
+        if (user != null) {
+
+            token = generateToken(user);
+            httpExchange.getResponseHeaders()
+                    .add("x-auth", token);
+
+        } else {
+
+            response.setStatusCode(401);
+            response.setData(writeJSON.createErrorReply("Unauthorized"));
+        }
+
+
+        if (user != null) {
+            if (user.getPassword().equals(md5Hex(userCredential.getPassword()))) {
+
+                loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
+
+
+                response.setStatusCode(200);
+                response.setData(writeJSON.writeResponseAutorization(loginResponse));
+
+            } else {
+                response.setStatusCode(401);
+                response.setData(writeJSON.createErrorReply("invalid password"));
+            }
+        }
+        response.setHttpExchange(httpExchange);
+        view.view(response);
+    }
 
     public void getGroup(HttpExchange httpExchange, Map result) {
         try {
@@ -44,6 +103,7 @@ public class Controller implements HttpHandler {
             response.setStatusCode(200);
             response.setData(writeJSON.createGroupListReply(groupList));
             response.setHttpExchange(httpExchange);
+
 
             view.view(response);
 
@@ -69,9 +129,7 @@ public class Controller implements HttpHandler {
         response.setHttpExchange(httpExchange);
 
         view.view(response);
-    }
-
-    ;
+    };
 
 
     public void deleteGroupById(HttpExchange httpExchange, Map result) throws WrongServerJsonException, wrongDataBaseConnection {
@@ -127,7 +185,7 @@ public class Controller implements HttpHandler {
         view.view(response);
     }
 
-    public void postGroup(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
+       public void postGroup(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
         Response response = new Response();
         response.setHttpExchange(httpExchange);
 
@@ -178,7 +236,10 @@ public class Controller implements HttpHandler {
     //goods
 
     public void searchGoods(HttpExchange httpExchange, Map<String, Object> result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
+
+
         String value = (String) result.get("value");
+
 
         if (value != null) {
             Response response = new Response();
@@ -205,8 +266,7 @@ public class Controller implements HttpHandler {
             view.view(response);
         }
     }
-
-    public void searchGoodsByGroup(HttpExchange httpExchange, Map<String, Object> result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
+    public void sarchGoodsByGroup(HttpExchange httpExchange, Map<String, Object> result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
 
 
         String value = (String) result.get("value");
@@ -235,7 +295,6 @@ public class Controller implements HttpHandler {
             view.view(response);
         }
     }
-
     public void getGoods(HttpExchange httpExchange, Map result) {
         try {
             Map<String, Object> params = (Map<String, Object>) (result.get("requestParameters"));
@@ -268,7 +327,6 @@ public class Controller implements HttpHandler {
             e.printStackTrace();
         }
     }
-
     public void getTotalPrice(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection {
         Response response = new Response();
         Integer price = goodsService.gettotalPrice();
@@ -279,7 +337,6 @@ public class Controller implements HttpHandler {
 
         view.view(response);
     }
-
     public void getGoodsById(HttpExchange httpExchange, Map result) throws noItemWithSuchIdException, wrongDataBaseConnection, WrongServerJsonException {
 
         String[] parts = (String[]) result.get("requestUriPathParts");
@@ -321,7 +378,6 @@ public class Controller implements HttpHandler {
             view.view(response);
         }
     }
-
     public void deleteGoodsById(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection, noItemWithSuchIdException {
 
         String[] parts = (String[]) result.get("requestUriPathParts");
@@ -330,8 +386,11 @@ public class Controller implements HttpHandler {
         Response response = new Response();
         try {
             goodsService.delete(id);
+
+
             response.setStatusCode(204);
         } catch (noItemWithSuchIdException e) {
+
             response.setStatusCode(404);
         }
         response.setHttpExchange(httpExchange);
@@ -340,8 +399,7 @@ public class Controller implements HttpHandler {
 
         view.view(response);
     }
-
-    public void getGroupTotalAmount(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection, noItemWithSuchIdException {
+    public void getGroupTotalAmount (HttpExchange httpExchange, Map result) throws wrongDataBaseConnection, noItemWithSuchIdException {
 
         String[] parts = (String[]) result.get("requestUriPathParts");
 
@@ -352,7 +410,7 @@ public class Controller implements HttpHandler {
 
         response.setStatusCode(200);
 
-        response.setData(writeJSON.createGroupCreatedPriceReply(id, goods));
+        response.setData(writeJSON.createGroupCreatedPriceReply(id,goods));
 
         response.setHttpExchange(httpExchange);
 
@@ -410,8 +468,7 @@ public class Controller implements HttpHandler {
 
         view.view(response);
     }
-
-    public synchronized void postGoodsChangeAmount(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData, notEnoughAmountException {
+    public synchronized void postGoodsChangeAmount(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
         Response response = new Response();
         response.setHttpExchange(httpExchange);
 
@@ -421,11 +478,10 @@ public class Controller implements HttpHandler {
 
         try {
 
-            if (goods.getName() == null) {
-                goodsService.writeOffAmount(goods);
-            } else {
+            if(goods.getName()=="add"){
                 goodsService.addAmount(goods);
-            }
+            } else {
+            goodsService.writeOffAmount(goods);}
 
 
             response.setStatusCode(204);
@@ -439,6 +495,7 @@ public class Controller implements HttpHandler {
 
         view.view(response);
     }
+
 
 
     public void unknownEndpoint(HttpExchange httpExchange, Map result) {
@@ -459,6 +516,9 @@ public class Controller implements HttpHandler {
             String methodToCallName = null;
 
             Map<String, Object> result = new HashMap<>();
+
+            Headers responseHeaders = httpExchange.getResponseHeaders();
+
 
             URI requestUri = httpExchange.getRequestURI();
             result.put("requestUri", requestUri);
@@ -484,33 +544,40 @@ public class Controller implements HttpHandler {
             } else {
                 paramsStr = requestUri.toString().substring(start + 1);
             }
+            Map<String, List<String>> map = httpExchange.getRequestHeaders();
+            System.out.println("token===="+ map.get("X-auth"));
+
 
             Map<String, Object> requestParameters = HttpUtil.parseQuery(paramsStr);
             result.put("requestParameters", requestParameters);
 
+            if (method.equals("get") && Pattern.matches("^/login", requestUriPath)) {
+                loginHandler(httpExchange, requestParameters);
 
-            httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+            } else {
 
-            if (httpExchange.getRequestMethod().equalsIgnoreCase("OPTIONS")) {
-                httpExchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-                httpExchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type,Authorization");
-                httpExchange.sendResponseHeaders(204, -1);
-                return;
-            }
+                if(map.get("X-auth")==null)throw new WrongAuthorizationException();
+
+                String token = String.valueOf(map.get("X-auth"));
+                token = token.substring(1, token.length()-1);
 
 
-            if (method.equals("get")) {
-                if (Pattern.matches("^/api/goods$", requestUriPath)) {
+                if(varification(token)){
+
+
+                if (method.equals("get")) {
+
+                if (Pattern.matches("^/api/goods/$", requestUriPath)) {
                     getGoods(httpExchange, result);
                 } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
                     getGoodsById(httpExchange, result);
-                } else if (Pattern.matches("^/api/goods/totalprice", requestUriPath)) {
+                }else if (Pattern.matches("^/api/goods/totalprice", requestUriPath)) {
                     getTotalPrice(httpExchange, result);
-                } else if (Pattern.matches("^/api/goods/search$", requestUriPath)) {
-                    searchGoods(httpExchange, requestParameters);
-                } else if (Pattern.matches("^/api/goods/searchbygroup$", requestUriPath)) {
-                    searchGoodsByGroup(httpExchange, requestParameters);
-                } else if (Pattern.matches("^/api/goods/totalprice/\\d+$", requestUriPath)) {
+                }else if (Pattern.matches("^/api/goods/search$", requestUriPath)) {
+                   searchGoods(httpExchange, requestParameters);
+               }else if (Pattern.matches("^/api/goods/searchbygroup$", requestUriPath)) {
+                    sarchGoodsByGroup(httpExchange, requestParameters);
+                }else if (Pattern.matches("^/api/goods/totalprice/\\d+$", requestUriPath)) {
                     getGroupTotalAmount(httpExchange, result);
                 } else if (Pattern.matches("^/api/group$", requestUriPath)) {
                     getGroup(httpExchange, result);
@@ -518,22 +585,22 @@ public class Controller implements HttpHandler {
                     getGroupById(httpExchange, result);
                 } else if (Pattern.matches("^/api/group/search$", requestUriPath)) {
                     searchGroup(httpExchange, requestParameters);
-                } else {
+                }else {
                     unknownEndpoint(httpExchange, result);
                 }
-            } else if (method.equals("delete")) {
-                if (Pattern.matches("^/api/goods$", requestUriPath)) {
-                    deleteAllGoods(httpExchange, result);
-                } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
-                    deleteGoodsById(httpExchange, result);
-                } else if (Pattern.matches("^/api/group$", requestUriPath)) {
-                    deleteAllGroups(httpExchange, result);
-                } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {
-                    deleteGroupById(httpExchange, result);
-                } else {
-                    unknownEndpoint(httpExchange, result);
-                }
-            } else if (method.equals("put")) {
+            }else if (method.equals("delete")) {
+                    if (Pattern.matches("^/api/goods$", requestUriPath)) {
+                        deleteAllGoods(httpExchange, result);
+                    } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
+                        deleteGoodsById(httpExchange, result);
+                    } else if (Pattern.matches("^/api/group$", requestUriPath)) {
+                        deleteAllGroups(httpExchange, result);
+                    } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {
+                        deleteGroupById(httpExchange, result);
+                    } else {
+                        unknownEndpoint(httpExchange, result);
+                    }
+                } else if (method.equals("put")) {
                 if (Pattern.matches("^/api/goods$", requestUriPath)) {
                     putGoods(httpExchange, result);
                 } else if (Pattern.matches("^/api/group$", requestUriPath)) {
@@ -545,13 +612,16 @@ public class Controller implements HttpHandler {
 
                 if (Pattern.matches("^/api/goods$", requestUriPath)) {
                     postGoods(httpExchange, result);
-                } else if (Pattern.matches("^/api/goods/changeamount$", requestUriPath)) {
+                }else if (Pattern.matches("^/api/goods/changeamount$", requestUriPath)) {
                     postGoodsChangeAmount(httpExchange, result);
                 } else if (Pattern.matches("^/api/group$", requestUriPath)) {
                     postGroup(httpExchange, result);
                 } else {
                     unknownEndpoint(httpExchange, result);
                 }
+            }}
+
+
             }
 
 
@@ -568,19 +638,21 @@ public class Controller implements HttpHandler {
         } catch (wrongDataBaseConnection e) {
             System.out.println("Wrong database connection");
         } catch (noItemWithSuchNameException e) {
-            response.setStatusCode(404);
-            response.setData(writeJSON.createErrorReply("No item with such name"));
-            view.view(response);
             System.out.println("No item with such name");
         } catch (wrongNotUniqueValue e) {
             System.out.println("Not unique value");
         } catch (WrongServerJsonException e) {
             e.printStackTrace();
-        } catch (notEnoughAmountException e) {
-            response.setStatusCode(409);
-            response.setData(writeJSON.createErrorReply("Not enough"));
+        } catch (WrongAuthorizationException e) {
+            response.setStatusCode(401);
+            response.setData(writeJSON.createErrorReply("Unauthorize"));
             view.view(response);
-            System.out.println("Not enough");
+            System.out.println("Unauthorize");
+        } catch (wrongTokenException e) {
+            response.setStatusCode(403);
+            response.setData(writeJSON.createErrorReply("Invalid token"));
+            view.view(response);
+            e.printStackTrace();
         }
     }
 
