@@ -13,7 +13,7 @@ public class JsonView implements View {
         String responseBody = "{\"error\": \"response encoding error\"}";
         Integer statusCode = 500;
 
-        String token = null;
+        String token = response.getToken();
 
         responseBody = response.getData();
 

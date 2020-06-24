@@ -26,19 +26,21 @@ public class UserDao {
 
             preparedStatement = connection.prepareStatement(sqlQuery);
             preparedStatement.setString(1, login);
+
             rs = preparedStatement.executeQuery();
 
             if (rs.next()) {
 
-
+                System.out.println("if");
                 User user= createUser(rs);
                 if(user.getId()!=null){
-
+                    System.out.println("if1");
                 return user;
                 }
                 else return null;
 
             } else {
+                System.out.println(rs.next());
 
                 return null;
 
@@ -137,6 +139,21 @@ public class UserDao {
                 preparedStatement.setString(3, user.getRole());
 
                 preparedStatement.executeUpdate();
+            }
+            else{
+
+                String sqlQuery = "INSERT INTO " + USERS_TABLE +
+                        " (id,login, password, role) " +
+                        " VALUES (?,?, ?,?)";
+
+                preparedStatement = connection.prepareStatement(sqlQuery);
+                preparedStatement.setInt(1, user.getId());
+                preparedStatement.setString(2, user.getLogin());
+                preparedStatement.setString(3, password);
+                preparedStatement.setString(4, user.getRole());
+
+                preparedStatement.executeUpdate();
+
             }
             System.out.println("Inserted " + user.getId()+" "+user.getLogin() + " " + user.getRole());
             return true;

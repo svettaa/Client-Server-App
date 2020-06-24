@@ -9,6 +9,7 @@ import com.lukichova.olenyn.app.service.GoodsService;
 import com.lukichova.olenyn.app.service.GroupService;
 import com.lukichova.olenyn.app.service.JwtService;
 import com.lukichova.olenyn.app.views.View;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -39,9 +40,9 @@ public class Controller implements HttpHandler {
         view = newView;
     }
 
-    private boolean varification() throws wrongTokenException {
+    private boolean varification(String token) throws wrongTokenException {
         UserDao userDao = new UserDao();
-        String login = getUsernameFromToken(jwtService.getToken());
+        String login = getUsernameFromToken(token);
 
         try {
             if(userDao.getByLogin(login)!=null)
@@ -69,13 +70,19 @@ public class Controller implements HttpHandler {
         User user = userDao.getByLogin(userCredential.getLogin());
         httpExchange.getResponseHeaders()
                 .add("Content-Type", "application/json");
+
+
         Response response = new Response();
         String token = null;
-
+        System.out.println("1");
         if (user != null) {
+            System.out.println("2");
             token = generateToken(user);
+            httpExchange.getResponseHeaders()
+                    .add("x-auth", token);
 
         } else {
+            System.out.println("3");
             response.setStatusCode(401);
             response.setData(writeJSON.createErrorReply("Unauthorized"));
         }
@@ -86,7 +93,7 @@ public class Controller implements HttpHandler {
 
                 loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
 
-                jwtService.token = token;
+               response.setToken( token);
                 response.setStatusCode(200);
                 response.setData(writeJSON.writeResponseAutorization(loginResponse));
 
@@ -521,6 +528,10 @@ public class Controller implements HttpHandler {
 
             Map<String, Object> result = new HashMap<>();
 
+            Headers responseHeaders = httpExchange.getResponseHeaders();
+
+           String token = String.valueOf(responseHeaders.get("x-auth"));
+
             URI requestUri = httpExchange.getRequestURI();
             result.put("requestUri", requestUri);
             System.out.println(result);
@@ -549,7 +560,7 @@ public class Controller implements HttpHandler {
             Map<String, Object> requestParameters = HttpUtil.parseQuery(paramsStr);
             result.put("requestParameters", requestParameters);
 
-            if (method.equals("get") && Pattern.matches("/login", requestUriPath)) {
+            if (method.equals("get") && Pattern.matches("^/login", requestUriPath)) {
                 loginHandler(httpExchange, requestParameters);
 
             } else {
