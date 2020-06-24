@@ -62,15 +62,15 @@ public class Controller implements HttpHandler {
 
         Response response = new Response();
         String token = null;
-        System.out.println("1");
+
         if (user != null) {
-            System.out.println("2");
+
             token = generateToken(user);
             httpExchange.getResponseHeaders()
                     .add("x-auth", token);
 
         } else {
-            System.out.println("3");
+
             response.setStatusCode(401);
             response.setData(writeJSON.createErrorReply("Unauthorized"));
         }
