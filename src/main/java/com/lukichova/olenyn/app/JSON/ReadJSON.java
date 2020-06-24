@@ -29,6 +29,7 @@ public class ReadJSON {
             throw new MissedJsonFieldException();
         }
     }
+
     public Goods selectUpdateAmount(String json) throws WrongJsonException, MissedJsonFieldException {
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -40,11 +41,11 @@ public class ReadJSON {
 
             Integer action = getIntFieldIfExists(root, "action");
 
-          if(action==1)
-              return new Goods(id, "add", null, leftAmount, null, null,null);
-          if(action==0)
-            return new Goods(id, null, null, leftAmount, null, null,null);
-          else throw new WrongJsonException();
+            if (action == 1)
+                return new Goods(id, "add", null, leftAmount, null, null, null);
+            if (action == 0)
+                return new Goods(id, null, null, leftAmount, null, null, null);
+            else throw new WrongJsonException();
         } catch (JsonProcessingException | NumberFormatException e) {
             throw new WrongJsonException();
         } catch (NullPointerException e) {

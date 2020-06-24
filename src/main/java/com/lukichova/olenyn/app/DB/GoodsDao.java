@@ -65,7 +65,6 @@ public class GoodsDao {
                  Goods goods =createGoods(rs);
                 return goods.getLeft_amount();
             } else {
-
                 throw new noItemWithSuchIdException();
             }
         } catch (SQLException sqlException) {
@@ -90,10 +89,12 @@ public class GoodsDao {
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, '%' + name + '%');
             ResultSet rs = preparedStatement.executeQuery();
+
             while (rs.next()) {
                 list.add(createGoods(rs));
                 System.out.println(createGoods(rs));
             }
+
             rs.close();
             return list;
         } catch (SQLException sqlException) {
