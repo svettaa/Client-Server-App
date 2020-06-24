@@ -178,10 +178,7 @@ public class Controller implements HttpHandler {
     //goods
 
     public void searchGoods(HttpExchange httpExchange, Map<String, Object> result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
-
-
         String value = (String) result.get("value");
-
 
         if (value != null) {
             Response response = new Response();
@@ -325,24 +322,23 @@ public class Controller implements HttpHandler {
         }
     }
 
-    public void deleteGoodsById(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection, noItemWithSuchIdException, WrongServerJsonException {
-
+    public void deleteGoodsById(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection, noItemWithSuchIdException {
 
         String[] parts = (String[]) result.get("requestUriPathParts");
-
         int id = Integer.parseInt(parts[3]);
 
         Response response = new Response();
-
-        Group group = groupService.listByCriteria(id);
-
-        response.setStatusCode(200);
-
-        response.setData(writeJSON.createGroupReply(group));
+        try {
+            goodsService.delete(id);
+            response.setStatusCode(204);
+        } catch (noItemWithSuchIdException e) {
+            response.setStatusCode(404);
+        }
         response.setHttpExchange(httpExchange);
+        response.setData(null);
+
 
         view.view(response);
-
     }
 
     public void getGroupTotalAmount(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection, noItemWithSuchIdException {
