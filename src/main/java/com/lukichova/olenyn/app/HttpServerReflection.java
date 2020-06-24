@@ -1,5 +1,6 @@
 package com.lukichova.olenyn.app;
 
+import com.lukichova.olenyn.app.DB.UserDao;
 import com.lukichova.olenyn.app.http.Controller;
 import com.lukichova.olenyn.app.service.GoodsService;
 import com.lukichova.olenyn.app.views.JsonView;
@@ -27,7 +28,8 @@ public class HttpServerReflection {
 
             server = HttpServer.create();
 
-
+            UserDao userDao = new UserDao();
+            //userDao.create();
             server.bind(new InetSocketAddress(HTTP_SERVER_PORT), 0);
 //            GoodsService h = new GoodsService();
 //            System.out.println(h.gettotalPrice());

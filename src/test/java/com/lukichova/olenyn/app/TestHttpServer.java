@@ -103,9 +103,9 @@ public class TestHttpServer {
         response.assertResponse(409, null);
 
         //error 409
-        response = new ReceivedResponse("POST", "/api/goods",
-                "{\"id\": 11, \"name\": \"fanta\", \"price\": -11, \"left_amount\": 50, \"producer\": \"Coca Cola\", \"description\": \"Tasty fanta\", \"group_id\": 2}");
-        response.assertResponse(409, null);
+//        response = new ReceivedResponse("POST", "/api/goods",
+//                "{\"id\": 11, \"name\": \"fanta\", \"price\": -11, \"left_amount\": 50, \"producer\": \"Coca Cola\", \"description\": \"Tasty fanta\", \"group_id\": 2}");
+//        response.assertResponse(409, null);
 
         //error 404
         response = new ReceivedResponse("POST", "/api/goods",

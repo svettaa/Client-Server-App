@@ -7,6 +7,7 @@ import com.lukichova.olenyn.app.JSON.WriteJSON;
 import com.lukichova.olenyn.app.dto.Response;
 import com.lukichova.olenyn.app.service.GoodsService;
 import com.lukichova.olenyn.app.service.GroupService;
+import com.lukichova.olenyn.app.service.JwtService;
 import com.lukichova.olenyn.app.views.View;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -20,6 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static com.lukichova.olenyn.app.service.JwtService.generateToken;
+import static com.lukichova.olenyn.app.service.JwtService.getUsernameFromToken;
+import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
 
 
 public class Controller implements HttpHandler {
@@ -29,12 +33,71 @@ public class Controller implements HttpHandler {
     private final WriteJSON writeJSON = new WriteJSON();
     private final GoodsService goodsService = new GoodsService();
     private final GroupService groupService = new GroupService();
-
+    JwtService jwtService = new JwtService();
 
     public static void setView(View newView) {
         view = newView;
     }
 
+    private boolean varification() throws wrongTokenException {
+        UserDao userDao = new UserDao();
+        String login = getUsernameFromToken(jwtService.getToken());
+
+        try {
+            if(userDao.getByLogin(login)!=null)
+
+                return true;
+        } catch (com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection wrongDataBaseConnection) {
+
+            throw new wrongTokenException();
+
+        } catch (noItemWithSuchIdException e) {
+
+            throw new wrongTokenException();
+
+        }
+        return false;
+    }
+    private void loginHandler(final HttpExchange httpExchange, Map<String, Object> pathParams) throws noItemWithSuchIdException, wrongDataBaseConnection, IOException, WrongAuthorizationException {
+
+
+        LoginResponse loginResponse = null;
+        UserDao userDao = new UserDao();
+        String password = (String) pathParams.get("password");
+        String login = (String) pathParams.get("login");
+        UserCredential userCredential = new UserCredential(login, password);
+        User user = userDao.getByLogin(userCredential.getLogin());
+        httpExchange.getResponseHeaders()
+                .add("Content-Type", "application/json");
+        Response response = new Response();
+        String token = null;
+
+        if (user != null) {
+            token = generateToken(user);
+
+        } else {
+            response.setStatusCode(401);
+            response.setData(writeJSON.createErrorReply("Unauthorized"));
+        }
+
+
+        if (user != null) {
+            if (user.getPassword().equals(md5Hex(userCredential.getPassword()))) {
+
+                loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
+
+                jwtService.token = token;
+                response.setStatusCode(200);
+                response.setData(writeJSON.writeResponseAutorization(loginResponse));
+
+            } else {
+                response.setStatusCode(401);
+                response.setData(writeJSON.createErrorReply("invalid password"));
+            }
+        }
+        response.setHttpExchange(httpExchange);
+        view.view(response);
+    }
 
     public void getGroup(HttpExchange httpExchange, Map result) {
         try {
@@ -319,25 +382,26 @@ public class Controller implements HttpHandler {
             view.view(response);
         }
     }
-
-    public void deleteGoodsById(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection, noItemWithSuchIdException, WrongServerJsonException {
-
+    public void deleteGoodsById(HttpExchange httpExchange, Map result) throws wrongDataBaseConnection, noItemWithSuchIdException {
 
         String[] parts = (String[]) result.get("requestUriPathParts");
-
         int id = Integer.parseInt(parts[3]);
 
         Response response = new Response();
+        try {
+            goodsService.delete(id);
 
-        Group group = groupService.listByCriteria(id);
 
-        response.setStatusCode(200);
+            response.setStatusCode(204);
+        } catch (noItemWithSuchIdException e) {
 
-        response.setData(writeJSON.createGroupReply(group));
+            response.setStatusCode(404);
+        }
         response.setHttpExchange(httpExchange);
+        response.setData(null);
+
 
         view.view(response);
-
     }
     public void getGroupTotalAmount (HttpExchange httpExchange, Map result) throws wrongDataBaseConnection, noItemWithSuchIdException {
 
@@ -485,7 +549,10 @@ public class Controller implements HttpHandler {
             Map<String, Object> requestParameters = HttpUtil.parseQuery(paramsStr);
             result.put("requestParameters", requestParameters);
 
+            if (method.equals("get") && Pattern.matches("/login", requestUriPath)) {
+                loginHandler(httpExchange, requestParameters);
 
+            } else {
 
 
                 if (method.equals("get")) {
@@ -511,19 +578,19 @@ public class Controller implements HttpHandler {
                 }else {
                     unknownEndpoint(httpExchange, result);
                 }
-            } else if (method.equals("delete")) {
-                if (Pattern.matches("^/api/goods$", requestUriPath)) {
-                    deleteAllGoods(httpExchange, result);
-                } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
-                    deleteGoodsById(httpExchange, result);
-                } else if (Pattern.matches("^/api/group$", requestUriPath)) {
-                    deleteAllGroups(httpExchange, result);
-                } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {
-                    deleteGroupById(httpExchange, result);
-                } else {
-                    unknownEndpoint(httpExchange, result);
-                }
-            } else if (method.equals("put")) {
+            }else if (method.equals("delete")) {
+                    if (Pattern.matches("^/api/goods$", requestUriPath)) {
+                        deleteAllGoods(httpExchange, result);
+                    } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
+                        deleteGoodsById(httpExchange, result);
+                    } else if (Pattern.matches("^/api/group$", requestUriPath)) {
+                        deleteAllGroups(httpExchange, result);
+                    } else if (Pattern.matches("^/api/group/\\d+$", requestUriPath)) {
+                        deleteGroupById(httpExchange, result);
+                    } else {
+                        unknownEndpoint(httpExchange, result);
+                    }
+                } else if (method.equals("put")) {
                 if (Pattern.matches("^/api/goods$", requestUriPath)) {
                     putGoods(httpExchange, result);
                 } else if (Pattern.matches("^/api/group$", requestUriPath)) {
@@ -542,7 +609,7 @@ public class Controller implements HttpHandler {
                 } else {
                     unknownEndpoint(httpExchange, result);
                 }
-            }
+            }}
 
 
         } catch (MissedJsonFieldException | noItemWithSuchIdException e) {
@@ -563,6 +630,11 @@ public class Controller implements HttpHandler {
             System.out.println("Not unique value");
         } catch (WrongServerJsonException e) {
             e.printStackTrace();
+        } catch (WrongAuthorizationException e) {
+            response.setStatusCode(401);
+            response.setData(writeJSON.createErrorReply("Unauthorize"));
+            view.view(response);
+            System.out.println("Unauthorize");
         }
     }
 
