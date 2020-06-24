@@ -5,9 +5,7 @@ import org.sqlite.SQLiteException;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.lukichova.olenyn.app.resoures.Resoures.GOODS_TABLE;
 import static com.lukichova.olenyn.app.resoures.Resoures.GROUP_TABLE;

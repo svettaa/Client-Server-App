@@ -19,8 +19,6 @@ import java.util.List;
 public class WriteJSON {
 
     public String writeResponseAutorization( LoginResponse response) throws IOException, WrongAuthorizationException {
-
-
         try {
             OutputStream outputStream = new ByteArrayOutputStream();
             ObjectMapper mapper = new ObjectMapper();

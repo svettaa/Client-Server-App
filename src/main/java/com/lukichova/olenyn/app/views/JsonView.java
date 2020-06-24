@@ -10,10 +10,8 @@ import java.io.OutputStream;
 public class JsonView implements View {
     @Override
     public void view(Response response) {
-        String responseBody = "{\"error\": \"response encoding error\"}";
-        Integer statusCode = 500;
-
-
+        String responseBody;
+        Integer statusCode;
 
         responseBody = response.getData();
 
@@ -27,16 +25,12 @@ public class JsonView implements View {
 
         try {
             if (responseBody != null) {
-
                 byte[] bs = responseBody.getBytes("UTF-8");
-
                 httpExchange.sendResponseHeaders(statusCode, bs.length);
                 OutputStream outputStream = httpExchange.getResponseBody();
                 outputStream.write(bs);
                 System.out.println(responseBody);
                 outputStream.close();
-
-
             } else {
                 httpExchange.sendResponseHeaders(statusCode, -1);
             }

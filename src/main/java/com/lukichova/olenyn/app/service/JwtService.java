@@ -9,15 +9,12 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
 import java.security.Key;
-import java.util.List;
-import java.util.Map;
 
 public class JwtService {
 
     public static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     public String token="";
-
 
     public String getToken() {
         return this.token;
@@ -41,8 +38,6 @@ public class JwtService {
 
     }
 
-
-
     public static String getUsernameFromToken(String jwt) {
         return Jwts.parserBuilder()
             .setSigningKey(SECRET_KEY)
@@ -51,6 +46,4 @@ public class JwtService {
             .getBody()
             .getSubject();
     }
-
-
 }

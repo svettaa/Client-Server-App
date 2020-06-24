@@ -13,23 +13,6 @@ import java.math.BigDecimal;
 
 public class ReadJSON {
 
-    public String selectStringSearch(String json) throws WrongJsonException, MissedJsonFieldException {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readValue(json, JsonNode.class);
-
-
-            String name = root.get("value").asText();
-
-
-            return name;
-        } catch (JsonProcessingException e) {
-            throw new WrongJsonException();
-        } catch (NullPointerException e) {
-            throw new MissedJsonFieldException();
-        }
-    }
-
     public Goods selectUpdateAmount(String json) throws WrongJsonException, MissedJsonFieldException {
         try {
             ObjectMapper mapper = new ObjectMapper();
