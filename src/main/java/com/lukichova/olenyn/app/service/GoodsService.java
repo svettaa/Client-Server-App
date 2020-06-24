@@ -18,10 +18,10 @@ public class GoodsService {
         return goodsDao.getByName(name);
     }
 
-    public List<Goods> searchByName(String name) throws noItemWithSuchIdException, wrongDataBaseConnection {
+    public List<Goods> searchByName(String name) throws noItemWithSuchIdException, wrongDataBaseConnection, noItemWithSuchNameException {
         return goodsDao.searchByName(name);
     }
-    public List<Goods> searchGoodsByGroup(String name) throws noItemWithSuchIdException, wrongDataBaseConnection {
+    public List<Goods> searchGoodsByGroup(String name) throws noItemWithSuchIdException, wrongDataBaseConnection, noItemWithSuchNameException {
         return goodsDao.searchGoodsByGroup(name);
     }
     public List<Goods> getByGroupId(Integer group_id) throws noItemWithSuchIdException, wrongDataBaseConnection {

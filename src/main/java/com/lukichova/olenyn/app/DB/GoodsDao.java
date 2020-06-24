@@ -75,7 +75,7 @@ public class GoodsDao {
             close(connection, preparedStatement, rs);
         }
     }
-    public List<Goods> searchByName(String name) throws wrongDataBaseConnection, noItemWithSuchIdException {
+    public List<Goods> searchByName(String name) throws wrongDataBaseConnection, noItemWithSuchIdException, noItemWithSuchNameException {
         List<Goods> list = new ArrayList<Goods>();
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -89,8 +89,11 @@ public class GoodsDao {
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, '%' + name + '%');
             ResultSet rs = preparedStatement.executeQuery();
-
+           if( !rs.next()){
+               throw new noItemWithSuchNameException();
+           }
             while (rs.next()) {
+
                 list.add(createGoods(rs));
                 System.out.println(createGoods(rs));
             }
@@ -167,7 +170,7 @@ public class GoodsDao {
 
         return g;
     }
-    public List<Goods> searchGoodsByGroup(String name) throws wrongDataBaseConnection, noItemWithSuchIdException {
+    public List<Goods> searchGoodsByGroup(String name) throws wrongDataBaseConnection, noItemWithSuchIdException, noItemWithSuchNameException {
         List<Goods> list = new ArrayList<Goods>();
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -182,6 +185,11 @@ public class GoodsDao {
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, '%' + name + '%');
             ResultSet rs = preparedStatement.executeQuery();
+            if( !rs.next()){
+
+
+                throw new noItemWithSuchNameException();
+            }
             while (rs.next()) {
                 list.add(createGoods(rs));
                 System.out.println(createGoods(rs));

@@ -572,6 +572,9 @@ public class Controller implements HttpHandler {
         } catch (wrongDataBaseConnection e) {
             System.out.println("Wrong database connection");
         } catch (noItemWithSuchNameException e) {
+            response.setStatusCode(404);
+            response.setData(writeJSON.createErrorReply("No item with such name"));
+            view.view(response);
             System.out.println("No item with such name");
         } catch (wrongNotUniqueValue e) {
             System.out.println("Not unique value");
