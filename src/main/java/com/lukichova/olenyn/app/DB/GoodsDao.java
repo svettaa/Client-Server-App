@@ -90,6 +90,7 @@ public class GoodsDao {
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, '%' + name + '%');
             ResultSet rs = preparedStatement.executeQuery();
+
             while (rs.next()) {
                 list.add(createGoods(rs));
                 System.out.println(createGoods(rs));

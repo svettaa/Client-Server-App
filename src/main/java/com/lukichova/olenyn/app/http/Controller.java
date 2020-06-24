@@ -41,23 +41,25 @@ public class Controller implements HttpHandler {
     }
 
     private boolean varification(String token) throws wrongTokenException {
-        UserDao userDao = new UserDao();
-        String login = getUsernameFromToken(token);
-
-        try {
-            if(userDao.getByLogin(login)!=null)
-
-                return true;
-        } catch (com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection wrongDataBaseConnection) {
-
-            throw new wrongTokenException();
-
-        } catch (noItemWithSuchIdException e) {
-
-            throw new wrongTokenException();
-
-        }
-        return false;
+//        UserDao userDao = new UserDao();
+//        System.out.println("login  ");
+//        String login = getUsernameFromToken(token);
+//        System.out.println("login    "+login);
+//
+//        try {
+//            System.out.println("try    "+login);
+//            if(userDao.getByLogin(login)!=null)
+//                return true;
+//        } catch (com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection wrongDataBaseConnection) {
+//
+//            throw new wrongTokenException();
+//
+//        } catch (noItemWithSuchIdException e) {
+//
+//            throw new wrongTokenException();
+//
+//        }
+//        return false;
     }
     private void loginHandler(final HttpExchange httpExchange, Map<String, Object> pathParams) throws noItemWithSuchIdException, wrongDataBaseConnection, IOException, WrongAuthorizationException {
 
@@ -555,6 +557,12 @@ public class Controller implements HttpHandler {
             } else {
                 paramsStr = requestUri.toString().substring(start + 1);
             }
+            Map<String, List<String>> map = httpExchange.getRequestHeaders();
+            System.out.println( map.get("X-auth"));
+
+//            for (Map.Entry<String, List<String>> entry : map.entrySet()) {
+//                System.out.println(entry.getKey() + " : " + entry.getValue());
+//            }
 
             Map<String, Object> requestParameters = HttpUtil.parseQuery(paramsStr);
             result.put("requestParameters", requestParameters);
@@ -563,15 +571,21 @@ public class Controller implements HttpHandler {
                 loginHandler(httpExchange, requestParameters);
 
             } else {
-               if(responseHeaders.get("X-auth")==null)throw new wrongTokenException();
-                String token = String.valueOf(responseHeaders.get("X-auth"));
+
+                if(map.get("X-auth")==null)throw new wrongTokenException();
+
+
+                String token = String.valueOf(map.get("X-auth"));
+                token = token.substring(1, token.length()-1);
                 if(token==null)throw new wrongTokenException();
+                System.out.println(token);
 
                 if(varification(token)){
 
+                    System.out.println("proishlo varification");
 
                 if (method.equals("get")) {
-
+                    System.out.println(1);
                 if (Pattern.matches("^/api/goods/$", requestUriPath)) {
                     getGoods(httpExchange, result);
                 } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
