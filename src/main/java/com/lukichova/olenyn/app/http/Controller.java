@@ -420,14 +420,11 @@ public class Controller implements HttpHandler {
 
 
         try {
-
             if (goods.getName() == null) {
                 goodsService.writeOffAmount(goods);
             } else {
                 goodsService.addAmount(goods);
             }
-
-
             response.setStatusCode(204);
         } catch (noItemWithSuchIdException e) {
 
@@ -573,6 +570,9 @@ public class Controller implements HttpHandler {
             view.view(response);
             System.out.println("No item with such name");
         } catch (wrongNotUniqueValue e) {
+            response.setStatusCode(409);
+            response.setData(writeJSON.createErrorReply("Not unique value"));
+            view.view(response);
             System.out.println("Not unique value");
         } catch (WrongServerJsonException e) {
             e.printStackTrace();
