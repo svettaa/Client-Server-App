@@ -91,7 +91,7 @@ public class Controller implements HttpHandler {
         if (user != null) {
             if (user.getPassword().equals(md5Hex(userCredential.getPassword()))) {
 
-                loginResponse = new LoginResponse(token, user.getLogin(), user.getRole());
+                loginResponse = new LoginResponse( user.getLogin(), user.getRole());
 
                response.setToken( token);
                 response.setStatusCode(200);
@@ -530,7 +530,6 @@ public class Controller implements HttpHandler {
 
             Headers responseHeaders = httpExchange.getResponseHeaders();
 
-           String token = String.valueOf(responseHeaders.get("x-auth"));
 
             URI requestUri = httpExchange.getRequestURI();
             result.put("requestUri", requestUri);
@@ -564,6 +563,11 @@ public class Controller implements HttpHandler {
                 loginHandler(httpExchange, requestParameters);
 
             } else {
+               if(responseHeaders.get("X-auth")==null)throw new wrongTokenException();
+                String token = String.valueOf(responseHeaders.get("X-auth"));
+                if(token==null)throw new wrongTokenException();
+
+                if(varification(token)){
 
 
                 if (method.equals("get")) {
@@ -623,6 +627,9 @@ public class Controller implements HttpHandler {
             }}
 
 
+            }
+
+
         } catch (MissedJsonFieldException | noItemWithSuchIdException e) {
             response.setStatusCode(404);
             response.setData(writeJSON.createErrorReply("No field"));
@@ -646,6 +653,11 @@ public class Controller implements HttpHandler {
             response.setData(writeJSON.createErrorReply("Unauthorize"));
             view.view(response);
             System.out.println("Unauthorize");
+        } catch (wrongTokenException e) {
+            response.setStatusCode(403);
+            response.setData(writeJSON.createErrorReply("Invalid token"));
+            view.view(response);
+            e.printStackTrace();
         }
     }
 

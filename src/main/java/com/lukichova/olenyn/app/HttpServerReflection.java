@@ -30,10 +30,10 @@ public class HttpServerReflection {
             Controller.setView(VIEW);
 
             server = HttpServer.create();
-            User user = new User(101,"baby","ppp","rrr");
-       //     User userTest = new User("sveta","luk","ff");
-            UserDao userDao = new UserDao();
-            userDao.create(user);
+//            User user = new User("sonya","best","rrr");
+//       //     User userTest = new User("sveta","luk","ff");
+//            UserDao userDao = new UserDao();
+//            userDao.create(user);
             server.bind(new InetSocketAddress(HTTP_SERVER_PORT), 0);
 //            GoodsService h = new GoodsService();
 //            System.out.println(h.gettotalPrice());
@@ -45,10 +45,6 @@ public class HttpServerReflection {
 
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (com.lukichova.olenyn.app.Exceptions.wrongNotUniqueValue wrongNotUniqueValue) {
-            wrongNotUniqueValue.printStackTrace();
-        } catch (com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection wrongDataBaseConnection) {
-            wrongDataBaseConnection.printStackTrace();
         }
     }
 }
