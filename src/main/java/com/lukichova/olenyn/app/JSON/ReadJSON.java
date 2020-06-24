@@ -35,11 +35,11 @@ public class ReadJSON {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readValue(json, JsonNode.class);
 
-            Integer id = getIntFieldIfExists(root, "id");
+            Integer id = root.get("id").asInt();
 
-            Integer leftAmount = getIntFieldIfExists(root, "amount");
+            Integer leftAmount = root.get("amount").asInt();
 
-            Integer action = getIntFieldIfExists(root, "action");
+            Integer action = root.get("action").asInt();
 
             if (action == 1)
                 return new Goods(id, "add", null, leftAmount, null, null, null);

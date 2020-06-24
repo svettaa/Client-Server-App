@@ -1,9 +1,6 @@
 package com.lukichova.olenyn.app.DB;
 
-import com.lukichova.olenyn.app.Exceptions.noItemWithSuchIdException;
-import com.lukichova.olenyn.app.Exceptions.noItemWithSuchNameException;
-import com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection;
-import com.lukichova.olenyn.app.Exceptions.wrongNotUniqueValue;
+import com.lukichova.olenyn.app.Exceptions.*;
 import org.sqlite.SQLiteException;
 
 import java.sql.*;
@@ -382,12 +379,15 @@ public class GoodsDao {
             close(connection, preparedStatement);
         }
     }
-    public boolean writeOffAmount(Goods goods) throws wrongDataBaseConnection, noItemWithSuchIdException {
+    public boolean writeOffAmount(Goods goods) throws wrongDataBaseConnection, noItemWithSuchIdException, notEnoughAmountException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         Goods g = new Goods();
         g=getById(goods.getId());
         int amount =  getLeftAmountById(goods.getId())- goods.getLeft_amount();
+        if(amount < 0){
+            throw new notEnoughAmountException();
+        }
         try {
             connection = DriverManager.getConnection(DataBase.url);
             String sqlQuery = "UPDATE " + GOODS_TABLE + " " +

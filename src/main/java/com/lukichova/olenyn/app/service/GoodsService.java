@@ -59,7 +59,7 @@ public class GoodsService {
 
         return goodsDao.update(goods);
     }
-    public boolean writeOffAmount(Goods goods) throws wrongDataBaseConnection, WrongJsonInputData, noItemWithSuchIdException, wrongNotUniqueValue {
+    public boolean writeOffAmount(Goods goods) throws wrongDataBaseConnection, WrongJsonInputData, noItemWithSuchIdException, wrongNotUniqueValue, notEnoughAmountException {
 //        if (goods.getId() == null || goods.getName() == null || goods.getProducer() == null ||
 //                goods.getLeft_amount() < 0 || goods.getLeft_amount() == null || goods.getPrice() == null ||
 //                (goods.getPrice().compareTo(new BigDecimal("0.00")) < 0) || goods.getGroup_id() == null ||

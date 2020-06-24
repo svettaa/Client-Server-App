@@ -415,7 +415,7 @@ public class Controller implements HttpHandler {
         view.view(response);
     }
 
-    public synchronized void postGoodsChangeAmount(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
+    public synchronized void postGoodsChangeAmount(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData, notEnoughAmountException {
         Response response = new Response();
         response.setHttpExchange(httpExchange);
 
@@ -425,10 +425,10 @@ public class Controller implements HttpHandler {
 
         try {
 
-            if (goods.getName() == "add") {
-                goodsService.addAmount(goods);
-            } else {
+            if (goods.getName() == null) {
                 goodsService.writeOffAmount(goods);
+            } else {
+                goodsService.addAmount(goods);
             }
 
 
@@ -580,6 +580,11 @@ public class Controller implements HttpHandler {
             System.out.println("Not unique value");
         } catch (WrongServerJsonException e) {
             e.printStackTrace();
+        } catch (notEnoughAmountException e) {
+            response.setStatusCode(409);
+            response.setData(writeJSON.createErrorReply("Not enough"));
+            view.view(response);
+            System.out.println("Not enough");
         }
     }
 
