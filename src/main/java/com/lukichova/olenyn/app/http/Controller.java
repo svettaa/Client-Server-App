@@ -468,7 +468,8 @@ public class Controller implements HttpHandler {
 
         view.view(response);
     }
-    public synchronized void postGoodsChangeAmount(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData {
+
+    public synchronized void postGoodsChangeAmount(HttpExchange httpExchange, Map result) throws wrongNotUniqueValue, wrongDataBaseConnection, IOException, MissedJsonFieldException, WrongJsonException, noItemWithSuchNameException, noItemWithSuchIdException, WrongServerJsonException, WrongJsonInputData, notEnoughAmountException {
         Response response = new Response();
         response.setHttpExchange(httpExchange);
 
@@ -477,13 +478,11 @@ public class Controller implements HttpHandler {
 
 
         try {
-
-            if(goods.getName()=="add"){
-                goodsService.addAmount(goods);
+            if (goods.getName() == null) {
+                goodsService.writeOffAmount(goods);
             } else {
-            goodsService.writeOffAmount(goods);}
-
-
+                goodsService.addAmount(goods);
+            }
             response.setStatusCode(204);
         } catch (noItemWithSuchIdException e) {
 
@@ -613,6 +612,7 @@ public class Controller implements HttpHandler {
                 if (Pattern.matches("^/api/goods$", requestUriPath)) {
                     postGoods(httpExchange, result);
                 }else if (Pattern.matches("^/api/goods/changeamount$", requestUriPath)) {
+
                     postGoodsChangeAmount(httpExchange, result);
                 } else if (Pattern.matches("^/api/group$", requestUriPath)) {
                     postGroup(httpExchange, result);
@@ -651,6 +651,11 @@ public class Controller implements HttpHandler {
         } catch (wrongTokenException e) {
             response.setStatusCode(403);
             response.setData(writeJSON.createErrorReply("Invalid token"));
+            view.view(response);
+            e.printStackTrace();
+        } catch (notEnoughAmountException e) {
+            response.setStatusCode(404);
+            response.setData(writeJSON.createErrorReply("notEnoughAmountException"));
             view.view(response);
             e.printStackTrace();
         }
