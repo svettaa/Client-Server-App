@@ -42,7 +42,7 @@ public class Controller implements HttpHandler {
 
         {
             if (token == null) throw new wrongTokenException();
-            if (jwtService.tokenValidation(token)) throw new wrongTokenException();
+            if (!jwtService.tokenValidation(token)) throw new wrongTokenException();
             return true;
         }
 
@@ -559,7 +559,7 @@ public class Controller implements HttpHandler {
 
             if (httpExchange.getRequestMethod().equalsIgnoreCase("OPTIONS")) {
                 httpExchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-                httpExchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type,Authorization");
+                httpExchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type,Authorization,x-auth,X-auth");
                 httpExchange.sendResponseHeaders(204, -1);
                 return;
             }
@@ -577,7 +577,7 @@ public class Controller implements HttpHandler {
 
                 if (varification(token)) {
                     if (method.equals("get")) {
-                        if (Pattern.matches("^/api/goods/$", requestUriPath)) {
+                        if (Pattern.matches("^/api/goods$", requestUriPath)) {
                             getGoods(httpExchange, result);
                         } else if (Pattern.matches("^/api/goods/\\d+$", requestUriPath)) {
                             getGoodsById(httpExchange, result);
@@ -646,6 +646,9 @@ public class Controller implements HttpHandler {
         } catch (wrongDataBaseConnection e) {
             System.out.println("Wrong database connection");
         } catch (noItemWithSuchNameException e) {
+            response.setStatusCode(404);
+            response.setData(writeJSON.createErrorReply("No field"));
+            view.view(response);
             System.out.println("No item with such name");
         } catch (wrongNotUniqueValue e) {
             response.setStatusCode(409);
@@ -666,7 +669,7 @@ public class Controller implements HttpHandler {
             e.printStackTrace();
         } catch (notEnoughAmountException e) {
             response.setStatusCode(409);
-            response.setData(writeJSON.createErrorReply("notEnoughAmountException"));
+            response.setData(writeJSON.createErrorReply("Not enough amount"));
             view.view(response);
             e.printStackTrace();
         }

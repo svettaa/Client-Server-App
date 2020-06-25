@@ -78,7 +78,7 @@ public class GroupDao {
         }
 
     }
-    public List<Group> searchByName(String name) throws wrongDataBaseConnection, noItemWithSuchIdException {
+    public List<Group> searchByName(String name) throws wrongDataBaseConnection, noItemWithSuchIdException, noItemWithSuchNameException {
         List<Group> all =  readAll();
         List<Group> list = new ArrayList<Group>();
         Object dd[] = all.stream()
@@ -86,6 +86,8 @@ public class GroupDao {
         ArrayList<Group> list1 = new ArrayList(Arrays.asList(dd));
         list=list1;
 
+        if(list.isEmpty())
+            throw new noItemWithSuchNameException();
         return list;
     }
     public List<Group> readAll() throws wrongDataBaseConnection {
