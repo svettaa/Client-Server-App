@@ -38,7 +38,7 @@ public class Controller implements HttpHandler {
         view = newView;
     }
 
-    private boolean varification(String token) throws wrongTokenException {
+    private boolean verification(String token) throws wrongTokenException {
 
         {
             if (token == null) throw new wrongTokenException();
@@ -548,7 +548,7 @@ public class Controller implements HttpHandler {
                 paramsStr = requestUri.toString().substring(start + 1);
             }
             Map<String, List<String>> map = httpExchange.getRequestHeaders();
-            System.out.println("token====" + map.get("X-auth"));
+            System.out.println("token====" + map.get("x-auth"));
 
 
             Map<String, Object> requestParameters = HttpUtil.parseQuery(paramsStr);
@@ -570,13 +570,13 @@ public class Controller implements HttpHandler {
             } else {
 
 
-                if(map.get("X-auth")==null)throw new wrongTokenException();
+                if(map.get("x-auth")==null)throw new wrongTokenException();
 
-                String token = String.valueOf(map.get("X-auth"));
+                String token = String.valueOf(map.get("x-auth"));
                 token = token.substring(1, token.length() - 1);
 
 
-                if (varification(token)) {
+                if (verification(token)) {
                     if (method.equals("get")) {
                         if (Pattern.matches("^/api/goods$", requestUriPath)) {
                             getGoods(httpExchange, result);
@@ -639,7 +639,6 @@ public class Controller implements HttpHandler {
             response.setData(writeJSON.createErrorReply("No field"));
             view.view(response);
         } catch (IOException e) {
-            e.printStackTrace();
         } catch (WrongJsonInputData | WrongJsonException e) {
             response.setStatusCode(409);
             response.setData(writeJSON.createErrorReply("Wrong input data"));
@@ -657,7 +656,6 @@ public class Controller implements HttpHandler {
             view.view(response);
             System.out.println("Not unique value");
         } catch (WrongServerJsonException e) {
-            e.printStackTrace();
         } catch (WrongAuthorizationException e) {
             response.setStatusCode(401);
             response.setData(writeJSON.createErrorReply("Unauthorize"));
@@ -667,12 +665,10 @@ public class Controller implements HttpHandler {
             response.setStatusCode(403);
             response.setData(writeJSON.createErrorReply("Invalid token"));
             view.view(response);
-            e.printStackTrace();
         } catch (notEnoughAmountException e) {
             response.setStatusCode(409);
             response.setData(writeJSON.createErrorReply("Not enough amount"));
             view.view(response);
-            e.printStackTrace();
         }
     }
 

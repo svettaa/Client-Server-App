@@ -86,6 +86,7 @@ public class TestDB {
 
         Goods newGoods = new Goods(1, "COCA COLA", new BigDecimal("15"), 99, "Coca Cola Ukraine", "best coca cola", 1);
         Assert.assertTrue(goodsService.update(newGoods));
+        goodsService.addAmount(new Goods(1, null, null, 49, null, null, null));
         Assert.assertEquals(newGoods, goodsService.listByCriteria(1));
 
         Assert.assertTrue(goodsService.delete(1));

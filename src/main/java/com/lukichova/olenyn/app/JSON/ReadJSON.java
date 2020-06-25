@@ -55,6 +55,20 @@ public class ReadJSON {
     }
 
 
+    public String selectToken(String json) throws WrongJsonException, MissedJsonFieldException {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readValue(json, JsonNode.class);
+
+            return getStringFieldIfExists(root, "token");
+        } catch (JsonProcessingException e) {
+            throw new WrongJsonException();
+        } catch (NullPointerException e) {
+            throw new MissedJsonFieldException();
+        }
+    }
+
+
     public Goods selectGoods(String json) throws WrongJsonException, MissedJsonFieldException {
         try {
             ObjectMapper mapper = new ObjectMapper();

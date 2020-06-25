@@ -1,11 +1,9 @@
 package com.lukichova.olenyn.app;
 
 import com.lukichova.olenyn.app.DB.*;
-import com.lukichova.olenyn.app.http.LoginResponse;
+import com.lukichova.olenyn.app.JSON.ReadJSON;
 import com.lukichova.olenyn.app.service.GoodsService;
 import org.junit.Test;
-
-import static com.lukichova.olenyn.app.service.JwtService.generateToken;
 
 public class TestHttpServer {
 
@@ -16,35 +14,40 @@ public class TestHttpServer {
                 userdao.deleteAll();
                 ReceivedResponse response;
 
-                User userTest = new User("sveta","luk","ff");
+                User userTest = new User("lll","ppp","rrr");
 
                 userdao.create(userTest);
-                String tokenTest = generateToken(userTest);
-                LoginResponse LoginedUser = new LoginResponse(tokenTest,userTest.getLogin(),userTest.getRole());
-                String token=LoginedUser.getToken();
 
 
 
 //error 401
-                //check login (unautorithe)
-                response = new ReceivedResponse("GET", "/login?login=s&password=l",
+//                check login (unautorithe)
+                response = new ReceivedResponse("GET", "/login?login=ll&password=l",
                         null, "");
                 response.assertResponse(401, null);
                 //check login (invalid password)
-                response = new ReceivedResponse("GET", "/login?login=sveta&password=l",
+                response = new ReceivedResponse("GET", "/login?login=lll&password=l",
                         null, "");
                 response.assertResponse(401, null);
                 //check login
 
-                response = new ReceivedResponse("GET", "/login?login=sveta&password=luk",
+                response = new ReceivedResponse("GET", "/login?login=lll&password=ppp",
                         null, "");
                 response.assertResponse(200, null);
 
+                ReadJSON readJSON = new ReadJSON();
+                String token = readJSON.selectToken(response.getRbody());
 
-                response = new ReceivedResponse("GET", "/login?login=sveta&password=ppp",
-                        null, "");
-                response.assertResponse(401, null);
 
+                //check unauthori
+
+                response = new ReceivedResponse("GET", "/api/goods",
+                        null, null);
+                response.assertResponse(403, null);
+
+                response = new ReceivedResponse("GET", "/api/goods",
+                        null, "gjsyk5eer");
+                response.assertResponse(403, null);
 
 
                 // delete
