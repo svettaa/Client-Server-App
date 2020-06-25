@@ -26,10 +26,20 @@ public class TestHttpServer {
 
 
 
+                //check login (unautorithe)
+                response = new ReceivedResponse("GET", "/login?login=s&password=l",
+                        null, "");
+                response.assertResponse(401, null);
+                //check login (invalid password)
+                response = new ReceivedResponse("GET", "/login?login=sveta&password=l",
+                        null, "");
+                response.assertResponse(401, null);
                 //check login
+
                 response = new ReceivedResponse("GET", "/login?login=sveta&password=luk",
                         null, "");
                 response.assertResponse(200, null);
+
 
                 response = new ReceivedResponse("GET", "/login?login=sveta&password=ppp",
                         null, "");
@@ -74,19 +84,27 @@ public class TestHttpServer {
                 response.assertResponse(201, "{\"id\":3}");
 
 
+
+
                 response = new ReceivedResponse("POST", "/api/group",
                         "{\"id\": 3, \"name\": \"Jeans\", \"description\": \"Jeans\"}", token);
                 response.assertResponse(204, null);
+
+
+
 
                 response = new ReceivedResponse("GET", "/api/group/3",
                         null, token);
                 response.assertResponse(200, "{\"id\":3,\"name\":\"Jeans\",\"description\":\"Jeans\"}");
 
+
+                //total price
+
                 response = new ReceivedResponse("GET", "/api/goods/totalprice",
                         null, token);
                 response.assertResponse(200,"{\"total_price\":" + goodsService.gettotalPrice()+"}");
 
-                //
+
 
                 response = new ReceivedResponse("GET", "/api/goods/totalprice/3",
                         null, token);
@@ -146,11 +164,40 @@ public class TestHttpServer {
                         "{\"id\": 11, \"name\": \"fanta\", \"price\": 11, \"left_amount\": 50, \"producer\": \"Coca Cola\", \"description\": \"Tasty fanta\", \"group_id\": 2}", token);
                 response.assertResponse(204, null);
 
+                //search all
+                response = new ReceivedResponse("GET", "/api/goods/search",
+                        null, token);
+                response.assertResponse(200,null);
+
+                //search
+
+                response = new ReceivedResponse("GET", "/api/goods/search?value=co",
+                        null, token);
+                response.assertResponse(200,null);
+
+                response = new ReceivedResponse("GET", "/api/goods/searchbygroup?value=je",
+                        null, token);
+                response.assertResponse(200,null);
 
                 response = new ReceivedResponse("GET", "/api/goods/10",
                         null, token);
                 response.assertResponse(200, "{\"id\":10,\"name\":\"cola\",\"producer\":\"Coca Cola\",\"description\":\"Tasty cola\",\"left_amount\":16,\"price\":\"10\",\"group_id\":2}");
 
+//write off
+                response = new ReceivedResponse("POST", "/api/goods/changeamount",
+                        "{\"id\": 11, \"amount\": \"5\", \"action\": 0}", token);
+                response.assertResponse(204, null);
+
+                //add
+                response = new ReceivedResponse("POST", "/api/goods/changeamount",
+                        "{\"id\": 11, \"amount\": \"5\", \"action\": 1}", token);
+                response.assertResponse(204, null);
+
+
+                //eror 409 ( write off more than goods are
+                response = new ReceivedResponse("POST", "/api/goods/changeamount",
+                        "{\"id\": 11, \"amount\": \"100000\", \"action\": 0}", token);
+                response.assertResponse(409, null);
 
                 //error 401
                 response = new ReceivedResponse("GET", "/api/goods/02329",
