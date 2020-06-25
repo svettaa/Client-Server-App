@@ -556,7 +556,7 @@ public class Controller implements HttpHandler {
 
             } else {
 
-                if(map.get("X-auth")==null)throw new WrongAuthorizationException();
+                if(map.get("X-auth")==null)throw new wrongTokenException();
 
                 String token = String.valueOf(map.get("X-auth"));
                 token = token.substring(1, token.length()-1);

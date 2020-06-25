@@ -25,7 +25,7 @@ public class TestHttpServer {
 
 
 
-
+//error 401
                 //check login (unautorithe)
                 response = new ReceivedResponse("GET", "/login?login=s&password=l",
                         null, "");
@@ -199,10 +199,15 @@ public class TestHttpServer {
                         "{\"id\": 11, \"amount\": \"100000\", \"action\": 0}", token);
                 response.assertResponse(409, null);
 
-                //error 401
+                //error 404
                 response = new ReceivedResponse("GET", "/api/goods/02329",
+                        null, token);
+                response.assertResponse(404, null);
+
+                //error 404
+                response = new ReceivedResponse("GET", "/api/goods/2",
                         null, null);
-                response.assertResponse(401, null);
+                response.assertResponse(403, null);
 
 
                 //error 404
