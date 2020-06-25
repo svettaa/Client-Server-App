@@ -1,9 +1,7 @@
 package com.lukichova.olenyn.app;
 
 import com.lukichova.olenyn.app.DB.Goods;
-import com.lukichova.olenyn.app.DB.GoodsDao;
 import com.lukichova.olenyn.app.DB.Group;
-import com.lukichova.olenyn.app.DB.GroupDao;
 import com.lukichova.olenyn.app.Exceptions.noItemWithSuchIdException;
 import com.lukichova.olenyn.app.Exceptions.noItemWithSuchNameException;
 import com.lukichova.olenyn.app.service.GoodsService;

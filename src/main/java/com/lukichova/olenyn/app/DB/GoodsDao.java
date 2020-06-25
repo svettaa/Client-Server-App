@@ -327,7 +327,7 @@ public class GoodsDao {
         }
     }
 
-    public boolean update(Goods goods) throws wrongDataBaseConnection, noItemWithSuchIdException {
+    public boolean update(Goods goods) throws wrongDataBaseConnection, noItemWithSuchIdException, wrongNotUniqueValue {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         Goods g = new Goods();
@@ -362,7 +362,7 @@ public class GoodsDao {
             return true;
         } catch (SQLiteException e) {
 
-            throw new noItemWithSuchIdException();
+            throw new wrongNotUniqueValue();
 
         } catch (SQLException sqlException) {
             throw new wrongDataBaseConnection();

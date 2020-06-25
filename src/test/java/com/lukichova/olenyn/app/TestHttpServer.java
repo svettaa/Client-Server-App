@@ -1,8 +1,5 @@
 package com.lukichova.olenyn.app;
 
-import com.lukichova.olenyn.app.DB.*;
-
-import com.sun.tools.xjc.reader.xmlschema.bindinfo.BIConversion;
 import org.junit.Test;
 
 

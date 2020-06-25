@@ -3,11 +3,9 @@ package com.lukichova.olenyn.app;
 import com.lukichova.olenyn.app.DB.DataBase;
 import com.lukichova.olenyn.app.DB.Goods;
 import com.lukichova.olenyn.app.DB.GoodsDao;
-import com.lukichova.olenyn.app.DB.GroupDao;
 import com.lukichova.olenyn.app.Exceptions.wrongDataBaseConnection;
 import com.lukichova.olenyn.app.Exceptions.wrongNotUniqueValue;
 import com.lukichova.olenyn.app.service.GoodsService;
-import com.lukichova.olenyn.app.service.GroupService;
 import org.junit.Test;
 
 
